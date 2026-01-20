@@ -35,40 +35,40 @@
                                     <th width="2%"><input type="checkbox" name="checkall" /></th>
                                     <th>S/N</th>
                                     <th>Suppliers Name</th>
-                                    <th>Previous Balance (Adv./Due)</th>
-                                    <th>QTY(Ton)</th>
-                                    <th>QTY(cft)</th>
+                                    {{-- <th>Previous Balance (Adv./Due)</th> --}}
+                                    {{-- <th>QTY(Ton)</th> --}}
+                                    <th>QTY(cft/Ton)</th>
                                     <th>Inv./Bill Amount</th>
                                     <th>Paid Amount</th>
                                     <th>Balance(Adv./Due)</th>
-                                    <th>Monthly Ending Balance (Adv./Due)</th>
+                                    {{-- <th>Monthly Ending Balance (Adv./Due)</th> --}}
                                     <th>Outstanding (Adv./Due)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @php
-                                    $total_qty_ton = 0;
+                                    // $total_qty_ton = 0;
                                     $total_qty_cft = 0;
                                     $total_amount = 0;
                                     $total_collection = 0;
                                     $total_balance = 0;
                                     $total_prev_balance = 0;
-                                    $total_monthly_ending = 0;
+                                    // $total_monthly_ending = 0;
                                     $total = 0;
-                                    // $i = 1; $total = 0;
+                                    $i = 1; $total = 0;
                                 @endphp
 
                                 @foreach ($supplierReports as $report)
                                     @php
                                     
                                         // Parsing values back for calculation
-                                        $total_qty_ton += floatval(str_replace(',', '', $report['qty_ton']));
+                                        // $total_qty_ton += floatval(str_replace(',', '', $report['qty_ton']));
                                         $total_qty_cft += floatval(str_replace(',', '', $report['qty_cft']));
                                         $total_amount += floatval(str_replace(',', '', $report['total_amount']));
                                         $total_collection += floatval(str_replace(',', '', $report['collection_amount']));
-                                        // $total_balance += floatval(str_replace(',', '', $report['balance_amount']));
-                                        $total_prev_balance += floatval(str_replace(',', '', $report['previous_balance_amount']));
-                                        $total_monthly_ending += floatval(str_replace(',', '', $report['monthly_ending_amount']));
+                                        $total_balance += floatval(str_replace(',', '', $report['balance_amount']));
+                                        // $total_prev_balance += floatval(str_replace(',', '', $report['previous_balance_amount']));
+                                        // $total_monthly_ending += floatval(str_replace(',', '', $report['monthly_ending_amount']));
                                         $supplier = \App\Models\Supplier::find($report['supplier_id']);
                                         $total +=$supplier->balance();
                                          
@@ -79,15 +79,15 @@
                                         <td><input type="checkbox" class="row-checkbox"></td>
                                         <td>{{ $report['s_no'] }}</td>
                                         <td>{{ $report['supplier_name'] }}</td>
-                                        <td style="text-align: right;">
+                                        {{-- <td style="text-align: right;">
                                             {{ $report['previous_balance_amount'] }}
                                             <span style="color: {{ $report['previous_balance_label'] == 'Due' ? 'red' : 'green' }}">
                                                 {{ $report['previous_balance_label'] }}
                                             </span>
-                                        </td>
-                                        <td style="text-align: right;">
+                                        </td> --}}
+                                        {{-- <td style="text-align: right;">
                                             {{ $report['qty_ton'] ?? '' }}
-                                        </td>
+                                        </td> --}}
                                         <td style="text-align: right;">
                                             {{ $report['qty_cft'] ?? '' }}
                                         </td>
@@ -101,12 +101,12 @@
                                             </span>
                                         </td>
 
-                                        <td style="text-align: right;">
+                                        {{-- <td style="text-align: right;">
                                             {{ $report['monthly_ending_amount'] }}
                                             <span style="color: {{ $report['monthly_ending_label'] == 'Due' ? 'red' : 'green' }}">
                                                 {{ $report['monthly_ending_label'] }}
                                             </span>
-                                        </td>
+                                        </td> --}}
                                 <td style="width: 220px;font-size: 15px;">{!! $supplier->balanceText() !!}</td>
                                         
                                     </tr>
@@ -117,14 +117,16 @@
                                     <td></td>
                                     <td></td>
                                     <td style="text-align: right;">TOTAL</td>
-                                    <td style="text-align: right;">{{ number_format($total_prev_balance, 2) }}</td>
-                                    <td style="text-align: right;">{{ number_format($total_qty_ton, 2) }}</td>
+                                    {{-- <td style="text-align: right;">{{ number_format($total_prev_balance, 2) }}</td> --}}
+                                    {{-- <td style="text-align: right;">{{ number_format($total_qty_ton, 2) }}</td> --}}
                                     <td style="text-align: right;">{{ number_format($total_qty_cft, 3) }}</td>
                                     <td style="text-align: right;">{{ number_format($total_amount, 2) }}</td>
                                     <td style="text-align: right;">{{ number_format($total_collection, 2) }}</td>
-                                    {{-- <td style="text-align: right;">{{ number_format($total_balance, 2) }}</td> --}}
-                                    <td style="text-align: right;">{{ number_format($total_monthly_ending, 2) }}</td>
-                                    <td style="text-align: right;">{{ number_format($total_monthly_ending, 2) }}</td>
+                                    <td style="text-align: right;">{{ number_format($total_balance, 2) }}</td>
+                                    {{-- <td style="text-align: right;">{{ number_format($total_monthly_ending, 2) }}</td> --}}
+                                    {{-- <td style="text-align: right;">{{ number_format($total_monthly_ending, 2) }}</td> --}}
+                                    <td></td>
+                                    <td></td>
                                     <td></td>
                                 </tr>
                             </tfoot>

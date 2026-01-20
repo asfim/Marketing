@@ -93,7 +93,7 @@
                         </li>
                     @endif
 
-                
+
 
 
                 </ul>
@@ -107,7 +107,7 @@
                 $user->can('supplier-list') ||
                 $user->can('supplier-payment') ||
                 $user->can('supplier-payment-details'))
-                
+
             <li class="openable {{ request()->is('supplier/*') ? 'active' : '' }}">
                 <a href="#">
                     <span class="isw-users"></span><span class="text">Suppliers</span>
@@ -140,7 +140,7 @@
                         </li>
                     @endif
 
-                    
+
 
                 </ul>
             </li>
@@ -572,14 +572,7 @@
                             Balances</span>
                     </a>
                 </li>
-                    @if ($user->hasRole(['super-admin']) || $user->can('monthly-report'))
-                        <li>
-                            <a href="{{ route('monthly.report.index') }}">
-                                <span class="glyphicon glyphicon-calendar"></span>
-                                <span class="text">Monthly Customer Report</span>
-                            </a>
-                        </li>
-                    @endif
+
 
                 <li class="{{ \Route::is('report.supplier') ? 'active' : '' }}">
                     <a href="{{ route('report.supplier') }}">
@@ -587,11 +580,20 @@
                             Balances</span>
                     </a>
                 </li>
+                @if ($user->hasRole(['super-admin']) || $user->can('monthly-report') || in_array($user->id, [17, 20]))
+                    <li>
+                        <a href="{{ route('monthly.report.index') }}">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                            <span class="text">Monthly Customer Report</span>
+                        </a>
+                    </li>
+                @endif
 
-                  @if ($user->hasRole(['super-admin']) || $user->can('cash-in-hand-statement-report'))
+                @if ($user->hasRole(['super-admin']) || $user->can('monthly-report'))
                     <li>
                         <a href="{{ route('monthly.supplier.report.index') }}">
-                            <span class="glyphicon glyphicon-calendar"></span><span class="text">Monthly Supplier Report</span>
+                            <span class="glyphicon glyphicon-calendar"></span><span class="text">Monthly Supplier
+                                Report</span>
                         </a>
                     </li>
                 @endif
