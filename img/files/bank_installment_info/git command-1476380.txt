@@ -1,0 +1,14 @@
+https://confluence.atlassian.com/bitbucketserver/basic-git-commands-776639767.html
+
+bitbucket.org
+inboxit7@gmail.com
+Ak45hhmo%%
+
+git commit -m "Say something" ==for single file
+git commit -am "Say something" ====for all file commit
+git push -u origin --(all)branch name
+git status
+git merge master
+git pull origin master
+
+commit korar pore pull ba push korte hobe

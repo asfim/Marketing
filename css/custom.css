@@ -1,0 +1,205 @@
+/* Custom CSS */
+
+.balance_area .number {
+    font-size: 18px !important;
+    font-weight: 500 !important;
+}
+
+.report_area .accordion {
+    height: 291px;
+    overflow: auto;
+}
+
+.report_area #Datepicker {
+
+    min-height: 330px;
+}
+
+.report_area #Datepicker table.ui-datepicker-calendar{
+
+    min-height: 294px;
+}
+
+
+/*DEELKO CUSTOM CSS*/
+input[type="date"].form-control, input[type="time"].form-control, input[type="datetime-local"].form-control, input[type="month"].form-control {
+    line-height: 1;
+}
+
+.dataTables_wrapper .dt-buttons{
+    padding: 5px 0;
+}
+.table-sorting .dataTables_filter {
+    /*padding-bottom:0;*/
+}
+table.dataTable {
+    margin-top: 0px !important;
+}
+
+.modal-header {
+    background: url(../img/styles/default/backgrounds/box-head.jpg) left top repeat-x;
+    color: #fff;
+    padding: 0px 20px;
+    border-bottom: none;
+}
+
+/*.form-control {*/
+    /*border: 1px solid #6b6464 !important;*/
+/*}*/
+/*.form-control:focus {*/
+    /*border: 2px solid #6b6464 !important;*/
+/*}*/
+
+label{
+    margin-top: 2px !important;
+}
+table.dataTable tbody>tr.selected, table.dataTable tbody>tr>.selected {
+    background-color: #36a7b3;
+}
+
+.fa{
+    font-size: 16px;
+}
+.fa.fa-edit{
+    color: darkorange;
+    font-size: 16px;
+}
+.fa-money-bill-alt{
+    color: #00adff;
+    font-size: 17px;
+}
+.fa.fa-trash{
+    color: orangered;
+    font-size: 15px;
+}
+.fa.fa-eye{
+    color: #ac45bf;
+    font-size: 16px;
+}
+.fa-file-invoice{
+    color: #2ab27b;
+    font-size: 17px;
+}
+.fa.fa-info-circle{
+    font-size: 16px;
+}
+.search-btn{
+    background: #36a7b3;
+    color: #fff;
+    transition: all .4s;
+}
+.search-btn:hover{
+    background: #00adff;
+    color: #fff;
+}
+.buttons.mini-nav > li:first-child{
+    background: #36a7b3;
+}
+.content .workplace .head .buttons li .dd-list li a{
+    transition: all .4s;
+}
+.content .workplace .head .buttons li .dd-list li a:hover{
+    background: #36a7b3;
+}
+
+.src-info{
+    color: #fff700;
+}
+.navigation li > ul > li:hover, .navigation li > ul > li.active {
+    background: #b4e5eb !important;
+}
+.navigation li > ul > li > a span.text{
+    text-shadow: none;
+}
+.row-form select{
+    font-size: 14px;
+}
+
+select option{
+    font-size: 16px;
+}
+select option:hover{
+    background: #5897FB !important;
+}
+
+.datepicker {
+    width: 100% !important;
+}
+.select2-container {
+    display: block;
+    width: 100% !important;
+}
+.alert-danger{
+    border-color: #b96461 !important;
+}
+.alert-success{
+    border-color: #2ab27b !important;
+}
+.badge-success{
+    background: #2ab27b !important;
+}
+.row-form [class^="col-md-"] {
+    line-height: 24px;
+}
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited{
+    color: #fff;
+}
+.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited, .ui-state-hover {
+    color: #797979 !important;
+}
+
+.top-search-box {
+    width: 30%;
+    margin-top: 4px;
+}
+
+.badge-warning{
+    background: #97d501 !important;
+}
+
+.wBlock{
+    text-align: center;
+    padding: 5px 5px;
+    /*margin-bottom: 10px;*/
+}
+.wBlock .dSpace {
+    padding: 10px;
+    width: 100% !important;
+    float: none;
+}
+.wBlock .dSpace span.number {
+    font-size: 25px;
+    line-height: 1;
+}
+.wBlock .dSpace h4 {
+    margin-top: 0;
+}
+.wBlock .dSpace a{
+    color: #fff;
+}
+
+.wBlock .dSpace a:hover{
+    opacity: .8;
+}
+.form-control {
+    border: 1px solid #878585;
+}
+
+@media print {
+    .hidden-print {
+        display: none !important;
+    }
+}
+
+
+.breadLine .buttons li > a {
+    transition: all .3s;
+}
+.breadLine .buttons li > a:hover, .breadLine .buttons li > a:focus {
+    background: #fbff00
+}
+
+.ui-state-default.ui-corner-top.ui-state-hover a
+{
+    color: #797979 !important;
+}

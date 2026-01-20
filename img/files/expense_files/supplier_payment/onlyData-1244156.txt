@@ -1,0 +1,485 @@
+-- phpMyAdmin SQL Dump
+-- version 4.6.4
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Jul 31, 2018 at 07:43 AM
+-- Server version: 5.7.14
+-- PHP Version: 7.0.10
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `ccl_db`
+--
+
+--
+-- Dumping data for table `asset_types`
+--
+
+INSERT INTO `asset_types` (`id`, `name`, `description`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'Furniture', 'All kind of furniture', 1, '2018-07-05 05:24:19', '2018-07-05 05:53:36'),
+(3, 'Land', 'All type of land', 1, '2018-07-07 01:54:20', '2018-07-07 01:54:20');
+
+--
+-- Dumping data for table `assets`
+--
+
+INSERT INTO `assets` (`id`, `transaction_id`, `asset_id`, `name`, `purchase_date`, `asset_type_id`, `purchase_amount`, `salvage_value`, `asset_life_year`, `depreciation`, `depreciated_amount`, `payment_mode`, `description`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'ASSET-1', 'F-001', 'Wooden Chair', '2018-05-05', 1, 3000, 200, 2, '1400.00', '11.52', 'Cash', 'Wooden chair', 1, '2018-07-07 05:08:47', '2018-07-12 01:35:27'),
+(2, 'ASSET-2', 'T-001', 'Table', '2018-07-10', 1, 5000, 700, 4, '1075.00', '8.85', 'Cash', 'Table for office', 1, '2018-07-10 00:24:44', '2018-07-10 00:24:44');
+
+
+--
+-- Dumping data for table `bank_infos`
+--
+
+INSERT INTO `bank_infos` (`id`, `account_name`, `account_no`, `bank_name`, `branch_name`, `account_type`, `description`, `status`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'Rabbi', '120.120.332', 'DBBL', 'Mirpur', 'Current', 'Business account', 1, 1, '2018-06-26 20:31:49', '2018-06-26 20:31:49'),
+(2, 'Rabbi', '55452154', 'HSBC', 'Bongsal', 'Loan', 'Load account', 1, 1, '2018-06-26 20:32:10', '2018-06-26 20:32:10'),
+(3, 'Rabbi', '120151214521545', 'Brac(Loan)', 'Wari', 'Loan', 'Loan account', 1, 1, '2018-06-27 22:00:30', '2018-06-27 22:00:30'),
+(4, 'Rabbi', '120.120.330', 'DBBL', 'Wari', 'Current', 'Na', 1, 1, '2018-07-30 07:43:05', '2018-07-30 07:43:05');
+
+--
+-- Dumping data for table `bank_installment_infos`
+--
+
+INSERT INTO `bank_installment_infos` (`id`, `installment_name`, `installment_number`, `installment_paid`, `monthly_amount`, `interest_rate`, `total_loan`, `total_loan_paid`, `start_date`, `end_date`, `status`, `bank_id`, `file`, `description`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'New Loan', 30, 8, '32000.00', 8, '720000.00', '256000.00', '2018-07-03', '2020-07-03', 1, 2, 'git command-1476380.txt', 'New loan', 1, '2018-07-02 23:14:20', '2018-07-03 03:31:30');
+
+--
+-- Dumping data for table `bank_installment_logs`
+--
+
+INSERT INTO `bank_installment_logs` (`id`, `transaction_id`, `bank_id`, `installment_info_id`, `posting_date`, `paid_amount`, `payment_mode`, `cheque_no`, `cheque_date`, `file`, `description`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'BIP-1', 2, 1, '2018-07-04', '64000.00', 'Bank', NULL, '2018-07-03', '', 'January, February', 1, '2018-07-04 11:43:16', '2018-07-04 11:43:16'),
+(2, 'BIP-2', 2, 1, '2018-07-04', '32000.00', 'Cash', NULL, NULL, '', 'March', 1, '2018-07-04 11:56:52', '2018-07-04 11:56:52'),
+(3, 'BIP-3', 2, 1, '2018-07-05', '32000.00', 'Cash', '2201214', '2018-07-03', '', 'April', 1, '2018-07-05 03:37:23', '2018-07-05 03:37:23'),
+(4, 'BIP-4', 2, 1, '2018-07-29', '32000.00', 'Cash', '012215', '2018-07-25', '', 'Na', 1, '2018-07-29 07:06:54', '2018-07-29 07:06:54'),
+(5, 'BIP-5', 2, 1, '2018-07-29', '32000.00', 'Cash', '2201214', '2018-07-16', '', 'August', 1, '2018-07-29 07:13:50', '2018-07-29 07:13:50'),
+(6, 'BIP-6', 2, 1, '2018-07-29', '32000.00', 'Cash', '2201201', '2018-07-26', 'bg-repeat-298462.png', 'July', 1, '2018-07-29 07:16:19', '2018-07-29 07:16:19'),
+(7, 'BIP-7', 2, 1, '2018-07-29', '32000.00', 'Bank', '2201214', '2018-07-18', 'MRP_Application_Form[Hard Copy]-284958.pdf', 'September', 1, '2018-07-29 07:20:02', '2018-07-29 07:20:02');
+
+--
+-- Dumping data for table `bank_statements`
+--
+
+INSERT INTO `bank_statements` (`id`, `transaction_id`, `posting_date`, `description`, `table_name`, `debit`, `credit`, `balance`, `bank_info_id`, `cheque_no`, `ref_date`, `branchId`, `created_at`, `updated_at`) VALUES
+(4, 'ADB-4', '2018-06-27', 'Advance Deposit - Cheque No - 2201214, Date - 2018-06-26,Deposit', 'bank_statements', '0.00', '500000.00', '1500000.00', 2, '2201214', '2018-06-26', NULL, '2018-06-26 20:48:42', '2018-06-26 20:48:42'),
+(3, 'ADB-1', '2018-06-27', 'Advance Deposit - Cheque No - 2201201, Date - 2018-06-26,Advance Deposit', 'bank_statements', '0.00', '1000000.00', '1000000.00', 1, '2201201', '2018-06-26', NULL, '2018-06-26 20:47:21', '2018-06-26 20:47:21'),
+(5, 'WBA-5', '2018-06-27', 'Withdraw bank amount - Cheque No - 2201201, Date - 2018-06-26,For personal use', 'bank_statements', '20000.00', '0.00', '1480000.00', 2, '2201201', '2018-06-26', 1, '2018-06-26 21:47:41', '2018-06-26 21:47:41'),
+(6, 'BIP-1', '2018-07-04', 'Bank Installment Payment - Bank Name: HSBC ,A/C no: 55452154', 'bank_installment_logs', '64000.00', '0.00', '1416000.00', 2, NULL, '2018-07-03', NULL, '2018-07-04 11:43:16', '2018-07-04 11:43:16'),
+(7, 'ADB-7', '2018-07-12', 'Advance Deposit - Cheque No - 2201201, Ref Date - 2018-07-11,Give cash amount', 'bank_statements', '0.00', '20000.00', '1436000.00', 2, '2201201', '2018-07-11', 1, '2018-07-12 03:54:24', '2018-07-12 03:54:24'),
+(8, 'WBA-8', '2018-07-12', 'Withdraw bank amount - Cheque No - 554851, Ref Date - 2018-07-10,For personal use', 'bank_statements', '10000.00', '0.00', '1426000.00', 1, '554851', '2018-07-10', 1, '2018-07-12 04:55:20', '2018-07-12 04:55:20'),
+(10, 'WBAFB-9', '2018-07-13', 'Withdraw bank amount for branch - Cheque No - 2201214, Ref Date - 2018-07-11,Give amount to site office', 'bank_statements', '10000.00', '0.00', '1416000.00', 1, '2201214', '2018-07-11', 2, '2018-07-13 00:04:52', '2018-07-13 00:04:52'),
+(11, 'BIP-7', '2018-07-29', 'Bank Installment Payment - Bank Name: HSBC ,A/C no: 55452154', 'bank_installment_logs', '32000.00', '0.00', '1384000.00', 1, '2201214', '2018-07-18', NULL, '2018-07-29 07:20:02', '2018-07-29 07:20:02'),
+(12, 'ADB-12', '2018-07-30', 'Advance Deposit - Cheque/Receipt No - 2201201, Ref Date - 2018-07-17,Cash taka joma', 'bank_statements', '0.00', '1200000.00', '2584000.00', 4, '2201201', '2018-07-17', 1, '2018-07-30 07:48:26', '2018-07-30 07:48:26'),
+(13, 'SP-6', '2018-07-30', 'Supplier Payment - Akbar', 'supplier_payments', '200000.00', '0.00', '2384000.00', 4, NULL, NULL, NULL, '2018-07-30 07:50:08', '2018-07-30 07:50:08'),
+(14, 'SP-7', '2018-07-30', 'Supplier Payment - Sajal', 'supplier_payments', '20000.00', '0.00', '2364000.00', 4, NULL, NULL, NULL, '2018-07-30 09:17:32', '2018-07-30 09:17:32'),
+(15, 'CUSP-6', '2018-07-30', 'Customer Payment - Parvez', 'customer_payments', '0.00', '40000.00', '2404000.00', 1, NULL, NULL, NULL, '2018-07-30 09:21:31', '2018-07-30 09:21:31');
+
+--
+-- Dumping data for table `bills`
+--
+
+INSERT INTO `bills` (`id`, `transaction_id`, `concrete_no`, `psi`, `total_cuM`, `total_cft`, `total_amount`, `bill_date`, `concrete_method`, `eng_tips`, `ait`, `vat`, `description`, `customer_id`, `user_id`, `created_at`, `updated_at`) VALUES
+(2, 'CBILL-1', 1, 2500, '4.00', '141.26', '282520.00', '2018-07-19', 'Pump', 0, 0, 0, 'N/A', 1, 1, '2018-07-19 05:44:47', '2018-07-19 05:44:47');
+
+--
+-- Dumping data for table `branch_balances`
+--
+
+INSERT INTO `branch_balances` (`id`, `total_amount`, `branchId`, `user_id`, `created_at`, `updated_at`) VALUES
+(3, 19950, 2, 1, '2018-07-13 00:04:52', '2018-07-13 00:04:52');
+
+--
+-- Dumping data for table `cash_statements`
+--
+
+INSERT INTO `cash_statements` (`id`, `transaction_id`, `posting_date`, `description`, `table_name`, `debit`, `credit`, `balance`, `branchId`, `created_at`, `updated_at`) VALUES
+(1, 'AC-1', '2018-06-12', 'Petty Cash - Investment', 'cash_statements', '0.00', '2000000.00', '2000000.00', NULL, '2018-06-12 02:33:48', '2018-06-12 02:33:48'),
+(2, 'LRP-2', '2018-06-12', 'Rent Payment - Land Owner, Month - January', 'owner_payment_logs', '120000.00', '0.00', '1880000.00', NULL, '2018-06-12 02:34:28', '2018-06-12 02:34:28'),
+(3, 'PP-1', '2018-06-28', 'Truck Rent for chalan no: 1', 'product_purchases', '5000.00', '0.00', '1875000.00', NULL, '2018-06-27 18:00:00', '2018-06-27 18:00:00'),
+(4, 'PP-1', '2018-06-28', 'Unload bill for chalan no: 1', 'product_purchases', '1000.00', '0.00', '1874000.00', NULL, '2018-06-27 18:00:00', '2018-06-27 18:00:00'),
+(5, 'BIP-2', '2018-07-04', 'Bank Installment Payment - Bank Name: HSBC, A/C no: 55452154', 'bank_installment_logs', '32000.00', '0.00', '1842000.00', NULL, '2018-07-04 11:56:52', '2018-07-04 11:56:52'),
+(6, 'BIP-3', '2018-07-05', 'Bank Installment Payment - Bank Name: HSBC, A/C no: 55452154', 'bank_installment_logs', '32000.00', '0.00', '1810000.00', NULL, '2018-07-05 03:37:23', '2018-07-05 03:37:23'),
+(7, 'ASSET-1', '2018-07-07', 'Asset Purchase - Chair 1', 'assets', '3000.00', '0.00', '1807000.00', NULL, '2018-07-07 05:08:47', '2018-07-07 05:08:47'),
+(8, 'GE-8', '2018-07-09', 'Genereal Expense - Tea', 'expenses', '50.00', '0.00', '1806950.00', NULL, '2018-07-09 05:08:00', '2018-07-09 05:08:00'),
+(9, 'GE-9', '2018-07-09', 'Genereal Expense - Cake', 'expenses', '50.00', '0.00', '1806900.00', NULL, '2018-07-09 05:12:39', '2018-07-09 05:12:39'),
+(10, 'ASSET-2', '2018-07-10', 'Asset Purchase - Table', 'assets', '5000.00', '0.00', '1801900.00', NULL, '2018-07-10 00:24:44', '2018-07-10 00:24:44'),
+(11, 'WC-11', '2018-07-12', 'Witdraw Cash - For personal Use', 'cash_statements', '10000.00', '0.00', '1791900.00', 1, '2018-07-12 03:47:32', '2018-07-12 03:47:32'),
+(19, 'WCFB-12', '2018-07-13', 'Witdraw Cash for branch - For branch', 'cash_statements', '10000.00', '0.00', '1781900.00', 2, '2018-07-13 00:20:42', '2018-07-13 00:20:42'),
+(20, 'ESS-1', '2018-07-14', 'Employee Salary Payment for Month - january', 'employee_salary_settings', '10200.00', '0.00', '1771700.00', NULL, '2018-07-13 21:11:55', '2018-07-13 21:11:55'),
+(21, 'PP-4', '2018-07-17', 'Truck Rent for chalan no: 002', 'product_purchases', '2000.00', '0.00', '1769700.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(22, 'PP-4', '2018-07-17', 'Unload bill for chalan no: 002', 'product_purchases', '500.00', '0.00', '1769200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(23, 'PP-5', '2018-07-17', 'Truck Rent for chalan no: 003', 'product_purchases', '5000.00', '0.00', '1764200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(24, 'PP-5', '2018-07-17', 'Unload bill for chalan no: 003', 'product_purchases', '3000.00', '0.00', '1761200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(25, 'PP-6', '2018-07-17', 'Truck Rent for chalan no: 004', 'product_purchases', '5000.00', '0.00', '1756200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(26, 'PP-6', '2018-07-17', 'Unload bill for chalan no: 004', 'product_purchases', '5000.00', '0.00', '1751200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(27, 'PP-7', '2018-07-17', 'Truck Rent for chalan no: 005', 'product_purchases', '0.00', '0.00', '1751200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(28, 'PP-7', '2018-07-17', 'Unload bill for chalan no: 005', 'product_purchases', '0.00', '0.00', '1751200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(29, 'PP-8', '2018-07-17', 'Truck Rent for chalan no: 006', 'product_purchases', '0.00', '0.00', '1751200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(30, 'PP-8', '2018-07-17', 'Unload bill for chalan no: 006', 'product_purchases', '0.00', '0.00', '1751200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(31, 'PP-9', '2018-07-17', 'Truck Rent for chalan no: 007', 'product_purchases', '2000.00', '0.00', '1749200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(32, 'PP-9', '2018-07-17', 'Unload bill for chalan no: 007', 'product_purchases', '1000.00', '0.00', '1748200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(33, 'PP-10', '2018-07-17', 'Truck Rent for chalan no: 8', 'product_purchases', '2000.00', '0.00', '1746200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(34, 'PP-10', '2018-07-17', 'Unload bill for chalan no: 8', 'product_purchases', '1000.00', '0.00', '1745200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(35, 'PP-11', '2018-07-17', 'Truck Rent for chalan no: 9', 'product_purchases', '5000.00', '0.00', '1740200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(36, 'PP-11', '2018-07-17', 'Unload bill for chalan no: 9', 'product_purchases', '2000.00', '0.00', '1738200.00', NULL, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(37, 'HRP-3', '2018-07-18', 'Rent Payment - House Owner, Month - January', 'owner_payment_logs', '20000.00', '0.00', '1718200.00', NULL, '2018-07-18 02:20:19', '2018-07-18 02:20:19'),
+(38, 'SP-1', '2018-07-19', 'Supplier Payment - Akbar', 'supplier_payments', '200000.00', '0.00', '1518200.00', NULL, '2018-07-19 05:01:03', '2018-07-19 05:01:03'),
+(39, 'CUSP-1', '2018-07-19', 'Customer Payment - Parvez', 'customer_payments', '0.00', '5000.00', '1523200.00', NULL, '2018-07-19 06:32:05', '2018-07-19 06:32:05'),
+(40, 'CUSP-3', '2018-07-19', 'Customer Payment - Parvez', 'customer_payments', '0.00', '5000.00', '1528200.00', NULL, '2018-07-19 06:53:45', '2018-07-19 06:53:45'),
+(42, 'SP-2', '2018-07-22', 'Supplier Payment - Akbar', 'supplier_payments', '1000000.00', '0.00', '528200.00', NULL, '2018-07-21 20:56:05', '2018-07-21 20:56:05'),
+(43, 'AC-43', '2018-07-22', 'Petty Cash - advance cash', 'cash_statements', '0.00', '1000000.00', '1528200.00', 1, '2018-07-21 21:10:35', '2018-07-21 21:10:35'),
+(44, 'SP-3', '2018-07-22', 'Supplier Payment - Akbar', 'supplier_payments', '500000.00', '0.00', '1028200.00', NULL, '2018-07-21 22:39:12', '2018-07-21 22:39:12'),
+(45, 'CUSP-4', '2018-07-22', 'Customer Payment - Parvez', 'customer_payments', '0.00', '40000.00', '1068200.00', NULL, '2018-07-21 22:42:47', '2018-07-21 22:42:47'),
+(46, 'SP-4', '2018-07-22', 'Supplier Payment - Bahar', 'supplier_payments', '20000.00', '0.00', '1048200.00', NULL, '2018-07-22 07:42:16', '2018-07-22 07:42:16'),
+(47, 'CUSP-5', '2018-07-23', 'Customer Payment - Parvez', 'customer_payments', '0.00', '20000.00', '1068200.00', NULL, '2018-07-23 03:36:36', '2018-07-23 03:36:36'),
+(48, 'PP-12', '2018-07-24', 'Truck Rent for chalan no: 54', 'product_purchases', '20000.00', '0.00', '1048200.00', NULL, '2018-07-23 18:00:00', '2018-07-23 18:00:00'),
+(49, 'PP-12', '2018-07-24', 'Unload bill for chalan no: 54', 'product_purchases', '800.00', '0.00', '1047400.00', NULL, '2018-07-23 18:00:00', '2018-07-23 18:00:00'),
+(50, 'ESS-1', '2018-07-24', 'Employee Salary Payment for Month - july', 'employee_salary_settings', '10000.00', '0.00', '1037400.00', NULL, '2018-07-24 01:02:46', '2018-07-24 01:02:46'),
+(51, 'GI-6', '2018-07-24', 'Genereal Income - Oil sell', 'incomes', '0.00', '500.00', '1037900.00', NULL, '2018-07-24 01:05:24', '2018-07-24 01:05:24'),
+(52, 'PP-13', '2018-07-24', 'Truck Rent for chalan no: 13', 'product_purchases', '3000.00', '0.00', '1034900.00', NULL, '2018-07-23 18:00:00', '2018-07-23 18:00:00'),
+(53, 'PP-13', '2018-07-24', 'Unload bill for chalan no: 13', 'product_purchases', '700.00', '0.00', '1034200.00', NULL, '2018-07-23 18:00:00', '2018-07-23 18:00:00'),
+(56, 'SP-5', '2018-07-25', 'Supplier Payment - Akbar', 'supplier_payments', '20000.00', '0.00', '1014200.00', NULL, '2018-07-25 00:51:04', '2018-07-25 00:51:04'),
+(57, 'GE-39', '2018-07-28', 'Genereal Expense - Eng Badal Tips', 'expenses', '20000.00', '0.00', '994200.00', 1, '2018-07-28 01:08:03', '2018-07-28 01:08:03'),
+(58, 'WI-7', '2018-07-28', 'Waste Income - Waste thing', 'incomes', '0.00', '2000.00', '996200.00', NULL, '2018-07-28 04:15:35', '2018-07-28 04:15:35'),
+(59, 'WI-10', '2018-07-28', 'Waste Income - Dirty Bags', 'incomes', '0.00', '100.00', '996300.00', NULL, '2018-07-28 04:17:09', '2018-07-28 04:17:09'),
+(60, 'BIP-4', '2018-07-29', 'Bank Installment Payment - Bank Name: HSBC, A/C no: 55452154', 'bank_installment_logs', '32000.00', '0.00', '964300.00', NULL, '2018-07-29 07:06:54', '2018-07-29 07:06:54'),
+(61, 'BIP-5', '2018-07-29', 'Bank Installment Payment - Bank Name: HSBC, A/C no: 55452154', 'bank_installment_logs', '32000.00', '0.00', '932300.00', NULL, '2018-07-29 07:13:50', '2018-07-29 07:13:50'),
+(62, 'BIP-6', '2018-07-29', 'Bank Installment Payment - Bank Name: HSBC, A/C no: 55452154', 'bank_installment_logs', '32000.00', '0.00', '900300.00', NULL, '2018-07-29 07:16:19', '2018-07-29 07:16:19'),
+(63, 'GE-45', '2018-07-30', 'Genereal Expense - Pen', 'expenses', '50.00', '0.00', '900250.00', 1, '2018-07-30 08:59:25', '2018-07-30 08:59:25');
+
+--
+-- Dumping data for table `customers`
+--
+
+INSERT INTO `customers` (`id`, `name`, `email`, `phone`, `address`, `extra_phone_no`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'Parvez', 'info@parvez.com', '015412152478', 'Mirpur', '018521212174', 1, '2018-07-13 19:29:09', '2018-07-13 19:29:09');
+
+--
+-- Dumping data for table `customer_payments`
+--
+
+INSERT INTO `customer_payments` (`id`, `transaction_id`, `customer_id`, `payment_date`, `bill_no`, `payment_mode`, `cheque_no`, `ref_date`, `bank_id`, `paid_amount`, `adjustment_amount`, `description`, `file`, `user_id`, `created_at`, `updated_at`) VALUES
+(2, 'CUSP-1', 1, '2018-07-19', 1, 'Cash', NULL, NULL, NULL, '5000.00', '0.00', 'N/A', NULL, 1, '2018-07-19 06:32:05', '2018-07-19 06:32:05'),
+(3, 'CUSP-3', 1, '2018-07-19', 1, 'Cash', NULL, NULL, NULL, '5000.00', '0.00', 'N/A', NULL, 1, '2018-07-19 06:53:45', '2018-07-19 06:53:45'),
+(4, 'CUSP-4', 1, '2018-07-22', 345, 'Cash', NULL, NULL, NULL, '40000.00', '5000.00', 'na', NULL, 1, '2018-07-21 22:42:47', '2018-07-21 22:42:47'),
+(5, 'CUSP-5', 1, '2018-07-23', 12, 'Cash', NULL, NULL, NULL, '20000.00', '500.00', 'Na', NULL, 1, '2018-07-23 03:36:37', '2018-07-23 03:36:37'),
+(6, 'CUSP-6', 1, '2018-07-30', 20, 'Bank', NULL, '2018-07-24', 1, '40000.00', '2000.00', 'Received amount', 'video-635697.pdf', 1, '2018-07-30 09:21:31', '2018-07-30 09:21:31');
+
+--
+-- Dumping data for table `customer_projects`
+--
+
+INSERT INTO `customer_projects` (`id`, `name`, `address`, `customer_id`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'Hirazeel', 'Hatiljheel Area', 1, 1, '2018-07-13 19:59:29', '2018-07-13 20:18:16');
+
+--
+-- Dumping data for table `customer_statements`
+--
+
+INSERT INTO `customer_statements` (`id`, `transaction_id`, `posting_date`, `description`, `table_name`, `debit`, `credit`, `balance`, `customer_id`, `created_at`, `updated_at`) VALUES
+(1, 'CBILL-1', '2018-07-19', 'Customer Bill Submitted to - Parvez', 'bills', '0.00', '282520.00', '282520.00', 1, '2018-07-19 05:44:47', '2018-07-19 05:44:47'),
+(3, 'CUSP-1', '2018-07-19', 'Customer Payment - Parvez', 'customer_payments', '5000.00', '0.00', '277520.00', 1, '2018-07-19 06:32:05', '2018-07-19 06:32:05'),
+(4, 'CUSP-3', '2018-07-19', 'Customer Payment - Parvez', 'customer_payments', '5000.00', '0.00', '272520.00', 1, '2018-07-19 06:53:45', '2018-07-19 06:53:45'),
+(5, 'CUSP-4', '2018-07-22', 'Customer Payment - Parvez', 'customer_payments', '45000.00', '0.00', '237520.00', 1, '2018-07-21 22:42:47', '2018-07-21 22:42:47'),
+(6, 'CUSP-5', '2018-07-23', 'Customer Payment - Parvez', 'customer_payments', '20500.00', '0.00', '218020.00', 1, '2018-07-23 03:36:36', '2018-07-23 03:36:36'),
+(7, 'CUSP-6', '2018-07-30', 'Customer Payment - Parvez', 'customer_payments', '42000.00', '0.00', '180020.00', 1, '2018-07-30 09:21:31', '2018-07-30 09:21:31');
+
+--
+-- Dumping data for table `employees`
+--
+
+INSERT INTO `employees` (`id`, `employeeId`, `employeeName`, `employeeEmail`, `employeePhone`, `employeeAddress`, `nationalId`, `joiningDate`, `salary`, `photo`, `branchId`, `created_at`, `updated_at`) VALUES
+(1, '01', 'Jion', 'jion@hotmail.com', '0021512154', 'Mirpur', '00021012014', '2018-07-02', '10000.00', '01.jpg', NULL, '2018-07-13 21:10:08', '2018-07-13 21:10:08');
+
+--
+-- Dumping data for table `employee_sallary_settings`
+--
+
+INSERT INTO `employee_sallary_settings` (`id`, `transaction_id`, `employeeId`, `salary`, `payment_mode`, `employeeBonus`, `totalSalary`, `description`, `sMonth`, `paymentDate`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'ESS-1', '01', '10000.00', 'Cash', '0.00', '10000.00', 'na', 'july', '2018-07-17', 1, '2018-07-24 01:02:46', '2018-07-24 01:02:46');
+
+--
+-- Dumping data for table `expenses`
+--
+
+INSERT INTO `expenses` (`id`, `transaction_id`, `expense_name`, `date`, `table_name`, `expense_type_id`, `payment_mode`, `amount`, `description`, `file`, `branchId`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'LRP-1', 'Rent Payment to Land Owner', '2018-06-02', NULL, 1, 'Cash', '120000.00', 'Rent Payment - Land Owner, Month - January, N/A', NULL, NULL, 1, '2018-06-12 02:30:50', '2018-06-12 02:30:50'),
+(2, 'LRP-2', 'Rent Payment to Land Owner', '2018-06-02', NULL, 1, 'Cash', '120000.00', 'Rent Payment - Land Owner, Month - January, N/A', NULL, NULL, 1, '2018-06-12 02:34:28', '2018-06-12 02:34:28'),
+(3, 'PP-1', 'Truck Rent', '2018-06-28', NULL, 2, 'cash', '5000.00', 'Truck Rent for chalan no: 1', NULL, NULL, 1, '2018-06-27 18:00:00', '2018-06-27 18:00:00'),
+(4, 'PP-1', 'Unload Bill', '2018-06-28', NULL, 2, 'cash', '1000.00', 'Unload bill for chalan no: 1', NULL, NULL, 1, '2018-06-27 18:00:00', '2018-06-27 18:00:00'),
+(5, 'BIP-1', 'Bank Installment Payment', '2018-07-04', 'bank_installment_logs', 3, 'Bank', '64000.00', 'January, February', NULL, NULL, 1, '2018-07-04 11:43:16', '2018-07-04 11:43:16'),
+(6, 'BIP-2', 'Bank Installment Payment', '2018-07-04', 'bank_installment_logs', 3, 'Cash', '32000.00', 'March', NULL, NULL, 1, '2018-07-04 11:56:52', '2018-07-04 11:56:52'),
+(7, 'BIP-3', 'Bank Installment Payment', '2018-07-05', 'bank_installment_logs', 3, 'Cash', '32000.00', 'April', NULL, NULL, 1, '2018-07-05 03:37:23', '2018-07-05 03:37:23'),
+(8, 'GE-8', 'Tea', '2018-07-09', NULL, 4, 'Cash', '50.00', 'N/A', NULL, 1, 1, '2018-07-09 05:08:00', '2018-07-09 05:08:00'),
+(9, 'GE-9', 'Cake', '2018-07-09', NULL, 4, 'Cash', '50.00', 'N/A', NULL, 1, 1, '2018-07-09 05:12:39', '2018-07-09 05:12:39'),
+(10, 'GE-10', 'Tea', '2018-07-13', NULL, 4, 'Cash', '50.00', 'Tea cost', NULL, 2, 2, '2018-07-13 00:41:42', '2018-07-13 00:41:42'),
+(11, 'ESS-1', 'Employee Salary Payment', '2018-01-10', 'employee_salary_settings', 5, 'Cash', '10200.00', 'Employee Salary Payment for Month - january, N/A', NULL, NULL, 1, '2018-07-13 21:11:55', '2018-07-13 21:11:55'),
+(12, 'PP-4', 'Truck Rent', '2018-07-17', 'product_purchases', 2, 'Cash', '2000.00', 'Truck Rent for chalan no: 002', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(13, 'PP-4', 'Unload Bill', '2018-07-17', 'product_purchases', 2, 'Cash', '500.00', 'Unload bill for chalan no: 002', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(14, 'PP-5', 'Truck Rent', '2018-07-17', 'product_purchases', 2, 'Cash', '5000.00', 'Truck Rent for chalan no: 003', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(15, 'PP-5', 'Unload Bill', '2018-07-17', 'product_purchases', 2, 'Cash', '3000.00', 'Unload bill for chalan no: 003', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(16, 'PP-6', 'Truck Rent', '2018-07-17', 'product_purchases', 2, 'Cash', '5000.00', 'Truck Rent for chalan no: 004', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(17, 'PP-6', 'Unload Bill', '2018-07-17', 'product_purchases', 2, 'Cash', '5000.00', 'Unload bill for chalan no: 004', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(18, 'PP-7', 'Truck Rent', '2018-07-17', 'product_purchases', 2, 'Cash', '0.00', 'Truck Rent for chalan no: 005', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(19, 'PP-7', 'Unload Bill', '2018-07-17', 'product_purchases', 2, 'Cash', '0.00', 'Unload bill for chalan no: 005', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(20, 'PP-8', 'Truck Rent', '2018-07-17', 'product_purchases', 2, 'Cash', '0.00', 'Truck Rent for chalan no: 006', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(21, 'PP-8', 'Unload Bill', '2018-07-17', 'product_purchases', 2, 'Cash', '0.00', 'Unload bill for chalan no: 006', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(22, 'PP-9', 'Truck Rent', '2018-07-17', 'product_purchases', 2, 'Cash', '2000.00', 'Truck Rent for chalan no: 007', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(23, 'PP-9', 'Unload Bill', '2018-07-17', 'product_purchases', 2, 'Cash', '1000.00', 'Unload bill for chalan no: 007', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(24, 'PP-10', 'Truck Rent', '2018-07-17', 'product_purchases', 2, 'Cash', '2000.00', 'Truck Rent for chalan no: 8', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(25, 'PP-10', 'Unload Bill', '2018-07-17', 'product_purchases', 2, 'Cash', '1000.00', 'Unload bill for chalan no: 8', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(26, 'PP-11', 'Truck Rent', '2018-07-17', 'product_purchases', 2, 'Cash', '5000.00', 'Truck Rent for chalan no: 9', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(27, 'PP-11', 'Unload Bill', '2018-07-17', 'product_purchases', 2, 'Cash', '2000.00', 'Unload bill for chalan no: 9', NULL, NULL, 1, '2018-07-16 18:00:00', '2018-07-16 18:00:00'),
+(28, 'HRP-3', 'Rent Payment to House Owner', '2018-07-18', 'owner_payment_logs', 1, 'Cash', '20000.00', 'Rent Payment - House Owner, Month - January, N/A', NULL, NULL, 1, '2018-07-18 02:20:19', '2018-07-18 02:20:19'),
+(29, 'SP-1', 'Supplier Bill Payment', '2018-07-19', 'supplier_payments', 6, 'Cash', '200000.00', 'N/A', NULL, NULL, 1, '2018-07-19 05:01:03', '2018-07-19 05:01:03'),
+(30, 'SP-2', 'Supplier Bill Payment', '2018-07-22', 'supplier_payments', 6, 'Cash', '1000000.00', 'Pay to supplier', NULL, NULL, 1, '2018-07-21 20:56:05', '2018-07-21 20:56:05'),
+(31, 'SP-3', 'Supplier Bill Payment', '2018-07-22', 'supplier_payments', 6, 'Cash', '500000.00', 'Na', NULL, NULL, 1, '2018-07-21 22:39:12', '2018-07-21 22:39:12'),
+(32, 'SP-4', 'Supplier Bill Payment', '2018-07-22', 'supplier_payments', 6, 'Cash', '20000.00', 'Advance', NULL, NULL, 1, '2018-07-22 07:42:16', '2018-07-22 07:42:16'),
+(33, 'PP-12', 'Truck Rent', '2018-07-24', 'product_purchases', 2, 'Cash', '20000.00', 'Truck Rent for chalan no: 54', NULL, NULL, 1, '2018-07-23 18:00:00', '2018-07-23 18:00:00'),
+(34, 'PP-12', 'Unload Bill', '2018-07-24', 'product_purchases', 2, 'Cash', '800.00', 'Unload bill for chalan no: 54', NULL, NULL, 1, '2018-07-23 18:00:00', '2018-07-23 18:00:00'),
+(35, 'ESS-1', 'Employee Salary Payment', '2018-07-17', 'employee_salary_settings', 5, 'Cash', '10000.00', 'Employee Salary Payment for Month - july, na', NULL, NULL, 1, '2018-07-24 01:02:46', '2018-07-24 01:02:46'),
+(36, 'PP-13', 'Truck Rent', '2018-07-24', 'product_purchases', 2, 'Cash', '3000.00', 'Truck Rent for chalan no: 13', NULL, NULL, 1, '2018-07-23 18:00:00', '2018-07-23 18:00:00'),
+(37, 'PP-13', 'Unload Bill', '2018-07-24', 'product_purchases', 2, 'Cash', '700.00', 'Unload bill for chalan no: 13', NULL, NULL, 1, '2018-07-23 18:00:00', '2018-07-23 18:00:00'),
+(38, 'SP-5', 'Supplier Bill Payment', '2018-07-25', 'supplier_payments', 6, 'Cash', '20000.00', 'NA', NULL, NULL, 1, '2018-07-25 00:51:04', '2018-07-25 00:51:04'),
+(39, 'GE-39', 'Eng Badal Tips', '2018-07-28', NULL, 7, 'Cash', '20000.00', 'For bill no 4', NULL, 1, 1, '2018-07-28 01:08:03', '2018-07-28 01:08:03'),
+(40, 'BIP-4', 'Bank Installment Payment', '2018-07-29', 'bank_installment_logs', 3, 'Cash', '32000.00', 'Na', NULL, NULL, 1, '2018-07-29 07:06:54', '2018-07-29 07:06:54'),
+(41, 'BIP-5', 'Bank Installment Payment', '2018-07-29', 'bank_installment_logs', 3, 'Cash', '32000.00', 'August', NULL, NULL, 1, '2018-07-29 07:13:50', '2018-07-29 07:13:50'),
+(42, 'BIP-6', 'Bank Installment Payment', '2018-07-29', 'bank_installment_logs', 3, 'Cash', '32000.00', 'July', NULL, NULL, 1, '2018-07-29 07:16:19', '2018-07-29 07:16:19'),
+(43, 'BIP-7', 'Bank Installment Payment', '2018-07-29', 'bank_installment_logs', 3, 'Bank', '32000.00', 'September', NULL, NULL, 1, '2018-07-29 07:20:02', '2018-07-29 07:20:02'),
+(44, 'SP-6', 'Supplier Bill Payment', '2018-07-30', 'supplier_payments', 6, 'Bank', '200000.00', 'Advance pay', NULL, NULL, 1, '2018-07-30 07:50:08', '2018-07-30 07:50:08'),
+(45, 'GE-45', 'Pen', '2018-07-30', NULL, 8, 'Cash', '50.00', 'NA', 'video-745286.pdf', 1, 1, '2018-07-30 08:59:25', '2018-07-30 08:59:25'),
+(46, 'SP-7', 'Supplier Bill Payment', '2018-07-30', 'supplier_payments', 6, 'Bank', '20000.00', 'Advance pay', NULL, NULL, 1, '2018-07-30 09:17:32', '2018-07-30 09:17:32');
+
+--
+-- Dumping data for table `expense_types`
+--
+
+INSERT INTO `expense_types` (`id`, `type_name`, `description`, `category`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'Rent Payment Expense', 'N/A', 'Rent Expenses', 1, '2018-06-12 02:30:50', '2018-06-12 02:30:50'),
+(2, 'Product Purchase Expense', 'N/A', 'Purchase Expenses', 1, '2018-06-27 22:44:18', '2018-06-27 22:44:18'),
+(3, 'Bank Installment Payment', 'N/A', 'Installment', 1, '2018-07-04 11:43:16', '2018-07-04 11:43:16'),
+(4, 'Food', 'All type of food expenses', 'General Expense', 1, '2018-07-09 05:04:18', '2018-07-09 05:04:18'),
+(5, 'Salary Payment Expense', 'N/A', 'Salary Expenses', 1, '2018-07-13 21:11:55', '2018-07-13 21:11:55'),
+(6, 'Supplier Payment', 'N/A', 'Supplier Payment', 1, '2018-07-19 05:01:03', '2018-07-19 05:01:03'),
+(7, 'Engineering Tips', 'Tips', 'General Expense', 1, '2018-07-25 01:34:29', '2018-07-25 01:34:29'),
+(8, 'Site purchase', 'NA', 'General Expense', 1, '2018-07-28 01:06:57', '2018-07-28 01:06:57');
+
+--
+-- Dumping data for table `incomes`
+--
+
+INSERT INTO `incomes` (`id`, `transaction_id`, `income_name`, `date`, `table_name`, `income_type_id`, `payment_mode`, `amount`, `description`, `user_id`, `created_at`, `updated_at`) VALUES
+(2, 'CUSP-1', 'Customer Bill Receive', '2018-07-19', 'customer_payments', 1, 'Cash', '5000.00', 'N/A', 1, '2018-07-19 06:32:05', '2018-07-19 06:32:05'),
+(3, 'CUSP-3', 'Customer Bill Receive', '2018-07-19', 'customer_payments', 1, 'Cash', '5000.00', 'N/A', 1, '2018-07-19 06:53:45', '2018-07-19 06:53:45'),
+(4, 'CUSP-4', 'Customer Bill Receive', '2018-07-22', 'customer_payments', 1, 'Cash', '40000.00', 'na', 1, '2018-07-21 22:42:47', '2018-07-21 22:42:47'),
+(5, 'CUSP-5', 'Customer Bill Receive', '2018-07-23', 'customer_payments', 1, 'Cash', '20000.00', 'Na', 1, '2018-07-23 03:36:36', '2018-07-23 03:36:36'),
+(6, 'GI-6', 'Oil sell', '2018-07-24', NULL, 2, 'Cash', '500.00', 'Na', 1, '2018-07-24 01:05:24', '2018-07-24 01:05:24'),
+(9, 'WI-7', 'Waste thing', '2018-07-28', 'incomes', 3, 'Cash', '2000.00', 'NA', 1, '2018-07-28 04:15:35', '2018-07-28 04:15:35'),
+(10, 'WI-10', 'Dirty Bags', '2018-07-28', 'incomes', 3, 'Cash', '100.00', 'Na', 1, '2018-07-28 04:17:08', '2018-07-28 04:17:08'),
+(11, 'CUSP-6', 'Customer Bill Receive', '2018-07-30', 'customer_payments', 1, 'Bank', '40000.00', 'Received amount', 1, '2018-07-30 09:21:31', '2018-07-30 09:21:31');
+
+--
+-- Dumping data for table `income_types`
+--
+
+INSERT INTO `income_types` (`id`, `type_name`, `description`, `category`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'Customer Payment', 'N/A', 'Customer Payment', 1, '2018-07-19 06:27:24', '2018-07-19 06:27:24'),
+(2, 'OIl', 'Na', 'General Income', 1, '2018-07-24 01:05:01', '2018-07-24 01:05:01'),
+(3, 'Waste Income', 'N/A', 'Waste Income', 1, '2018-07-28 04:15:35', '2018-07-28 04:15:35');
+
+--
+-- Dumping data for table `locations`
+--
+
+INSERT INTO `locations` (`id`, `name`, `location_details`, `profile_id`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'Dhanmondi', 'Mirpur', 1, 1, '2018-06-12 02:28:37', '2018-06-12 02:28:37'),
+(2, 'Mogbazar', 'N/A', 2, 1, '2018-06-12 02:29:02', '2018-06-12 02:29:02');
+
+--
+-- Dumping data for table `migrations`
+--
+
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
+(106, '2014_10_12_000000_create_users_table', 1),
+(107, '2018_05_09_063125_create_supplier_table', 1),
+(108, '2018_05_12_090304_create_supplier_payments_table', 1),
+(109, '2018_05_12_091818_create_supplier_payment_logs_table', 1),
+(110, '2018_05_14_032544_create_bank_infos_table', 1),
+(111, '2018_05_14_060842_create_bank_statements_table', 1),
+(112, '2018_05_14_143500_create_cash_statements_table', 1),
+(113, '2018_05_14_171540_create_supplier_statements_table', 1),
+(114, '2018_05_19_053404_create_product_names_table', 1),
+(115, '2018_05_20_045534_create_product_purchases_table', 1),
+(116, '2018_05_20_080001_create_product_stock_table', 1),
+(117, '2018_05_24_083411_create_expense_types_table', 1),
+(118, '2018_05_24_083436_create_expenses_table', 1),
+(119, '2018_05_25_023510_create_customers_table', 1),
+(120, '2018_05_27_165709_create_income_types_table', 1),
+(121, '2018_05_27_165726_create_incomes_table', 1),
+(122, '2018_06_05_031829_create_owner_profiles_table', 1),
+(123, '2018_06_05_053519_create_locations_table', 1),
+(124, '2018_06_05_053832_create_owner_payments_table', 1),
+(125, '2018_06_05_103256_create_owner_payment_logs_table', 1),
+(126, '2018_06_05_111406_create_branches_table', 1),
+(127, '2018_06_05_135724_create_roles_table', 1),
+(128, '2018_06_05_140348_create_role_users_table', 1),
+(129, '2018_06_07_080920_create_employees_table', 1),
+(130, '2018_06_30_130215_create_bank_installment_infos_table', 2),
+(131, '2018_07_01_035843_create_bank_installment_logs_table', 2),
+(132, '2018_07_05_104250_create_asset_types_table', 3),
+(133, '2018_07_05_104404_create_assets_table', 3),
+(134, '2018_07_12_075956_create_branch_balances_table', 4),
+(135, '2018_07_14_013609_create_customer_projects_table', 5),
+(136, '2018_07_17_050947_create_product_sales_table', 6),
+(137, '2018_07_17_051035_create_bills_table', 6),
+(138, '2018_07_17_053629_create_customer_statements_table', 6),
+(139, '2018_07_19_110638_create_customer_payments_table', 7);
+
+--
+-- Dumping data for table `mix_designs`
+--
+
+INSERT INTO `mix_designs` (`id`, `customer_id`, `psi`, `stone_id`, `stone_quantity`, `chemical_id`, `chemical_quantity`, `sand_id`, `sand_quantity`, `cement_id`, `cement_quantity`, `water`, `water_quantity`, `rate`, `description`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 2500, '3,4', '100,100', '5,6', '50,50', '7', '200', '1,2', '200,50', 'Water', '200', '2000.00', 'N/A', 1, '2018-07-16 04:05:29', '2018-07-19 04:28:40'),
+(2, 1, 3000, '3,4', '100,200', '5', '50', '7', '100', '2', '120', 'Water', '150', '1800.00', 'N/A', 1, '2018-07-19 02:57:51', '2018-07-19 04:29:13'),
+(3, 1, 3500, '3,4', '50,50', '5,6', '5,2', '7', '80', '2', '80', 'Water', '100', '1000.00', 'na', 1, '2018-07-21 21:09:36', '2018-07-22 07:34:46');
+
+--
+-- Dumping data for table `owner_payments`
+--
+
+INSERT INTO `owner_payments` (`id`, `location_id`, `profile_id`, `total_month`, `monthly_rent`, `payable_amount`, `paid_amount`, `due_amount`, `description`, `user_id`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 24, 55000, 1320000, 120000, 1200000, 'N/A', 1, 1, '2018-06-12 02:29:54', '2018-06-12 02:34:28');
+
+--
+-- Dumping data for table `owner_payment_logs`
+--
+
+INSERT INTO `owner_payment_logs` (`id`, `transaction_id`, `location_id`, `rent_type`, `month`, `profile_id`, `description`, `payment_date`, `payment_mode`, `paid_amount`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'LRP-1', 1, 'Advance', 'January', 1, 'N/A', '2018-06-02', 'Cash', 120000, 1, '2018-06-12 02:30:50', '2018-06-12 02:30:50'),
+(2, 'LRP-2', 1, 'Advance', 'January', 1, 'N/A', '2018-06-02', 'Cash', 120000, 1, '2018-06-12 02:34:28', '2018-06-12 02:34:28'),
+(3, 'HRP-3', 2, 'Advance', 'January', 2, 'N/A', '2018-07-18', 'Cash', 20000, 1, '2018-07-18 02:20:19', '2018-07-18 02:20:19');
+
+--
+-- Dumping data for table `owner_profiles`
+--
+
+INSERT INTO `owner_profiles` (`id`, `name`, `email`, `phone`, `photo`, `type`, `user_id`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Hasan Ahmed', 'info@hasan.com', '015412152478', NULL, 'Land Owner', 1, 1, '2018-06-12 02:28:37', '2018-06-12 02:28:37'),
+(2, 'Parvez', 'info@parvez.com', '01555121548', NULL, 'House Owner', 1, 1, '2018-06-12 02:29:02', '2018-06-12 02:29:02');
+
+--
+-- Dumping data for table `product_names`
+--
+
+INSERT INTO `product_names` (`id`, `name`, `photo`, `conversion_rate`, `description`, `category`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'Shah cement', NULL, NULL, 'N/A', 'Cement', 1, '2018-06-27 22:42:01', '2018-06-27 22:42:01'),
+(2, 'Fresh Cement', NULL, NULL, 'Well cement', 'Cement', 1, '2018-07-15 05:24:59', '2018-07-15 05:24:59'),
+(3, '1/2 inch stone', NULL, '41.50', 'stone', 'Stone', 1, '2018-07-16 00:49:36', '2018-07-17 06:20:49'),
+(4, '3/4 inch stone', NULL, '42.50', 'N/A', 'Stone', 1, '2018-07-16 00:49:55', '2018-07-17 06:21:20'),
+(5, 'Chemical 1', NULL, NULL, 'N/A', 'Chemical', 1, '2018-07-16 00:50:15', '2018-07-16 00:50:15'),
+(6, 'Chemical 2', NULL, NULL, 'N/A', 'Chemical', 1, '2018-07-16 00:50:30', '2018-07-16 00:50:30'),
+(7, 'Sylhet Sand', NULL, '39.50', 'n/a', 'Sand', 1, '2018-07-16 00:50:48', '2018-07-17 06:21:34');
+
+--
+-- Dumping data for table `product_purchases`
+--
+
+INSERT INTO `product_purchases` (`id`, `transaction_id`, `dmr_no`, `chalan_no`, `supplier_id`, `vehicle_no`, `product_name_id`, `received_date`, `purchase_date`, `unit_type`, `product_qty`, `rate_per_unit`, `material_cost`, `truck_rent`, `unload_bill`, `total_material_cost`, `file`, `description`, `user_id`, `created_at`, `updated_at`) VALUES
+(3, 'PP-1', 1, 1, 1, '22-3321', 1, '2018-06-19', '2018-06-28', 'KG', '100.00', '20.00', '2000.00', 5000, 1000, '8000.00', 'wed-29892.jpeg,youtube icon-706147.jpeg', 'N/A', 1, '2018-06-28 03:18:51', '2018-07-16 00:11:05'),
+(4, 'PP-4', 2, 2, 1, '22-3321', 2, '2018-07-17', '2018-07-17', 'Ton', '2.00', '20000.00', '40000.00', 2000, 500, '42500.00', 'WWW-715760.jpeg', 'N/A', 1, '2018-07-17 03:39:02', '2018-07-17 03:39:02'),
+(5, 'PP-5', 3, 3, 1, '22-3321', 3, '2018-07-17', '2018-07-17', 'CFT', '5000.00', '500.00', '2500000.00', 5000, 3000, '2508000.00', '', 'na', 1, '2018-07-17 03:40:08', '2018-07-17 03:40:08'),
+(6, 'PP-6', 4, 4, 1, '22-854', 4, '2018-07-17', '2018-07-17', 'CFT', '2000.00', '10000.00', '20000000.00', 5000, 5000, '20010000.00', '', 'na', 1, '2018-07-17 03:40:55', '2018-07-17 03:40:55'),
+(7, 'PP-7', 5, 5, 1, '22-854', 5, '2018-07-17', '2018-07-17', 'KG', '1000.00', '300.00', '300000.00', 0, 0, '300000.00', '', 'na', 1, '2018-07-17 03:42:05', '2018-07-17 03:42:05'),
+(8, 'PP-8', 6, 6, 1, '3221', 6, '2018-07-17', '2018-07-17', 'KG', '500.00', '150.00', '75000.00', 0, 0, '75000.00', 'abc-1482148.jpeg', 'na', 1, '2018-07-17 03:42:48', '2018-07-19 22:41:09'),
+(9, 'PP-9', 7, 7, 1, '3221', 7, '2018-07-17', '2018-07-17', 'CFT', '500.00', '600.00', '300000.00', 2000, 1000, '303000.00', '', 'na', 1, '2018-07-17 03:43:43', '2018-07-17 03:43:43'),
+(10, 'PP-10', 8, 8, 1, '3221', 7, '2018-07-17', '2018-07-17', 'CFT', '300.00', '100.00', '30000.00', 2000, 1000, '33000.00', '', 'na', 1, '2018-07-17 03:45:29', '2018-07-17 03:45:29'),
+(11, 'PP-11', 9, 9, 1, '5552', 1, '2018-07-17', '2018-07-17', 'Ton', '2.00', '25000.00', '50000.00', 5000, 2000, '57000.00', '', 'N/A', 1, '2018-07-17 07:41:06', '2018-07-17 07:41:06'),
+(12, 'PP-12', 45, 54, 2, '44554', 1, '2018-07-17', '2018-07-24', 'Ton', '3.00', '6500.00', '19500.00', 20000, 800, '40300.00', 'abc-1304123.jpeg,foorti-941071.jpeg', 'Na', 1, '2018-07-24 00:44:03', '2018-07-24 00:44:03'),
+(13, 'PP-13', 13, 13, 2, '44554', 3, '2018-07-17', '2018-07-24', 'CFT', '200.00', '2000.00', '400000.00', 3000, 700, '403700.00', 'foorti-438675.jpeg', 'Na', 1, '2018-07-24 04:08:47', '2018-07-24 04:08:47');
+
+--
+-- Dumping data for table `product_sales`
+--
+
+INSERT INTO `product_sales` (`id`, `challan_no`, `customer_id`, `project_id`, `mix_design_id`, `psi`, `cuM`, `sell_date`, `concrete_no`, `description`, `user_id`, `status`, `created_at`, `updated_at`) VALUES
+(3, 1, 1, 1, 1, 2500, '2.00', '2018-07-17', 1, 'N/A', 1, 0, '2018-07-17 07:40:22', '2018-07-19 05:44:47'),
+(4, 2, 1, 1, 1, 2500, '2.00', '2018-07-17', 1, 'n/a', 1, 0, '2018-07-17 08:04:01', '2018-07-19 05:44:47'),
+(5, 3, 1, 1, 2, 3000, '2.00', '2018-07-19', NULL, 'N/A', 1, 1, '2018-07-19 04:41:26', '2018-07-19 04:41:26'),
+(6, 4, 1, 1, 3, 3500, '3.00', '2018-07-22', NULL, 'Na', 1, 1, '2018-07-21 21:56:34', '2018-07-21 21:56:34'),
+(7, 5, 1, 1, 3, 3500, '1.00', '2018-07-22', NULL, 'na', 1, 1, '2018-07-21 23:36:44', '2018-07-21 23:36:44');
+
+--
+-- Dumping data for table `product_stocks`
+--
+
+INSERT INTO `product_stocks` (`id`, `product_name_id`, `quantity`, `unit_type`, `created_at`, `updated_at`) VALUES
+(3, 1, '4300.00', 'KG', '2018-06-28 03:18:51', '2018-07-17 08:04:01'),
+(4, 2, '1240.00', 'kg', '2018-07-17 03:39:02', '2018-07-21 23:36:44'),
+(5, 3, '5175.91', 'CFT', '2018-07-17 03:40:08', '2018-07-21 23:36:44'),
+(6, 4, '1971.75', 'CFT', '2018-07-17 03:40:55', '2018-07-21 23:36:44'),
+(7, 5, '680.00', 'KG', '2018-07-17 03:42:05', '2018-07-21 23:36:44'),
+(8, 6, '292.00', 'KG', '2018-07-17 03:42:48', '2018-07-21 23:36:44'),
+(9, 7, '756.44', 'CFT', '2018-07-17 03:43:43', '2018-07-21 23:36:44');
+
+--
+-- Dumping data for table `suppliers`
+--
+
+INSERT INTO `suppliers` (`id`, `name`, `email`, `phone`, `address`, `extra_phone_no`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'Akbar', 'ak@gmail.com', '017452215421', 'Dhanmondi', '018521212174', 1, '2018-06-27 22:40:53', '2018-06-27 22:40:53'),
+(2, 'Bahar', 'info@parvez.com', '019987876', 'Agrabad, India', NULL, 1, '2018-07-22 07:41:30', '2018-07-22 07:41:30'),
+(3, 'Sajal', NULL, '01914541225', 'Mirpur', NULL, 1, '2018-07-29 01:22:10', '2018-07-29 01:22:10');
+
+--
+-- Dumping data for table `supplier_payments`
+--
+
+INSERT INTO `supplier_payments` (`id`, `transaction_id`, `supplier_id`, `payment_date`, `voucher_no`, `payment_mode`, `cheque_no`, `ref_date`, `bank_id`, `payable_amount`, `paid_amount`, `adjustment_amount`, `description`, `file`, `user_id`, `created_at`, `updated_at`) VALUES
+(1, 'SP-1', 1, '2018-07-19', 1, 'Cash', NULL, NULL, NULL, '0.00', '200000.00', '0.00', 'N/A', NULL, 1, '2018-07-19 05:01:04', '2018-07-19 05:01:04'),
+(2, 'SP-2', 1, '2018-07-22', 2, 'Cash', NULL, NULL, NULL, '0.00', '1000000.00', '0.00', 'Pay to supplier', NULL, 1, '2018-07-21 20:56:05', '2018-07-21 20:56:05'),
+(3, 'SP-3', 1, '2018-07-22', 3, 'Cash', NULL, NULL, NULL, '0.00', '500000.00', '30000.00', 'Na', NULL, 1, '2018-07-21 22:39:12', '2018-07-21 22:39:12'),
+(4, 'SP-4', 2, '2018-07-22', 4, 'Cash', NULL, NULL, NULL, '0.00', '20000.00', '0.00', 'Advance', NULL, 1, '2018-07-22 07:42:16', '2018-07-22 07:42:16'),
+(5, 'SP-5', 1, '2018-07-25', 5, 'Cash', NULL, NULL, NULL, '0.00', '20000.00', '1000.00', 'NA', NULL, 1, '2018-07-25 00:51:04', '2018-07-25 00:51:04'),
+(6, 'SP-6', 1, '2018-07-30', 6, 'Bank', '5541254', '2018-07-29', 4, '0.00', '200000.00', '10000.00', 'Advance pay', NULL, 1, '2018-07-30 07:50:08', '2018-07-30 07:50:08'),
+(7, 'SP-7', 3, '2018-07-30', 7, 'Bank', '2201215', '2018-07-30', 4, '0.00', '20000.00', '200.00', 'Advance pay', 'video-1152741.pdf', 1, '2018-07-30 09:17:32', '2018-07-30 09:17:32');
+
+--
+-- Dumping data for table `supplier_statements`
+--
+
+INSERT INTO `supplier_statements` (`id`, `transaction_id`, `posting_date`, `description`, `table_name`, `debit`, `credit`, `balance`, `supplier_id`, `created_at`, `updated_at`) VALUES
+(2, 'PP-2', '2018-06-28', 'Product Purchase From - Akbar', 'product_purchases', '0.00', '2000.00', '2000.00', 1, '2018-06-28 02:36:01', '2018-06-28 02:36:01'),
+(3, 'PP-1', '2018-06-28', 'Product Purchase From - Akbar', 'product_purchases', '0.00', '2000.00', '4000.00', 1, '2018-06-28 03:18:51', '2018-06-28 03:18:51'),
+(4, 'PP-4', '2018-07-17', 'Product Purchase From - Akbar', 'product_purchases', '0.00', '40000.00', '44000.00', 1, '2018-07-17 03:39:02', '2018-07-17 03:39:02'),
+(5, 'PP-5', '2018-07-17', 'Product Purchase From - Akbar', 'product_purchases', '0.00', '2500000.00', '2544000.00', 1, '2018-07-17 03:40:08', '2018-07-17 03:40:08'),
+(6, 'PP-6', '2018-07-17', 'Product Purchase From - Akbar', 'product_purchases', '0.00', '20000000.00', '22544000.00', 1, '2018-07-17 03:40:55', '2018-07-17 03:40:55'),
+(7, 'PP-7', '2018-07-17', 'Product Purchase From - Akbar', 'product_purchases', '0.00', '300000.00', '22844000.00', 1, '2018-07-17 03:42:05', '2018-07-17 03:42:05'),
+(8, 'PP-8', '2018-07-17', 'Product Purchase From - Akbar', 'product_purchases', '0.00', '75000.00', '22919000.00', 1, '2018-07-17 03:42:48', '2018-07-17 03:42:48'),
+(9, 'PP-9', '2018-07-17', 'Product Purchase From - Akbar', 'product_purchases', '0.00', '300000.00', '23219000.00', 1, '2018-07-17 03:43:43', '2018-07-17 03:43:43'),
+(10, 'PP-10', '2018-07-17', 'Product Purchase From - Akbar', 'product_purchases', '0.00', '30000.00', '23249000.00', 1, '2018-07-17 03:45:29', '2018-07-17 03:45:29'),
+(11, 'PP-11', '2018-07-17', 'Product Purchase From - Akbar', 'product_purchases', '0.00', '50000.00', '23299000.00', 1, '2018-07-17 07:41:06', '2018-07-17 07:41:06'),
+(12, 'SP-1', '2018-07-19', 'Supplier Payment - Akbar', 'supplier_payments', '200000.00', '0.00', '23099000.00', 1, '2018-07-19 05:01:04', '2018-07-19 05:01:04'),
+(13, 'SP-2', '2018-07-22', 'Supplier Payment - Akbar', 'supplier_payments', '1000000.00', '0.00', '22099000.00', 1, '2018-07-21 20:56:05', '2018-07-21 20:56:05'),
+(14, 'SP-3', '2018-07-22', 'Supplier Payment - Akbar', 'supplier_payments', '530000.00', '0.00', '21629000.00', 1, '2018-07-21 22:39:12', '2018-07-21 22:39:12'),
+(15, 'SP-4', '2018-07-22', 'Supplier Payment - Bahar', 'supplier_payments', '20000.00', '0.00', '21609000.00', 2, '2018-07-22 07:42:16', '2018-07-22 07:42:16'),
+(16, 'PP-12', '2018-07-24', 'Product Purchase From - Bahar', 'product_purchases', '0.00', '19500.00', '21628500.00', 2, '2018-07-24 00:44:03', '2018-07-24 00:44:03'),
+(17, 'PP-13', '2018-07-24', 'Product Purchase From - Bahar', 'product_purchases', '0.00', '400000.00', '22028500.00', 2, '2018-07-24 04:08:47', '2018-07-24 04:08:47'),
+(18, 'SP-5', '2018-07-25', 'Supplier Payment - Akbar', 'supplier_payments', '21000.00', '0.00', '22009500.00', 1, '2018-07-25 00:51:04', '2018-07-25 00:51:04'),
+(19, 'SP-6', '2018-07-30', 'Supplier Payment - Akbar', 'supplier_payments', '210000.00', '0.00', '21819500.00', 1, '2018-07-30 07:50:08', '2018-07-30 07:50:08'),
+(20, 'SP-7', '2018-07-30', 'Supplier Payment - Sajal', 'supplier_payments', '20200.00', '0.00', '21799700.00', 3, '2018-07-30 09:17:32', '2018-07-30 09:17:32');
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
