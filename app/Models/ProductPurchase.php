@@ -23,4 +23,9 @@ class ProductPurchase extends Model
     {
         return $this->belongsTo(ProductName::class, 'product_name_id', 'id');
     }
+    public function branch()
+    {
+    return $this->belongsTo(Branch::class, 'branchId', 'id');
+    }
+
 }

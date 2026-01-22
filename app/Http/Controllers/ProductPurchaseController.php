@@ -244,9 +244,10 @@ public function productPurchaseList(Request $request)
     $grant_total_qty = ProductPurchase::sum('product_qty') - SupplierStatement::sum('adjustment_qty');
     $product_names = ProductName::all();
     $suppliers = Supplier::orderBy('name', 'ASC')->get();
+    $branch=Branch::all();
 
     return view('admin.product.view_product_purchase_list', compact(
-        'purchases', 'check_p', 'product_names', 'suppliers', 'grant_total_qty'
+        'purchases', 'check_p', 'product_names', 'suppliers', 'grant_total_qty','branch'
     ));
 }
 

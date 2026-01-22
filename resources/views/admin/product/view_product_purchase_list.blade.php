@@ -70,7 +70,10 @@
                                     <th>Truck Rent</th>
                                     <th>Unload Bill</th>
                                     <th>Total Mat Cost</th>
+                                    <th>Branch</th>
+                                     @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details'))
                                     <th class="hidden-print">Actions</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -103,6 +106,8 @@
                                         <td>{{ number_format($purchase->truck_rent, 2) }}</td>
                                         <td>{{ number_format($purchase->unload_bill, 2) }}</td>
                                         <td>{{ number_format($purchase->total_material_cost, 2) }}</td>
+                                        <td>{{ $purchase->branch->name ?? '-' }}</td>
+
                                         <td class="hidden-print">
                                             @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details'))
                                                 <a role="button" class="view_btn" data-dmr_no="{{ $purchase->dmr_no }}"

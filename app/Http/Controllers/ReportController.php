@@ -818,269 +818,647 @@ public function allCustomerBalanceReport(Request $request)
         return view('admin.report.report_trial_balance',  compact('data'));
     }
 
+
+
     public function quickReport()
-    {
+{
+    $user = Auth::user();
+    $isSuperAdmin = $user && $user->is_super_admin;
+    $branchId = $user ? $user->branchId : null;
 
+    /** Purchase List - Grouped by Month (Last 3 Months) */
+    $threeMonthsAgo = now()->subMonths(3)->format('Y-m-d H:i:s');
 
+    $purchaseSummaryQuery = DB::table('product_purchases')
+        ->selectRaw('COUNT(*) AS purchase_count, YEAR(purchase_date) AS Year, MONTH(purchase_date) AS Month, SUM(material_cost) AS total_mcost')
+        ->where('purchase_date', '>=', $threeMonthsAgo);
 
-        /** Purchase List */
-        $query_purchase = "SELECT count(*) AS purchase_count, YEAR(purchase_date) Year,MONTH(purchase_date) Month, sum(material_cost) as total_mcost FROM product_purchases WHERE purchase_date >= DATE_ADD(NOW(), INTERVAL -3 MONTH) GROUP BY YEAR(purchase_date),MONTH(purchase_date) ORDER BY YEAR(purchase_date) DESC, MONTH(purchase_date) DESC";
-        $total_purchase_month = DB::select(DB::raw($query_purchase));
-        $total_purchase_month_array = array();
-
-        if (count($total_purchase_month) > 0) {
-            $tpm = 0;
-            $pmonth = '';
-            $pp = 0;
-            foreach ($total_purchase_month as $tp_month) {
-
-                $query_pcount   = "SELECT max(id) as mid, supplier_id, product_name_id, sum(material_cost) as tm_cost, COUNT(*) as tp_count FROM `product_purchases` WHERE YEAR(purchase_date) = '" . $tp_month->Year . "' AND MONTH(purchase_date) = '" . $tp_month->Month . "' GROUP BY supplier_id, product_name_id ORDER BY supplier_id ASC, product_name_id ASC, max(id) DESC";
-
-                $query_count_data   = DB::select(DB::raw($query_pcount));
-                $query_count_data_array = array();
-                for($i = 0; $i<count($query_count_data); $i++){
-                    $query_count_data_array[$query_count_data[$i]->supplier_id."_".$query_count_data[$i]->product_name_id]    = $query_count_data[$i]->tp_count."___".$query_count_data[$i]->tm_cost;
-                }
-
-                $query_pfinal = "SELECT product_purchases.chalan_no, product_purchases.supplier_id, product_purchases.product_name_id, product_purchases.purchase_date, product_purchases.unit_type, product_purchases.product_qty, product_purchases.rate_per_unit, product_purchases.material_cost, product_purchases.total_material_cost, suppliers.name as sname, product_names.name as pname FROM product_purchases INNER JOIN suppliers ON product_purchases.supplier_id = suppliers.id INNER JOIN product_names ON product_purchases.product_name_id = product_names.id WHERE YEAR(purchase_date) = '" . $tp_month->Year . "' AND MONTH(purchase_date) = '" . $tp_month->Month . "' ORDER BY product_purchases.supplier_id ASC, product_purchases.product_name_id ASC, product_purchases.id DESC";
-
-                $purchase_data = DB::select(DB::raw($query_pfinal));
-                $purchase_data_array = '';
-                if (count($purchase_data) > 0) {
-                    $tmc_cost = 0;
-                    $last_id = '';
-                    foreach ($purchase_data as $purchase) {
-
-                        if ($pmonth == '') {
-                            $pmonth = $tp_month->Month;
-                        }
-
-                        if ($pmonth == $tp_month->Month) {
-                            $tpm++;
-                            $tpmk = $tpm;
-                        } else {
-                            $tpmk = 1;
-                            $tpm = 0;
-                            $pmonth = '';
-                        }
-
-                        $sup_id   = $purchase->supplier_id."_".$purchase->product_name_id;
-                        $count_tm_cost = $query_count_data_array[$sup_id];
-                        $separator      = explode("___", $count_tm_cost);
-                        $count          = $separator[0];
-                        $tmc_cost       = $separator[1];
-                        $purchase_data_array .= '<tr>
-                                                    <td><div style="width: 65px;">' . $purchase->purchase_date . '</div></td>
-                                                    <td>' . $purchase->chalan_no . '</td>
-                                                    <td>' . $purchase->sname . '</td>
-                                                    <td>' . $purchase->pname . '</td>
-                                                    <td>' . round($purchase->product_qty,3) . '</td>
-                                                    <td>' . $purchase->unit_type . '</td>
-                                                    <td>' . round($purchase->rate_per_unit,3) . '</td>
-                                                    <td>' . round($purchase->material_cost,3) . '</td>';
-
-                        if($last_id != $sup_id){
-                            $purchase_data_array .= '<td rowspan="'.$count.'">' . round($tmc_cost,3) . '</td>';
-                        }
-
-                        if ($tpmk == 1) {
-                            //echo "true";
-                            if ($tp_month->purchase_count > 1) {
-                                $rowspan = 'rowspan="' . $tp_month->purchase_count . '"';
-                            } else {
-                                $rowspan = '';
-                            }
-                            $purchase_data_array .= '<td ' . $rowspan . '>' . round($tp_month->total_mcost,3) . '</td>';
-
-                        }
-                        $purchase_data_array .= '</tr>';
-
-                        $last_id = $purchase->supplier_id."_".$purchase->product_name_id;
-                    }
-
-                }
-
-
-
-                $total_purchase_month_array[] = '<h3>' . date("F Y", strtotime(date($tp_month->Year . "-" . $tp_month->Month))) . '</h3>
-                                                <div>
-                                                    <table cellpadding="0" cellspacing="0" width="100%" class="sOrders">
-                                                        <thead>
-                                                            <tr>
-                                                                <th><div style="width: 65px;">Date</div></th>
-                                                                <th>C.No</th>
-                                                                <th>S.Name</th>
-                                                                <th>P.Name</th>
-                                                                <th>Qty</th>
-                                                                <th>U.Type</th>
-                                                                <th>RPU</th>
-                                                                <th>M.Cost</th>
-                                                                <th>T.M.Cost</th>
-                                                                <th>G.T.M.Cost</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            ' . $purchase_data_array . '
-                                                        </tbody>
-                                                    </table>
-                                                </div>';
-
-                $pp++;
-
-            }
-
-
-        }
-
-
-        /**********************/
-        $purchase_list = DB::select('SELECT pp.product_name_id, p.name, MONTH(pp.received_date) as month,YEAR(pp.received_date) as year, pp.unit_type, SUM(pp.product_qty) as total_qty,SUM(pp.total_material_cost) as total_mat_cost FROM `product_purchases` as pp 
-    JOIN product_names as p ON p.id = pp.product_name_id  GROUP BY MONTH(pp.received_date),YEAR(pp.received_date), p.name, pp.product_name_id, pp.unit_type ORDER BY pp.received_date DESC');
-        $months_list = DB::select('SELECT MONTH(pp.received_date) as month, YEAR(pp.received_date) as year, COUNT(pp.received_date) as row_total FROM `product_purchases` as pp GROUP BY MONTH(pp.received_date),YEAR(pp.received_date) '
-            . 'ORDER BY year DESC,month DESC');
-
-        $i = 0;
-        $break_row = 0;
-        $break_div = 0;
-        $break_list = 0;
-        $html_purchase_list = array();
-        foreach($months_list as $pmlist)
-        {
-
-            $html_purchase_list[$i] =  '<h3>'.date("F Y", strtotime(date($pmlist->year . "-" . $pmlist->month))).'</h3>'.
-                '<div>
-                                <table cellpadding="0" cellspacing="0" width="100%" class="sOrders">
-                                     <thead>
-                                        <tr>
-                                            <th width="5%">SN</th>
-                                            <th width="20%">Material Name</th>
-                                            <th width="20%">Total qty</th>
-                                            <th width="20%">Total Mat Cost</th>
-                                        </tr>
-                                     </thead>
-                                    <tbody>';
-
-            $k = 0;
-            foreach ($purchase_list as $list)
-            {
-                $k++;
-                //$date = $list->received_date;
-                $month_n = $list->month;
-                $year_n = $list->year;
-                //echo $year_title.' '.$month_n;
-                //dd($year_n);
-
-                if($pmlist->month == $month_n && $pmlist->year == $year_n)
-                {
-
-
-                    $html_purchase_list[$i] .= '<tr>
-                                            <td>'.$k.'</td>
-                                            <td>'.$list->name.'</td>
-                                            <td>'.round($list->total_qty,2).' '.$list->unit_type.'</td>
-                                            <td>'.round($list->total_mat_cost,2).'</td>
-                                        </tr>';
-                    $break_row++;
-                }
-
-                if($break_row == $pmlist->row_total)
-                {
-                    $break_list++;
-                    if($break_list == 2)
-                    {
-                        break;
-                    }
-                }
-
-            }
-            $html_purchase_list[$i] .= '</tbody>
-                                    
-                                </table>
-                            </div>' ;
-            if($break_div == 2)
-            { break;}
-            $i++;
-            $break_div++;
-        }
-
-        /******************************************/
-
-        $sales_list = DB::select('SELECT mix_designs.rate, mix_designs.psi, ps.sell_date, SUM(ps.cuM) as total_cum FROM `product_sales` as ps 
-                                JOIN `mix_designs` ON `mix_designs`.id=ps.mix_design_id
-                                GROUP BY ps.sell_date, mix_designs.psi, mix_designs.rate ORDER BY ps.sell_date DESC');
-
-        $sales_months_list = DB::select('SELECT MONTH(ps.sell_date) as month, YEAR(ps.sell_date) as year, 
-                COUNT(ps.sell_date) as row_total,SUM(ps.cuM) as total_cum FROM `product_sales` as ps '
-            . 'GROUP BY MONTH(ps.sell_date),YEAR(ps.sell_date) ORDER BY year DESC,month DESC');
-
-        $i = 0;
-        $break_row = 0;
-        $break_div = 0;
-        $break_list = 0;
-        $html_sales_list = array();
-
-        foreach($sales_months_list as $smlist)
-        {
-
-            $html_sales_list[$i] =
-                '<h3>'.
-                date("F Y", strtotime(date($smlist->year . "-" . $smlist->month)))
-                .'<span style="float:right;margin-right:25px;">Total: '.$smlist->total_cum.'</span>
-                </h3>'.
-                '<div>
-                    <table cellpadding="0" cellspacing="0" width="100%" class="sOrders">
-                         <thead>
-                            <tr>
-                                <th width="20%">Date</th>
-                                <th width="20%">PSI</th>
-                                <th width="20%">Total cuM</th>
-                                <th width="20%">Total</th>
-                            </tr>
-                         </thead>
-                         <tbody>';
-
-
-            foreach ($sales_list as $list)
-            {
-                $date = $list->sell_date;
-                $month_n = date("m",strtotime($date));
-                $year_n = date('Y',strtotime($date));
-                if($smlist->month == $month_n && $smlist->year == $year_n)
-                {
-                    $html_sales_list[$i] .=
-                        '<tr>
-                                <td>'.date('d-M-y',strtotime($list->sell_date)).'</td>
-                                <td>'.$list->psi.'</td>
-                                <td>'.round($list->total_cum,2).'</td>  
-                                <td>'.number_format($list->total_cum*35.15*$list->rate,2).'</td>  
-                            </tr>';
-                    $break_row++;
-                }
-
-                if($break_row == $smlist->row_total) {
-                    $break_list++;
-                    if($break_list == 2) {
-                        break;
-                    }
-                }
-
-            }
-            $html_sales_list[$i] .= '</tbody>
-                                    
-                                </table>
-                            </div>' ;
-            if($break_div == 2) { break;}
-            $i++;
-            $break_div++;
-        }
-
-        /******************************************/
-
-        //product stock data
-        $product_stocks = ProductStock::all();
-
-        return view('admin.report.report_quick', compact( 'product_stocks', 'html_purchase_list','html_sales_list'));
+    if (!$isSuperAdmin && $branchId) {
+        $purchaseSummaryQuery->where('branchId', $branchId);
     }
+
+    $purchaseSummaryQuery->groupBy(DB::raw('YEAR(purchase_date), MONTH(purchase_date)'))
+        ->orderByRaw('YEAR(purchase_date) DESC, MONTH(purchase_date) DESC');
+
+    $total_purchase_month = $purchaseSummaryQuery->get();
+    $total_purchase_month_array = [];
+
+    if ($total_purchase_month->isNotEmpty()) {
+        $tpm = 0;
+        $pmonth = '';
+        $pp = 0;
+
+        foreach ($total_purchase_month as $tp_month) {
+            // Sub-query: count per supplier + product
+            $detailQuery = DB::table('product_purchases')
+                ->selectRaw('MAX(id) as mid, supplier_id, product_name_id, SUM(material_cost) as tm_cost, COUNT(*) as tp_count')
+                ->whereYear('purchase_date', $tp_month->Year)
+                ->whereMonth('purchase_date', $tp_month->Month);
+
+            if (!$isSuperAdmin && $branchId) {
+                $detailQuery->where('branchId', $branchId);
+            }
+
+            $detailQuery->groupBy('supplier_id', 'product_name_id')
+                ->orderBy('supplier_id')
+                ->orderBy('product_name_id')
+                ->orderByRaw('MAX(id) DESC');
+
+            $query_count_data = $detailQuery->get();
+
+            $query_count_data_array = [];
+            foreach ($query_count_data as $item) {
+                $key = $item->supplier_id . '_' . $item->product_name_id;
+                $query_count_data_array[$key] = $item->tp_count . '___' . $item->tm_cost;
+            }
+
+            // Final detailed purchase data
+            $finalQuery = DB::table('product_purchases')
+                ->join('suppliers', 'product_purchases.supplier_id', '=', 'suppliers.id')
+                ->join('product_names', 'product_purchases.product_name_id', '=', 'product_names.id')
+                ->select('product_purchases.chalan_no','product_purchases.supplier_id','product_purchases.product_name_id','product_purchases.purchase_date',
+                    'product_purchases.unit_type',
+                    'product_purchases.product_qty',
+                    'product_purchases.rate_per_unit',
+                    'product_purchases.material_cost',
+                    'product_purchases.total_material_cost',
+                    'suppliers.name as sname',
+                    'product_names.name as pname'
+                )
+                ->whereYear('product_purchases.purchase_date', $tp_month->Year)
+                ->whereMonth('product_purchases.purchase_date', $tp_month->Month);
+                
+
+            if (!$isSuperAdmin && $branchId) {
+                $finalQuery->where('product_purchases.branchId', $branchId);
+            }
+
+            $finalQuery->orderBy('product_purchases.supplier_id')
+                ->orderBy('product_purchases.product_name_id')
+                ->orderBy('product_purchases.id', 'DESC');
+
+            $purchase_data = $finalQuery->get();
+
+            
+
+            $purchase_data_array = '';
+            if ($purchase_data->isNotEmpty()) {
+                $last_id = '';
+
+                foreach ($purchase_data as $index => $purchase) {
+                    if ($pmonth == '') {
+                        $pmonth = $tp_month->Month;
+                    }
+
+                    if ($pmonth == $tp_month->Month) {
+                        $tpm++;
+                        $tpmk = $tpm;
+                    } else {
+                        $tpmk = 1;
+                        $tpm = 0;
+                        $pmonth = '';
+                    }
+
+                    $sup_id = $purchase->supplier_id . '_' . $purchase->product_name_id;
+                    $count_tm_cost = $query_count_data_array[$sup_id] ?? '0___0';
+                    [$count, $tmc_cost] = explode('___', $count_tm_cost);
+
+                    $purchase_data_array .= '<tr>
+                        <td><div style="width: 65px;">' . e($purchase->purchase_date) . '</div></td>
+                        <td>' . e($purchase->chalan_no) . '</td>
+                    
+                        <td>' . e($purchase->sname) . '</td>
+                        <td>' . e($purchase->pname) . '</td>
+                        <td>' . round($purchase->product_qty, 3) . '</td>
+                        <td>' . e($purchase->unit_type) . '</td>
+                        <td>' . round($purchase->rate_per_unit, 3) . '</td>
+                        <td>' . round($purchase->material_cost, 3) . '</td>';
+
+                    if ($last_id != $sup_id) {
+                        $purchase_data_array .= '<td rowspan="' . e($count) . '">' . round($tmc_cost, 3) . '</td>';
+                    }
+
+                    if ($tpmk == 1) {
+                        $rowspan = $tp_month->purchase_count > 1 ? 'rowspan="' . $tp_month->purchase_count . '"' : '';
+                        $purchase_data_array .= '<td ' . $rowspan . '>' . round($tp_month->total_mcost, 3) . '</td>';
+                    }
+
+                    $purchase_data_array .= '</tr>';
+                    $last_id = $sup_id;
+                }
+            }
+
+            $total_purchase_month_array[] = '<h3>' . date("F Y", mktime(0, 0, 0, $tp_month->Month, 1, $tp_month->Year)) . '</h3>
+                <div>
+                    <table cellpadding="0" cellspacing="0" width="100%" class="sOrders">
+                        <thead>
+                            <tr>
+                                <th><div style="width: 65px;">Date</div></th>
+                                <th>C.No</th>
+                                <th>S.Name</th>
+                                <th>P.Name</th>
+                                <th>Qty</th>
+                                <th>U.Type</th>
+                                <th>RPU</th>
+                                <th>M.Cost</th>
+                                <th>T.M.Cost</th>
+                                <th>G.T.M.Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>' . $purchase_data_array . '</tbody>
+                    </table>
+                </div>';
+
+            $pp++;
+        }
+    }
+
+    /********************** SECOND SECTION: Aggregated Purchase List **********************/
+   // 🔹 PURCHASE LIST WITH BRANCH NAME
+$purchaseListQuery = DB::table('product_purchases as pp')
+    ->join('product_names as p', 'p.id', '=', 'pp.product_name_id')
+    ->join('branches', 'branches.id', '=', 'pp.branchId')
+    ->selectRaw('
+        pp.product_name_id,
+        p.name,
+        branches.name as branch_name, 
+        MONTH(pp.received_date) as month,
+        YEAR(pp.received_date) as year,
+        pp.unit_type,
+        SUM(pp.product_qty) as total_qty,
+        SUM(pp.total_material_cost) as total_mat_cost
+    ')
+    ->groupBy(DB::raw('
+        MONTH(pp.received_date),
+        YEAR(pp.received_date),
+        p.name,
+        pp.product_name_id,
+        pp.unit_type,
+        branches.name 
+    '))
+    ->orderBy('pp.received_date', 'DESC');
+
+if (!$isSuperAdmin && $branchId) {
+    $purchaseListQuery->where('pp.branchId', $branchId);
+}
+$purchase_list = $purchaseListQuery->get();
+
+// 🔹 MONTHS LIST (no branch needed here)
+$monthsListQuery = DB::table('product_purchases as pp')
+    ->selectRaw('MONTH(pp.received_date) as month, YEAR(pp.received_date) as year, COUNT(pp.received_date) as row_total')
+    ->groupBy(DB::raw('MONTH(pp.received_date), YEAR(pp.received_date)'))
+    ->orderBy('year', 'DESC')
+    ->orderBy('month', 'DESC');
+
+if (!$isSuperAdmin && $branchId) {
+    $monthsListQuery->where('pp.branchId', $branchId);
+}
+$months_list = $monthsListQuery->get();
+
+// 🔹 BUILD HTML WITH BRANCH NAME
+$html_purchase_list = [];
+$i = 0;
+foreach ($months_list as $pmlist) {
+    $html_purchase_list[$i] = '<h3>' . date("F Y", mktime(0, 0, 0, $pmlist->month, 1, $pmlist->year)) . '</h3>
+        <div>
+            <table cellpadding="0" cellspacing="0" width="100%" class="sOrders">
+                <thead>
+                    <tr>
+                        <th width="5%">SN</th>
+                        <th width="20%">Material Name</th>
+                        <th width="20%">Branch</th> 
+                        <th width="20%">Total qty</th>
+                        <th width="20%">Total Mat Cost</th>
+                    </tr>
+                </thead>
+                <tbody>';
+
+    $k = 0;
+    foreach ($purchase_list as $list) {
+        if ($pmlist->month == $list->month && $pmlist->year == $list->year) {
+            $k++;
+            $html_purchase_list[$i] .= '<tr>
+                <td>' . $k . '</td>
+                <td>' . e($list->name) . '</td>
+                <td>' . e($list->branch_name) . '</td> 
+                <td>' . round($list->total_qty, 2) . ' ' . e($list->unit_type) . '</td>
+                <td>' . round($list->total_mat_cost, 2) . '</td>
+            </tr>';
+        }
+    }
+
+    $html_purchase_list[$i] .= '</tbody></table></div>';
+    $i++;
+    if ($i >= 2) break; // Only show last 2 months
+}
+
+    /********************** THIRD SECTION: Sales List **********************/
+    // $salesListQuery = DB::table('product_sales as ps')
+    //     ->join('mix_designs', 'mix_designs.id', '=', 'ps.mix_design_id')
+    //     ->selectRaw('mix_designs.rate, mix_designs.psi, ps.sell_date, SUM(ps.cuM) as total_cum')
+    //     ->groupBy('ps.sell_date', 'mix_designs.psi', 'mix_designs.rate')
+    //     ->orderBy('ps.sell_date', 'DESC');
+
+    // if (!$isSuperAdmin && $branchId) {
+    //     $salesListQuery->where('ps.branchId', $branchId);
+    // }
+
+    // $sales_list = $salesListQuery->get();
+
+    // $salesMonthsQuery = DB::table('product_sales as ps')
+    //     ->selectRaw('MONTH(ps.sell_date) as month, YEAR(ps.sell_date) as year, COUNT(ps.sell_date) as row_total, SUM(ps.cuM) as total_cum')
+    //     ->groupBy(DB::raw('MONTH(ps.sell_date), YEAR(ps.sell_date)'))
+    //     ->orderBy('year', 'DESC')
+    //     ->orderBy('month', 'DESC');
+
+    // if (!$isSuperAdmin && $branchId) {
+    //     $salesMonthsQuery->where('ps.branchId', $branchId);
+    // }
+
+    // $sales_months_list = $salesMonthsQuery->get();
+
+    // $html_sales_list = [];
+    // $i = 0;
+    // foreach ($sales_months_list as $smlist) {
+    //     $html_sales_list[$i] = '<h3>' .
+    //         date("F Y", mktime(0, 0, 0, $smlist->month, 1, $smlist->year)) .
+    //         '<span style="float:right;margin-right:25px;">Total: ' . round($smlist->total_cum, 2) . '</span>
+    //         </h3>
+    //         <div>
+    //             <table cellpadding="0" cellspacing="0" width="100%" class="sOrders">
+    //                 <thead>
+    //                     <tr>
+    //                         <th width="20%">Date</th>
+    //                         <th width="20%">PSI</th>
+    //                         <th width="20%">Total cuM</th>
+    //                         <th width="20%">Total</th>
+    //                     </tr>
+    //                 </thead>
+    //                 <tbody>';
+
+    //     foreach ($sales_list as $list) {
+    //         $sellMonth = (int) date('m', strtotime($list->sell_date));
+    //         $sellYear = (int) date('Y', strtotime($list->sell_date));
+
+    //         if ($smlist->month == $sellMonth && $smlist->year == $sellYear) {
+    //             $totalValue = $list->total_cum * 35.15 * $list->rate;
+    //             $html_sales_list[$i] .= '<tr>
+    //                 <td>' . date('d-M-y', strtotime($list->sell_date)) . '</td>
+    //                 <td>' . e($list->psi) . '</td>
+    //                 <td>' . round($list->total_cum, 2) . '</td>
+    //                 <td>' . number_format($totalValue, 2) . '</td>
+    //             </tr>';
+    //         }
+    //     }
+
+    //     $html_sales_list[$i] .= '</tbody></table></div>';
+    //     $i++;
+    //     if ($i >= 2) break; // Only last 2 months
+    // }
+// 🔹 SALES LIST WITH BRANCH NAME
+$salesListQuery = DB::table('product_sales as ps')
+    ->join('mix_designs', 'mix_designs.id', '=', 'ps.mix_design_id')
+    ->join('branches', 'branches.id', '=', 'ps.branchId') 
+    ->selectRaw('mix_designs.rate, mix_designs.psi, ps.sell_date, SUM(ps.cuM) as total_cum, branches.name as branch_name')
+    ->groupBy('ps.sell_date', 'mix_designs.psi', 'mix_designs.rate', 'branches.name') 
+    ->orderBy('ps.sell_date', 'DESC');
+
+if (!$isSuperAdmin && $branchId) {
+    $salesListQuery->where('ps.branchId', $branchId);
+}
+$sales_list = $salesListQuery->get();
+
+// 🔹 SALES MONTHS SUMMARY (no branch name needed here)
+$salesMonthsQuery = DB::table('product_sales as ps')
+    ->selectRaw('MONTH(ps.sell_date) as month, YEAR(ps.sell_date) as year, COUNT(ps.sell_date) as row_total, SUM(ps.cuM) as total_cum')
+    ->groupBy(DB::raw('MONTH(ps.sell_date), YEAR(ps.sell_date)'))
+    ->orderBy('year', 'DESC')
+    ->orderBy('month', 'DESC');
+
+if (!$isSuperAdmin && $branchId) {
+    $salesMonthsQuery->where('ps.branchId', $branchId);
+}
+$sales_months_list = $salesMonthsQuery->get();
+
+// 🔹 BUILD HTML WITH BRANCH NAME
+$html_sales_list = [];
+$i = 0;
+foreach ($sales_months_list as $smlist) {
+    $html_sales_list[$i] = '<h3>' .
+        date("F Y", mktime(0, 0, 0, $smlist->month, 1, $smlist->year)) .
+        '<span style="float:right;margin-right:25px;">Total: ' . round($smlist->total_cum, 2) . '</span>
+        </h3>
+        <div>
+            <table cellpadding="0" cellspacing="0" width="100%" class="sOrders">
+                <thead>
+                    <tr>
+                        <th width="15%">Date</th>
+                        <th width="15%">Branch</th> 
+                        <th width="15%">PSI</th>
+                        <th width="15%">Total cuM</th>
+                        <th width="20%">Total</th>
+                    </tr>
+                </thead>
+                <tbody>';
+
+    foreach ($sales_list as $list) {
+        $sellMonth = (int) date('m', strtotime($list->sell_date));
+        $sellYear = (int) date('Y', strtotime($list->sell_date));
+
+        if ($smlist->month == $sellMonth && $smlist->year == $sellYear) {
+            $totalValue = $list->total_cum * 35.15 * $list->rate;
+            $html_sales_list[$i] .= '<tr>
+                <td>' . date('d-M-y', strtotime($list->sell_date)) . '</td>
+                <td>' . e($list->branch_name) . '</td> 
+                <td>' . e($list->psi) . '</td>
+                <td>' . round($list->total_cum, 2) . '</td>
+                <td>' . number_format($totalValue, 2) . '</td>
+            </tr>';
+        }
+    }
+
+    $html_sales_list[$i] .= '</tbody></table></div>';
+    $i++;
+    if ($i >= 2) break; // Only last 2 months
+}
+    /********************** PRODUCT STOCK (NO FILTER) **********************/
+    $product_stocks = ProductStock::all();
+     // No filtering as per requirement
+  
+    return view('admin.report.report_quick', compact(
+        'product_stocks',
+        'html_purchase_list',
+        'html_sales_list'
+        
+    ));
+}
+
+
+
+
+    // public function quickReport()
+    // {
+
+
+
+    //     /** Purchase List */
+    //     $query_purchase = "SELECT count(*) AS purchase_count, YEAR(purchase_date) Year,MONTH(purchase_date) Month, sum(material_cost) as total_mcost FROM product_purchases WHERE purchase_date >= DATE_ADD(NOW(), INTERVAL -3 MONTH) GROUP BY YEAR(purchase_date),MONTH(purchase_date) ORDER BY YEAR(purchase_date) DESC, MONTH(purchase_date) DESC";
+    //     $total_purchase_month = DB::select(DB::raw($query_purchase));
+    //     $total_purchase_month_array = array();
+
+    //     if (count($total_purchase_month) > 0) {
+    //         $tpm = 0;
+    //         $pmonth = '';
+    //         $pp = 0;
+    //         foreach ($total_purchase_month as $tp_month) {
+
+    //             $query_pcount   = "SELECT max(id) as mid, supplier_id, product_name_id, sum(material_cost) as tm_cost, COUNT(*) as tp_count FROM `product_purchases` WHERE YEAR(purchase_date) = '" . $tp_month->Year . "' AND MONTH(purchase_date) = '" . $tp_month->Month . "' GROUP BY supplier_id, product_name_id ORDER BY supplier_id ASC, product_name_id ASC, max(id) DESC";
+
+    //             $query_count_data   = DB::select(DB::raw($query_pcount));
+    //             $query_count_data_array = array();
+    //             for($i = 0; $i<count($query_count_data); $i++){
+    //                 $query_count_data_array[$query_count_data[$i]->supplier_id."_".$query_count_data[$i]->product_name_id]    = $query_count_data[$i]->tp_count."___".$query_count_data[$i]->tm_cost;
+    //             }
+
+    //             $query_pfinal = "SELECT product_purchases.chalan_no, product_purchases.supplier_id, product_purchases.product_name_id, product_purchases.purchase_date, product_purchases.unit_type, product_purchases.product_qty, product_purchases.rate_per_unit, product_purchases.material_cost, product_purchases.total_material_cost, suppliers.name as sname, product_names.name as pname FROM product_purchases INNER JOIN suppliers ON product_purchases.supplier_id = suppliers.id INNER JOIN product_names ON product_purchases.product_name_id = product_names.id WHERE YEAR(purchase_date) = '" . $tp_month->Year . "' AND MONTH(purchase_date) = '" . $tp_month->Month . "' ORDER BY product_purchases.supplier_id ASC, product_purchases.product_name_id ASC, product_purchases.id DESC";
+
+    //             $purchase_data = DB::select(DB::raw($query_pfinal));
+    //             $purchase_data_array = '';
+    //             if (count($purchase_data) > 0) {
+    //                 $tmc_cost = 0;
+    //                 $last_id = '';
+    //                 foreach ($purchase_data as $purchase) {
+
+    //                     if ($pmonth == '') {
+    //                         $pmonth = $tp_month->Month;
+    //                     }
+
+    //                     if ($pmonth == $tp_month->Month) {
+    //                         $tpm++;
+    //                         $tpmk = $tpm;
+    //                     } else {
+    //                         $tpmk = 1;
+    //                         $tpm = 0;
+    //                         $pmonth = '';
+    //                     }
+
+    //                     $sup_id   = $purchase->supplier_id."_".$purchase->product_name_id;
+    //                     $count_tm_cost = $query_count_data_array[$sup_id];
+    //                     $separator      = explode("___", $count_tm_cost);
+    //                     $count          = $separator[0];
+    //                     $tmc_cost       = $separator[1];
+    //                     $purchase_data_array .= '<tr>
+    //                                                 <td><div style="width: 65px;">' . $purchase->purchase_date . '</div></td>
+    //                                                 <td>' . $purchase->chalan_no . '</td>
+    //                                                 <td>' . $purchase->sname . '</td>
+    //                                                 <td>' . $purchase->pname . '</td>
+    //                                                 <td>' . round($purchase->product_qty,3) . '</td>
+    //                                                 <td>' . $purchase->unit_type . '</td>
+    //                                                 <td>' . round($purchase->rate_per_unit,3) . '</td>
+    //                                                 <td>' . round($purchase->material_cost,3) . '</td>';
+
+    //                     if($last_id != $sup_id){
+    //                         $purchase_data_array .= '<td rowspan="'.$count.'">' . round($tmc_cost,3) . '</td>';
+    //                     }
+
+    //                     if ($tpmk == 1) {
+    //                         //echo "true";
+    //                         if ($tp_month->purchase_count > 1) {
+    //                             $rowspan = 'rowspan="' . $tp_month->purchase_count . '"';
+    //                         } else {
+    //                             $rowspan = '';
+    //                         }
+    //                         $purchase_data_array .= '<td ' . $rowspan . '>' . round($tp_month->total_mcost,3) . '</td>';
+
+    //                     }
+    //                     $purchase_data_array .= '</tr>';
+
+    //                     $last_id = $purchase->supplier_id."_".$purchase->product_name_id;
+    //                 }
+
+    //             }
+
+
+
+    //             $total_purchase_month_array[] = '<h3>' . date("F Y", strtotime(date($tp_month->Year . "-" . $tp_month->Month))) . '</h3>
+    //                                             <div>
+    //                                                 <table cellpadding="0" cellspacing="0" width="100%" class="sOrders">
+    //                                                     <thead>
+    //                                                         <tr>
+    //                                                             <th><div style="width: 65px;">Date</div></th>
+    //                                                             <th>C.No</th>
+    //                                                             <th>S.Name</th>
+    //                                                             <th>P.Name</th>
+    //                                                             <th>Qty</th>
+    //                                                             <th>U.Type</th>
+    //                                                             <th>RPU</th>
+    //                                                             <th>M.Cost</th>
+    //                                                             <th>T.M.Cost</th>
+    //                                                             <th>G.T.M.Cost</th>
+    //                                                         </tr>
+    //                                                     </thead>
+    //                                                     <tbody>
+    //                                                         ' . $purchase_data_array . '
+    //                                                     </tbody>
+    //                                                 </table>
+    //                                             </div>';
+
+    //             $pp++;
+
+    //         }
+
+
+    //     }
+
+
+    //     /**********************/
+    //     $purchase_list = DB::select('SELECT pp.product_name_id, p.name, MONTH(pp.received_date) as month,YEAR(pp.received_date) as year, pp.unit_type, SUM(pp.product_qty) as total_qty,SUM(pp.total_material_cost) as total_mat_cost FROM `product_purchases` as pp 
+    // JOIN product_names as p ON p.id = pp.product_name_id  GROUP BY MONTH(pp.received_date),YEAR(pp.received_date), p.name, pp.product_name_id, pp.unit_type ORDER BY pp.received_date DESC');
+    //     $months_list = DB::select('SELECT MONTH(pp.received_date) as month, YEAR(pp.received_date) as year, COUNT(pp.received_date) as row_total FROM `product_purchases` as pp GROUP BY MONTH(pp.received_date),YEAR(pp.received_date) '
+    //         . 'ORDER BY year DESC,month DESC');
+
+    //     $i = 0;
+    //     $break_row = 0;
+    //     $break_div = 0;
+    //     $break_list = 0;
+    //     $html_purchase_list = array();
+    //     foreach($months_list as $pmlist)
+    //     {
+
+    //         $html_purchase_list[$i] =  '<h3>'.date("F Y", strtotime(date($pmlist->year . "-" . $pmlist->month))).'</h3>'.
+    //             '<div>
+    //                             <table cellpadding="0" cellspacing="0" width="100%" class="sOrders">
+    //                                  <thead>
+    //                                     <tr>
+    //                                         <th width="5%">SN</th>
+    //                                         <th width="20%">Material Name</th>
+    //                                         <th width="20%">Total qty</th>
+    //                                         <th width="20%">Total Mat Cost</th>
+    //                                     </tr>
+    //                                  </thead>
+    //                                 <tbody>';
+
+    //         $k = 0;
+    //         foreach ($purchase_list as $list)
+    //         {
+    //             $k++;
+    //             //$date = $list->received_date;
+    //             $month_n = $list->month;
+    //             $year_n = $list->year;
+    //             //echo $year_title.' '.$month_n;
+    //             //dd($year_n);
+
+    //             if($pmlist->month == $month_n && $pmlist->year == $year_n)
+    //             {
+
+
+    //                 $html_purchase_list[$i] .= '<tr>
+    //                                         <td>'.$k.'</td>
+    //                                         <td>'.$list->name.'</td>
+    //                                         <td>'.round($list->total_qty,2).' '.$list->unit_type.'</td>
+    //                                         <td>'.round($list->total_mat_cost,2).'</td>
+    //                                     </tr>';
+    //                 $break_row++;
+    //             }
+
+    //             if($break_row == $pmlist->row_total)
+    //             {
+    //                 $break_list++;
+    //                 if($break_list == 2)
+    //                 {
+    //                     break;
+    //                 }
+    //             }
+
+    //         }
+    //         $html_purchase_list[$i] .= '</tbody>
+                                    
+    //                             </table>
+    //                         </div>' ;
+    //         if($break_div == 2)
+    //         { break;}
+    //         $i++;
+    //         $break_div++;
+    //     }
+
+    //     /******************************************/
+
+    //     $sales_list = DB::select('SELECT mix_designs.rate, mix_designs.psi, ps.sell_date, SUM(ps.cuM) as total_cum FROM `product_sales` as ps 
+    //                             JOIN `mix_designs` ON `mix_designs`.id=ps.mix_design_id
+    //                             GROUP BY ps.sell_date, mix_designs.psi, mix_designs.rate ORDER BY ps.sell_date DESC');
+
+    //     $sales_months_list = DB::select('SELECT MONTH(ps.sell_date) as month, YEAR(ps.sell_date) as year, 
+    //             COUNT(ps.sell_date) as row_total,SUM(ps.cuM) as total_cum FROM `product_sales` as ps '
+    //         . 'GROUP BY MONTH(ps.sell_date),YEAR(ps.sell_date) ORDER BY year DESC,month DESC');
+
+    //     $i = 0;
+    //     $break_row = 0;
+    //     $break_div = 0;
+    //     $break_list = 0;
+    //     $html_sales_list = array();
+
+    //     foreach($sales_months_list as $smlist)
+    //     {
+
+    //         $html_sales_list[$i] =
+    //             '<h3>'.
+    //             date("F Y", strtotime(date($smlist->year . "-" . $smlist->month)))
+    //             .'<span style="float:right;margin-right:25px;">Total: '.$smlist->total_cum.'</span>
+    //             </h3>'.
+    //             '<div>
+    //                 <table cellpadding="0" cellspacing="0" width="100%" class="sOrders">
+    //                      <thead>
+    //                         <tr>
+    //                             <th width="20%">Date</th>
+    //                             <th width="20%">PSI</th>
+    //                             <th width="20%">Total cuM</th>
+    //                             <th width="20%">Total</th>
+    //                         </tr>
+    //                      </thead>
+    //                      <tbody>';
+
+
+    //         foreach ($sales_list as $list)
+    //         {
+    //             $date = $list->sell_date;
+    //             $month_n = date("m",strtotime($date));
+    //             $year_n = date('Y',strtotime($date));
+    //             if($smlist->month == $month_n && $smlist->year == $year_n)
+    //             {
+    //                 $html_sales_list[$i] .=
+    //                     '<tr>
+    //                             <td>'.date('d-M-y',strtotime($list->sell_date)).'</td>
+    //                             <td>'.$list->psi.'</td>
+    //                             <td>'.round($list->total_cum,2).'</td>  
+    //                             <td>'.number_format($list->total_cum*35.15*$list->rate,2).'</td>  
+    //                         </tr>';
+    //                 $break_row++;
+    //             }
+
+    //             if($break_row == $smlist->row_total) {
+    //                 $break_list++;
+    //                 if($break_list == 2) {
+    //                     break;
+    //                 }
+    //             }
+
+    //         }
+    //         $html_sales_list[$i] .= '</tbody>
+                                    
+    //                             </table>
+    //                         </div>' ;
+    //         if($break_div == 2) { break;}
+    //         $i++;
+    //         $break_div++;
+    //     }
+
+    //     /******************************************/
+
+    //     //product stock data
+    //     $product_stocks = ProductStock::all();
+
+    //     return view('admin.report.report_quick', compact( 'product_stocks', 'html_purchase_list','html_sales_list'));
+    // }
 
     public function customerDiscount(Request $request)
     {

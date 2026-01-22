@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\CashController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\UserController;
+
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ConfigController;
@@ -82,10 +82,10 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::group(['middleware' => ['auth']], function () {
 
-    Route::get('login/{token}/sec', [UserController::class, 'secretLogin'])->name('secret.login');
+    Route::get('login/{token}/sec', [App\Http\Controllers\UserController::class, 'secretLogin'])->name('secret.login');
 Route::group(['middleware' => ['role:super-admin|admin|manager']], function () {
 
-    Route::resource('role', RoleController::class);
+    Route::resource('role', App\Http\Controllers\RoleController::class);
     Route::resource('user', UserController::class);
 
     Route::get('settings', [ConfigController::class, 'index'])->name('config.index');
