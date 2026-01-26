@@ -793,87 +793,204 @@
 @endsection
 
 @section('page-script')
-    <script>
-        var t = 0;
-        var new_item = 0;
+<script>
+    var t = 0;
+    var new_item = 0;
 
-        $(document).ready(function(e) {
-
-            //update no and change color
-            $("#btn_bill_update").on('click',function(){
-                $("#error_div").empty();
-                var bill_no = $("#bill_no_modal").val();
-                var ad_qty = $("#ad_qty_modal").val();
-                var ad_cost = $("#ad_cost_modal").val();
-                $("#bill_no").val(bill_no);
-                $("#adjustment_amount").val(ad_qty);
-                $("#adjustment_cost").val(ad_cost);
-                if(bill_no === "")
-                {
-                    $("#error_div").append("<p>Please enter bill no</p>");
-
-                }
-
-                else {
-                    $("#checked_bill_form").submit();
-                }
-            });
-
-            $("#datatable tbody").on( 'click', 'tr', function () {
-                if($(this).find("input[type=checkbox]").is(':checked')) {
-                    $(this).addClass('selected');
-                } else{$(this).removeClass('selected');}
-            } );
-
-            //for select all rows
-            $("#datatable thead tr input[type=checkbox]").on( 'click', function () {
-                if($(this).is(':checked')) {
-                    $("#datatable tbody tr").addClass('selected');
-                } else{$("#datatable tbody tr").removeClass('selected');}
-            });
-
-            var $checkbox = $("input[type=checkbox]");
-
-            $checkbox.change(function(){
-                var len = $(".checkbox:checked").length;
-                // console.log(len)
-                var total_mat_cost = 0;
-                var total_qty = 0;
-                if(len>0) {
-                    var rowData = table.rows('.selected').data();
-                    $.each(rowData, function( index, value ) {
-                        console.log('ok');
-                        var str = rowData[index][6].split(" ");
-                        total_qty = total_qty + parseFloat(str[0]);
-                        total_mat_cost = total_mat_cost + parseFloat(rowData[index][8]);
-                    });
-                    $("#total_pro_qty").html('<b>'+total_qty+'</b>');
-                    $("#total_mat_cost").html('<b>'+total_mat_cost+'</b>');
-                    $("#total_selected").html('<b>'+len+'</b>');
-                    //alert(rowData[0][7]);
-                    $("#check_btn_div").css('display','inline-block');
-                } else {$("#check_btn_div").css('display','none'); }
-                len = 0;
-            });
-
-            $(document).on('click','.view_btn', function(){
-                $('#dmr_no').html($(this).data('dmr_no'));
-                $('#chalan_no').html($(this).data('chalan_no'));
-                $('#purchase_date').html($(this).data('purchase_date'));
-                $('#received_date').html($(this).data('received_date'));
-                $('#product_name').html($(this).data('product_name'));
-                $('#supplier_name').html($(this).data('supplier_name'));
-                $('#quantity').html($(this).data('quantity'));
-                $('#rate_per_unit').html($(this).data('rate_per_unit'));
-                $('#material_cost').html($(this).data('material_cost'));
-                $('#truck_rent').html($(this).data('truck_rent'));
-                $('#unload_bill').html($(this).data('unload_bill'));
-                $('#total_material_cost').html($(this).data('total_material_cost'));
-                $('#vehicle_no').html($(this).data('vehicle_no'));
-                $('#description').html($(this).data('description'));
-            });
+    $(document).ready(function(e) {
+        // Debug: Check if DataTable is initialized
+        console.log("Table instance:", typeof table, table);
+        
+        //update no and change color
+        $("#btn_bill_update").on('click',function(){
+            $("#error_div").empty();
+            var bill_no = $("#bill_no_modal").val();
+            var ad_qty = $("#ad_qty_modal").val();
+            var ad_cost = $("#ad_cost_modal").val();
+            $("#bill_no").val(bill_no);
+            $("#adjustment_amount").val(ad_qty);
+            $("#adjustment_cost").val(ad_cost);
+            
+            if(bill_no === "") {
+                $("#error_div").append("<p>Please enter bill no</p>");
+                return false;
+            }
+            
+            // Use setTimeout to ensure modal animation completes
+            setTimeout(function() {
+                $("#checked_bill_form").submit();
+            }, 300);
         });
-    </script>
+
+        // Row click handler
+        $("#datatable tbody").on('click', 'tr', function(e) {
+            // Don't trigger on checkbox click
+            if($(e.target).is('input[type="checkbox"]')) return;
+            
+            var checkbox = $(this).find("input[type=checkbox]");
+            var isChecked = checkbox.prop('checked');
+            
+            // Toggle checkbox
+            checkbox.prop('checked', !isChecked);
+            
+            // Toggle selected class
+            if(!isChecked) {
+                $(this).addClass('selected');
+            } else {
+                $(this).removeClass('selected');
+            }
+            
+            // Trigger change event
+            checkbox.trigger('change');
+        });
+
+        // Select all checkbox handler
+        $("#datatable thead tr input[type=checkbox]").on('click', function() {
+            var isChecked = $(this).prop('checked');
+            
+            // Check/uncheck all checkboxes
+            $("#datatable tbody input[type=checkbox]").prop('checked', isChecked);
+            
+            // Add/remove selected class
+            if(isChecked) {
+                $("#datatable tbody tr").addClass('selected');
+            } else {
+                $("#datatable tbody tr").removeClass('selected');
+            }
+            
+            // Trigger change event on all checkboxes
+            $("#datatable tbody input[type=checkbox]").trigger('change');
+        });
+
+        // Checkbox change handler
+        $(document).on('change', '#datatable tbody input[type=checkbox]', function(){
+            console.log("Checkbox changed");
+            
+            var checkedBoxes = $("#datatable tbody input[type=checkbox]:checked");
+            var len = checkedBoxes.length;
+            var total_mat_cost = 0;
+            var total_qty = 0;
+            
+            console.log("Checked boxes count:", len);
+            
+            if(len > 0) {
+                checkedBoxes.each(function(index) {
+                    console.log("Processing checkbox", index);
+                    
+                    var $row = $(this).closest('tr');
+                    var rowIndex = $row.index();
+                    
+                    // Try multiple ways to get row data
+                    var rowData = null;
+                    
+                    // Method 1: Using DataTables API if available
+                    if(typeof table !== 'undefined' && table) {
+                        try {
+                            rowData = table.row($row).data();
+                            console.log("Row data from DataTable API:", rowData);
+                        } catch(e) {
+                            console.log("Error getting DataTable row:", e);
+                        }
+                    }
+                    
+                    // Method 2: Get data from table cells directly
+                    if(!rowData || rowData.length === 0) {
+                        rowData = [];
+                        $row.find('td').each(function(i, cell) {
+                            rowData.push($(cell).text().trim());
+                        });
+                        console.log("Row data from DOM:", rowData);
+                    }
+                    
+                    if(rowData && rowData.length > 0) {
+                        // Parse quantity (assuming column 6, index 5)
+                        var qtyCell = rowData[5] || rowData[6] || '0';
+                        console.log("Quantity cell text:", qtyCell);
+                        
+                        // Extract numeric value from string
+                        var qtyValue = 0;
+                        if(typeof qtyCell === 'string') {
+                            // Remove commas and extract number
+                            var cleanQty = qtyCell.replace(/,/g, '');
+                            var qtyMatch = cleanQty.match(/[-+]?[0-9]*\.?[0-9]+/);
+                            qtyValue = qtyMatch ? parseFloat(qtyMatch[0]) : 0;
+                        } else {
+                            qtyValue = parseFloat(qtyCell) || 0;
+                        }
+                        
+                        console.log("Parsed quantity:", qtyValue);
+                        total_qty += qtyValue;
+                        
+                        // Parse material cost (assuming column 8, index 7)
+                        var costCell = rowData[7] || rowData[8] || '0';
+                        console.log("Cost cell text:", costCell);
+                        
+                        // Extract numeric value from string
+                        var costValue = 0;
+                        if(typeof costCell === 'string') {
+                            // Remove currency symbols, commas and extract number
+                            var cleanCost = costCell.replace(/[$,]/g, '');
+                            var costMatch = cleanCost.match(/[-+]?[0-9]*\.?[0-9]+/);
+                            costValue = costMatch ? parseFloat(costMatch[0]) : 0;
+                        } else {
+                            costValue = parseFloat(costCell) || 0;
+                        }
+                        
+                        console.log("Parsed cost:", costValue);
+                        total_mat_cost += costValue;
+                    }
+                });
+                
+                console.log("Total Quantity:", total_qty);
+                console.log("Total Mat Cost:", total_mat_cost);
+                
+                // Update display with formatted numbers
+                $("#total_pro_qty").html('<b>'+total_qty.toFixed(2)+'</b>');
+                $("#total_mat_cost").html('<b>'+total_mat_cost.toFixed(2)+'</b>');
+                $("#total_selected").html('<b>'+len+'</b>');
+                $("#check_btn_div").css('display','inline-block');
+            } else {
+                $("#total_pro_qty").html('<b>0.00</b>');
+                $("#total_mat_cost").html('<b>0.00</b>');
+                $("#total_selected").html('<b>0</b>');
+                $("#check_btn_div").css('display','none');
+            }
+            
+            // Prevent default if needed
+            return false;
+        });
+
+        // View button handler
+        $(document).on('click','.view_btn', function(e){
+            e.preventDefault();
+            
+            // Get data attributes
+            var $btn = $(this);
+            $('#dmr_no').html($btn.data('dmr_no') || '');
+            $('#chalan_no').html($btn.data('chalan_no') || '');
+            $('#purchase_date').html($btn.data('purchase_date') || '');
+            $('#received_date').html($btn.data('received_date') || '');
+            $('#product_name').html($btn.data('product_name') || '');
+            $('#supplier_name').html($btn.data('supplier_name') || '');
+            $('#quantity').html($btn.data('quantity') || '');
+            $('#rate_per_unit').html($btn.data('rate_per_unit') || '');
+            $('#material_cost').html($btn.data('material_cost') || '');
+            $('#truck_rent').html($btn.data('truck_rent') || '');
+            $('#unload_bill').html($btn.data('unload_bill') || '');
+            $('#total_material_cost').html($btn.data('total_material_cost') || '');
+            $('#vehicle_no').html($btn.data('vehicle_no') || '');
+            $('#description').html($btn.data('description') || '');
+            
+            // Show modal
+            $('#viewModal').modal('show');
+        });
+
+        // Initialize event for the first time
+        setTimeout(function() {
+            $("#datatable tbody input[type=checkbox]:checked").trigger('change');
+        }, 1000);
+    });
+</script>
 @endsection
 <script>
     function printStatement(elementId, mode) {
