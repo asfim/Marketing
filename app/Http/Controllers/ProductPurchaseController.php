@@ -20,237 +20,185 @@ use Illuminate\Support\Facades\Session;
 class ProductPurchaseController extends Controller
 {
 
-//     public function productPurchaseList(Request $request)
-//     {
-//         $user_data = Auth::user();
-//         if  ($request->filled("date_range")) {
-//             $date_range = date_range_to_arr($request->date_range);
-//         }
-//        else{
-//            $date_range = [date('Y-m-d',strtotime('-30 days')), date('Y-m-d')];
-//        }
-
-//         $check_p = ProductPurchase::select(DB::raw('bill_no,count(*)as tor,MAX(received_date) as received_date, 
-//             MAX(dmr_no) as dmr_no, MAX(check_status) as check_status, MAX(chalan_no) as chalan_no, 
-//             MAX(supplier_id) as supplier_id, MAX(product_name_id) as product_name_id,
-//             sum(material_cost) as material_cost, sum(total_material_cost) as total_material_cost, 
-//             sum(truck_rent) as truck_rent, sum(unload_bill) as unload_bill, sum(product_qty) as product_qty'));
-
-//         $purchases = new ProductPurchase();
-//         //    if (!$request->filled('search_text')) {
-//             $purchases = $purchases->whereBetween('received_date', [
-//                 Carbon::parse($date_range[0])->format('Y-m-d'),
-//                 Carbon::parse($date_range[1])->format('Y-m-d')
-//             ]);
-          
-//         // }
-// // dd($check_p->get());
-//         // if ($user_data->branchId != '') {
-//         //     $purchases = $purchases->where('branchId', $user_data->branchId);
-//         //     $check_p = $check_p->where('branchId', $user_data->branchId);
-//         // }
-
-//              $admin_ids = [1,16,17,18,19,21,22,23];
-
-//         if (!in_array($user_data->id, $admin_ids)) {
-//             $purchases = $purchases->where('branchId', $user_data->branchId);
-//             $check_p = $check_p->where('branchId', $user_data->branchId);
-//         }
-
-//         if ($request->search_text != '') {
-    
-//     $purchases = $purchases->where(function ($query) use ($request) {
-//         $query->where('dmr_no', '=', $request->search_text)
-//             ->orWhere('chalan_no', '=', $request->search_text)  // '='
-//             ->orWhere('product_qty', '=', $request->search_text)
-//             ->orWhere('rate_per_unit', '=', $request->search_text)
-//             ->orWhere('material_cost', '=', $request->search_text)
-//             ->orWhere('total_material_cost', '=', $request->search_text)
-//             ->orWhereHas('supplier', function ($q) use ($request) {
-//                 $q->where('name', 'like', '%' . $request->search_text . '%');
-//             })
-//             ->orWhereHas('product_name', function ($q) use ($request) {
-//                 $q->where('name', 'like', '%' . $request->search_text . '%');
-//             });
-//     });
-    
-   
-//     $check_p = $check_p->where(function ($query) use ($request) {
-//         $query->where('dmr_no', '=', $request->search_text)
-//             ->orWhere('chalan_no', '=', $request->search_text)
-//             ->orWhere('product_qty', '=', $request->search_text)
-//             ->orWhere('rate_per_unit', '=', $request->search_text)
-//             ->orWhere('material_cost', '=', $request->search_text)
-//             ->orWhere('total_material_cost', '=', $request->search_text)
-//             ->orWhereHas('supplier', function ($q) use ($request) {
-//                 $q->where('name', 'like', '%' . $request->search_text . '%');
-//             })
-//             ->orWhereHas('product_name', function ($q) use ($request) {
-//                 $q->where('name', 'like', '%' . $request->search_text . '%');
-//             });
-//     });
-    
-    
-//     if ($request->search_text2 != '') {
-//         $purchases = $purchases->whereHas('product_name', function ($q) use ($request) {
-//             $q->where('name', 'like', '%' . $request->search_text2 . '%');
-//         });
-        
-//         $check_p = $check_p->whereHas('product_name', function ($q) use ($request) {
-//             $q->where('name', 'like', '%' . $request->search_text2 . '%');
-//         });
-//     }
-// }
-//         $purchases = $purchases->where('check_status', 0)
-//             ->orderBy('check_status', 'ASC')
-//             ->orderBy('received_date', 'DESC')
-//             ->get();
-
-//         // dd($purchases);
-
-//         $check_p = $check_p
-//             ->where('check_status', 1)
-//             ->orderBy('received_date', 'DESC')->groupBy('bill_no');
-  
-//             $check_p = $check_p->whereBetween('received_date', [
-//                             Carbon::parse($date_range[0])->format('Y-m-d'),
-//                             Carbon::parse($date_range[1])->format('Y-m-d')
-
-//                         ])->get();
-
-//         $grant_total_qty = ProductPurchase::sum('product_qty') - SupplierStatement::sum('adjustment_qty');
-//         $product_names = ProductName::all();
-//         $suppliers = Supplier::orderBy('name', 'ASC')->get();
-//         return view('admin.product.view_product_purchase_list', compact('purchases', 'check_p', 'product_names', 'suppliers', 'grant_total_qty'));
-//     }
-
+//    
 
 
 public function productPurchaseList(Request $request)
+
 {
-    $user_data = Auth::user();
+  $user_data = Auth::user();
 
-    if ($request->filled("date_range")) {
-        $date_range = date_range_to_arr($request->date_range);
-    } else {
+        // 1. Handle date range
+        if ($request->filled("date_range")) {
+            $date_range = date_range_to_arr($request->date_range);
+        } else {
+            if ($request->has("date_range") && !$request->filled("date_range")) {
+                $date_range = null;
+            } else {
+                $date_range = [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+            }
+        }
+
+        // 2. Initialize queries with relationships
+        $check_p = ProductPurchase::select(DB::raw('bill_no, count(*) as tor,
+            MAX(received_date) as received_date,
+            MAX(dmr_no) as dmr_no,
+            MAX(check_status) as check_status,
+            MAX(chalan_no) as chalan_no,
+            MAX(supplier_id) as supplier_id,
+            MAX(product_name_id) as product_name_id,
+            MAX(branchId) as branchId,
+            SUM(material_cost) as material_cost,
+            SUM(total_material_cost) as total_material_cost,
+            SUM(truck_rent) as truck_rent,
+            SUM(unload_bill) as unload_bill,
+            SUM(product_qty) as product_qty'))
+            ->with(['supplier', 'product_name', 'branch']);
+
+        $purchases = ProductPurchase::with(['supplier', 'product_name', 'branch']);
+
+        // 3. Branch filtering for non-admin users
+        $admin_ids = [1, 16, 17, 18, 19, 21, 22, 23];
+        if (!in_array($user_data->id, $admin_ids)) {
+            $purchases = $purchases->where('branchId', $user_data->branchId);
+            $check_p = $check_p->where('branchId', $user_data->branchId);
+        }
+
+        // 4. Branch filter for admin users (from request)
+        if ($request->filled('branch_filter') && in_array($user_data->id, $admin_ids)) {
+            $branch_filter = $request->branch_filter;
+            $purchases = $purchases->where('branchId', $branch_filter);
+            $check_p = $check_p->where('branchId', $branch_filter);
+        }
+
+        // 5. Search functionality
+        $hasSearch = $request->filled('search_text') || $request->filled('search_text2');
+
+        if ($hasSearch) {
+            if ($request->filled('search_text')) {
+                $search_text = $request->search_text;
+
+                $purchases = $purchases->where(function ($query) use ($search_text) {
+                    $query->where('dmr_no', '=', $search_text)
+                        ->orWhere('chalan_no', '=', $search_text)
+                        ->orWhere('product_qty', '=', $search_text)
+                        ->orWhere('rate_per_unit', '=', $search_text)
+                        ->orWhere('material_cost', '=', $search_text)
+                        ->orWhere('total_material_cost', '=', $search_text)
+                        ->orWhereHas('supplier', function ($q) use ($search_text) {
+                            $q->where('name', 'like', '%' . $search_text . '%');
+                        })
+                        ->orWhereHas('product_name', function ($q) use ($search_text) {
+                            $q->where('name', 'like', '%' . $search_text . '%');
+                        })
+                        ->orWhereHas('branch', function ($q) use ($search_text) {
+                            $q->where('name', 'like', '%' . $search_text . '%');
+                        });
+                });
+
+                $check_p = $check_p->where(function ($query) use ($search_text) {
+                    $query->where('dmr_no', '=', $search_text)
+                        ->orWhere('chalan_no', '=', $search_text)
+                        ->orWhere('product_qty', '=', $search_text)
+                        ->orWhere('rate_per_unit', '=', $search_text)
+                        ->orWhere('material_cost', '=', $search_text)
+                        ->orWhere('total_material_cost', '=', $search_text)
+                        ->orWhereHas('supplier', function ($q) use ($search_text) {
+                            $q->where('name', 'like', '%' . $search_text . '%');
+                        })
+                        ->orWhereHas('product_name', function ($q) use ($search_text) {
+                            $q->where('name', 'like', '%' . $search_text . '%');
+                        })
+                        ->orWhereHas('branch', function ($q) use ($search_text) {
+                            $q->where('name', 'like', '%' . $search_text . '%');
+                        });
+                });
+            }
+
+            if ($request->filled('search_text2')) {
+                $search_text2 = $request->search_text2;
+
+                $purchases = $purchases->whereHas('product_name', function ($q) use ($search_text2) {
+                    $q->where('name', 'like', '%' . $search_text2 . '%');
+                });
+
+                $check_p = $check_p->whereHas('product_name', function ($q) use ($search_text2) {
+                    $q->where('name', 'like', '%' . $search_text2 . '%');
+                });
+            }
+        }
+
+        // 6. Date range filtering
+        if (isset($date_range)) {
+            $purchases = $purchases->whereBetween('received_date', [
+                Carbon::parse($date_range[0])->format('Y-m-d'),
+                Carbon::parse($date_range[1])->format('Y-m-d')
+            ]);
+
+            $check_p = $check_p->whereBetween('received_date', [
+                Carbon::parse($date_range[0])->format('Y-m-d'),
+                Carbon::parse($date_range[1])->format('Y-m-d')
+            ]);
+        }
+
+        // 7. Fetch unchecked purchases
+        $purchases = $purchases->where('check_status', 0)
+            ->orderBy('check_status', 'ASC')
+            ->orderBy('received_date', 'DESC')
+            ->get();
+
+        // 8. Fetch checked purchases (grouped by bill)
+        $check_p = $check_p->where('check_status', 1)
+            ->orderBy('received_date', 'DESC')
+            ->groupBy('bill_no')
+            ->get();
+
+        // 9. Calculate grant total quantity
+        $grant_total_qty = ProductPurchase::sum('product_qty') - SupplierStatement::sum('adjustment_qty');
+
+        // 10. Fetch additional data
+        $product_names = ProductName::all();
+        $suppliers = Supplier::orderBy('name', 'ASC')->get();
+        $branches = Branch::all();
+
+        // 11. Calculate branch-wise totals
+        $branch_totals_query = ProductPurchase::where('check_status', 0);
         
-        if($request->has("date_range") && !$request->filled("date_range")){
-             $date_range = null;
+        if (!in_array($user_data->id, $admin_ids)) {
+            $branch_totals_query = $branch_totals_query->where('branchId', $user_data->branchId);
+        }
+        
+        if ($request->filled('branch_filter') && in_array($user_data->id, $admin_ids)) {
+            $branch_totals_query = $branch_totals_query->where('branchId', $request->branch_filter);
+        }
+        
+        if (isset($date_range)) {
+            $branch_totals_query = $branch_totals_query->whereBetween('received_date', [
+                Carbon::parse($date_range[0])->format('Y-m-d'),
+                Carbon::parse($date_range[1])->format('Y-m-d')
+            ]);
+        }
+        
+        $branch_totals = $branch_totals_query->select('branchId',
+                DB::raw('SUM(product_qty) as total_qty'),
+                DB::raw('SUM(total_material_cost) as total_cost'))
+            ->groupBy('branchId')
+            ->with('branch')
+            ->get();
 
-        }
-        else{
-            $date_range = [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
-        }
+        // 12. Return view with all data
+        return view('admin.product.view_product_purchase_list', compact(
+            'purchases',
+            'check_p',
+            'product_names',
+            'suppliers',
+            'grant_total_qty',
+            'branches',
+            'branch_totals',
+            'user_data',
+            'admin_ids'
+        ));
     }
-
-
-    $check_p = ProductPurchase::select(DB::raw('bill_no, count(*) as tor,
-        MAX(received_date) as received_date,
-        MAX(dmr_no) as dmr_no,
-        MAX(check_status) as check_status,
-        MAX(chalan_no) as chalan_no,
-        MAX(supplier_id) as supplier_id,
-        MAX(product_name_id) as product_name_id,
-        SUM(material_cost) as material_cost,
-        SUM(total_material_cost) as total_material_cost,
-        SUM(truck_rent) as truck_rent,
-        SUM(unload_bill) as unload_bill,
-        SUM(product_qty) as product_qty'));
-
-    $purchases = new ProductPurchase();
-
-
-    $admin_ids = [1,16,17,18,19,21,22,23];
-    if (!in_array($user_data->id, $admin_ids)) {
-        $purchases = $purchases->where('branchId', $user_data->branchId);
-        $check_p = $check_p->where('branchId', $user_data->branchId);
-    }
-
-    $hasSearch = $request->filled('search_text') || $request->filled('search_text2');
-
-    if ($hasSearch) {
-        if ($request->filled('search_text')) {
-            $search_text = $request->search_text;
-
-            $purchases = $purchases->where(function($query) use ($search_text) {
-                $query->where('dmr_no', '=', $search_text)
-                      ->orWhere('chalan_no', '=', $search_text)
-                      ->orWhere('product_qty', '=', $search_text)
-                      ->orWhere('rate_per_unit', '=', $search_text)
-                      ->orWhere('material_cost', '=', $search_text)
-                      ->orWhere('total_material_cost', '=', $search_text)
-                      ->orWhereHas('supplier', function($q) use ($search_text) {
-                          $q->where('name', 'like', '%' . $search_text . '%');
-                      })
-                      ->orWhereHas('product_name', function($q) use ($search_text) {
-                          $q->where('name', 'like', '%' . $search_text . '%');
-                      });
-            });
-
-            $check_p = $check_p->where(function($query) use ($search_text) {
-                $query->where('dmr_no', '=', $search_text)
-                      ->orWhere('chalan_no', '=', $search_text)
-                      ->orWhere('product_qty', '=', $search_text)
-                      ->orWhere('rate_per_unit', '=', $search_text)
-                      ->orWhere('material_cost', '=', $search_text)
-                      ->orWhere('total_material_cost', '=', $search_text)
-                      ->orWhereHas('supplier', function($q) use ($search_text) {
-                          $q->where('name', 'like', '%' . $search_text . '%');
-                      })
-                      ->orWhereHas('product_name', function($q) use ($search_text) {
-                          $q->where('name', 'like', '%' . $search_text . '%');
-                      });
-            });
-        }
-
-        if ($request->filled('search_text2')) {
-            $search_text2 = $request->search_text2;
-
-            $purchases = $purchases->whereHas('product_name', function($q) use ($search_text2) {
-                $q->where('name', 'like', '%' . $search_text2 . '%');
-            });
-
-            $check_p = $check_p->whereHas('product_name', function($q) use ($search_text2) {
-                $q->where('name', 'like', '%' . $search_text2 . '%');
-            });
-        }
-
-    } 
-    if(isset($date_range)){
-        $purchases = $purchases->whereBetween('received_date', [
-                    Carbon::parse($date_range[0])->format('Y-m-d'),
-                    Carbon::parse($date_range[1])->format('Y-m-d')
-                ]);
-
-                $check_p = $check_p->whereBetween('received_date', [
-                    Carbon::parse($date_range[0])->format('Y-m-d'),
-                    Carbon::parse($date_range[1])->format('Y-m-d')
-
-                ]);
-    }
-     
-        // dd($date_range);
-    $purchases = $purchases->where('check_status', 0)
-        ->orderBy('check_status', 'ASC')
-        ->orderBy('received_date', 'DESC')
-        ->get();
-
-    $check_p = $check_p->where('check_status', 1)
-        ->orderBy('received_date', 'DESC')
-        ->groupBy('bill_no')
-        ->get();
-
-    // ৭. Extra data
-    $grant_total_qty = ProductPurchase::sum('product_qty') - SupplierStatement::sum('adjustment_qty');
-    $product_names = ProductName::all();
-    $suppliers = Supplier::orderBy('name', 'ASC')->get();
-    $branch=Branch::all();
-
-    return view('admin.product.view_product_purchase_list', compact(
-        'purchases', 'check_p', 'product_names', 'suppliers', 'grant_total_qty','branch'
-    ));
-}
-
 
 
     public function productPurchaseForm()
