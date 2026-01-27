@@ -1141,7 +1141,7 @@ public function allCustomerBalanceReport(Request $request)
     $branchId = $user ? $user->branchId : null;
     
     // 🔹 বিশেষ ইউজার যারা সব ব্রাঞ্চ দেখতে পারবে (যেমন user_id = 17)
-    $canViewAllBranches = $user && $user->id == 17; // user_id 17 সব ব্রাঞ্চ দেখবে
+ $canViewAllBranches = $user && ($user->id == 17 || $user->id == 20);
 
     /** Purchase List - Grouped by Month (Last 3 Months) */
     $threeMonthsAgo = now()->subMonths(3)->format('Y-m-d H:i:s');

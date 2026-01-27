@@ -34,6 +34,9 @@ class ProductSaleController extends Controller
         // } elseif ($branchId != ''){
         //     $challans = $challans->where('branchId', $branchId);
         // }
+        if ($branchId != 14 && $branchId != 13 && $branchId != '') {
+            $challans = $challans->where('branchId', $branchId);
+        }
 
         if(isset($date_range)) {
             $challans = $challans->whereBetween('sell_date', [

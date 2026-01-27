@@ -126,7 +126,7 @@
                                         <form action="{{ route('product.purchase.check') }}" method="post" id="checked_bill_form" class="form-horizontal">
                                             {{csrf_field()}}
                                             <input type="hidden" name="bill_no" id="bill_no" value="" />
-                                            <input type="hidden" name="adjustment_amount" id="adjustment_amount" value="" />
+                                            <input type="hidden" name="adjustment_qty" id="adjustment_amount" value="" />
                                             <input type="hidden" name="adjustment_cost" id="adjustment_cost" value="" />
                                             <table cellpadding="0" cellspacing="0" width="100%" class="table" id="datatable">
                                                 <thead>

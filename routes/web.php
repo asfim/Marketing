@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\CashController;
-use App\Http\Controllers\RoleController;
 
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\BranchController;
@@ -36,8 +35,6 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\InvestmentController;
-// use App\Http\Controllers\RoleController;
-//use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ProductSaleController;
 use App\Http\Controllers\CustomerBillController;
 use App\Http\Controllers\FundTransferController;

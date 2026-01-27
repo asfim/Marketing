@@ -87,7 +87,7 @@
                                 @endif
                                 <th>Total</th>
                                 <th>Bill Status</th>
-                                @if ($user->branchId == '')
+                                 @if ($user->hasRole(['super-admin']) || $user->can('challan-branch-view'))
                                     <th>Branch</th>
                                 @endif
                                 <th class="hidden-print">Actions</th>
@@ -134,7 +134,7 @@
                                     @endif
 
                                     <td>{{ $chalan->status == 1 ? 'Not Submitted' : 'Submitted' }}</td>
-                                    @if ($user->branchId == '')
+                                      @if ($user->hasRole(['super-admin']) || $user->can('challan-branch-view'))
                                         <td>{{ $chalan->branch->name ?? '-' }}</td>
                                     @endif
                                     <td class="hidden-print">

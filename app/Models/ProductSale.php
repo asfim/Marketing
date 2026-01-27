@@ -42,4 +42,5 @@ class ProductSale extends Model
         return $this->belongsTo(DemoProductSale::class, 'challan_no', 'challan_no');
     }
     
+    
 }
