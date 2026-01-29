@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BankInfo;
-use App\Models\BankStatement;
+use Illuminate\Support\Facades\Log;
 use App\Models\Branch;
-use App\Models\CashStatement;
-use App\Models\ProductPurchase;
+use App\Models\BankInfo;
 use App\Models\Supplier;
+use Illuminate\Http\Request;
+use App\Models\BankStatement;
+use App\Models\CashStatement;
+use Illuminate\Support\Carbon;
+use App\Models\ProductPurchase;
 use App\Models\SupplierPayment;
 use App\Models\SupplierStatement;
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class SupplierController extends Controller
@@ -174,170 +175,525 @@ class SupplierController extends Controller
 
 
         //SEARCH ON PURCHASE TAB
-    public function show(Request $request, $id)
-{
+//     public function show(Request $request, $id)
+// {
     
+//     $user_data = Auth::user();
+//     $supplier = Supplier::findOrFail($id);
+//     $branches = Branch::all();
+//     $selected_tab = $request->tab_type ?? 'tab-profile';
+//     $purchases = $supplier->purchases();
+//     $check_p = $supplier->checkedPurchases();
+
+//     // Initialize default date ranges
+//     $billinfo_date_range = $request->filled('billinfo_date_range')
+//         ? date_range_to_arr($request->billinfo_date_range)
+//         : [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+
+//     $payment_date_range = $request->filled('payment_date_range')
+//         ? date_range_to_arr($request->payment_date_range)
+//         : [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+
+//     $statement_date_range = $request->filled('statement_date_range')
+//         ? date_range_to_arr($request->statement_date_range)
+//         : [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+
+//     // SEARCH ON PURCHASE TAB
+//     // if ($selected_tab == 'tab-purchase') {
+//     //     // Apply date range filter
+//     //     $purchases = $purchases->whereBetween('received_date', [
+//     //          Carbon::parse($purchase_date_range[0])->format('Y-m-d'),
+//     //         Carbon::parse($purchase_date_range[1])->format('Y-m-d'),
+//     //     ]);
+
+//     //     $check_p = $check_p->whereBetween('received_date', [
+//     //         Carbon::parse($purchase_date_range[0])->format('Y-m-d'),
+//     //         Carbon::parse($purchase_date_range[1])->format('Y-m-d'),
+//     //     ]);
+
+//     //     // Apply branch filter for non-admin users if tutul is want then open it 
+//     //     // if ($user_data->id != 1) {
+//     //     //     $purchases = $purchases->where('branchId', $user_data->branchId);
+//     //     //     $check_p = $check_p->where('branchId', $user_data->branchId); 
+//     //     // }
+//     //     $admin_ids = [1,21,22,23];
+
+//     //     if (!in_array($user_data->id, $admin_ids)) {
+//     //         $purchases = $purchases->where('branchId', $user_data->branchId);
+//     //         $check_p = $check_p->where('branchId', $user_data->branchId);
+//     //     }
+
+//     //     // Apply search filter
+//     //     if ($request->filled('purchase_search_text')) {
+//     //         $purchases = $purchases->where(function ($query) use ($request) {
+//     //             $query->where('dmr_no', $request->purchase_search_text)
+//     //                 ->orWhere('chalan_no', $request->purchase_search_text)
+//     //                 ->orWhere('product_qty', $request->purchase_search_text)
+//     //                 ->orWhere('rate_per_unit', $request->purchase_search_text)
+//     //                 ->orWhere('material_cost', $request->purchase_search_text)
+//     //                 ->orWhere('total_material_cost', $request->purchase_search_text)
+//     //                 ->orWhereHas('product_name', function ($q) use ($request) {
+//     //                     $q->where('name', 'like', '%' . $request->purchase_search_text . '%');
+//     //                 });
+//     //         });
+
+//     //         $check_p = $check_p->where(function ($query) use ($request) {
+//     //             $query->where('dmr_no', $request->purchase_search_text)
+//     //                 ->orWhere('chalan_no', $request->purchase_search_text)
+//     //                 ->orWhere('product_qty', $request->purchase_search_text)
+//     //                 ->orWhere('rate_per_unit', $request->purchase_search_text)
+//     //                 ->orWhere('material_cost', $request->purchase_search_text)
+//     //                 ->orWhere('total_material_cost', $request->purchase_search_text)
+//     //                 ->orWhereHas('product_name', function ($q) use ($request) {
+//     //                     $q->where('name', 'like', '%' . $request->purchase_search_text . '%');
+//     //                 });
+//     //         });
+//     //     }
+
+//     //     // Execute queries
+//     //     $purchases = $purchases->orderByDesc('received_date')->get();
+//     //     $check_p = $check_p->orderByDesc('received_date')->get();
+//     // } else {
+//     //     // Default purchase data for other tabs
+//     //     $purchases = $supplier->purchases()->get();
+//     //     $check_p = $supplier->checkedPurchases()->get();
+//     // }
+
+
+
+// $purchase_date_range = [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+
+// $start_date = $purchase_date_range[0];
+// $end_date   = $purchase_date_range[1];
+
+// // Apply default date range for all tabs
+// $purchases = $purchases->whereBetween('received_date', [$start_date, $end_date]);
+
+// // When tab is purchase → apply filters
+// if ($selected_tab == 'tab-purchase') {
+// $check_p   = $check_p->whereBetween('received_date', [$start_date, $end_date]);
+
+
+//     // If user selects a date range
+//     if ($request->filled('purchase_date_range')) {
+//         $purchase_date_range = date_range_to_arr($request->purchase_date_range);
+
+//         $start_date = Carbon::parse($purchase_date_range[0])->format('Y-m-d');
+//         $end_date   = Carbon::parse($purchase_date_range[1])->format('Y-m-d');
+
+//         $purchases = $purchases->whereBetween('received_date', [$start_date, $end_date]);
+//         $check_p   = $check_p->whereBetween('received_date', [$start_date, $end_date]);
+//     }
+
+//     // Branch filter except admins
+//     $admin_ids = [1, 21, 22, 23];
+//     if (!in_array($user_data->id, $admin_ids)) {
+//         $purchases = $purchases->where('branchId', $user_data->branchId);
+//         $check_p   = $check_p->where('branchId', $user_data->branchId);
+//     }
+
+//     // Search filter
+//     if ($request->filled('purchase_search_text')) {
+//         $search = $request->purchase_search_text;
+
+//         $purchases = $purchases->where(function ($query) use ($search) {
+//             $query->where('dmr_no', $search)
+//                   ->orWhere('chalan_no', $search)
+//                   ->orWhere('product_qty', $search)
+//                   ->orWhere('rate_per_unit', $search)
+//                   ->orWhere('material_cost', $search)
+//                   ->orWhere('total_material_cost', $search)
+//                   ->orWhereHas('product_name', function ($q) use ($search) {
+//                       $q->where('name', 'like', '%' . $search . '%');
+//                   });
+//         });
+
+//         $check_p = $check_p->where(function ($query) use ($search) {
+//             $query->where('dmr_no', $search)
+//                   ->orWhere('chalan_no', $search)
+//                   ->orWhere('product_qty', $search)
+//                   ->orWhere('rate_per_unit', $search)
+//                   ->orWhere('material_cost', $search)
+//                   ->orWhere('total_material_cost', $search)
+//                   ->orWhereHas('product_name', function ($q) use ($search) {
+//                       $q->where('name', 'like', '%' . $search . '%');
+//                   });
+//         });
+//     }
+// }
+
+// // Final output
+// $purchases = $purchases->orderByDesc('received_date')->get();
+// $check_p   = $check_p->orderByDesc('received_date')->get();
+
+
+//     if ($selected_tab === 'tab-billinfo') {
+//     // START FROM FRESH CHECKED PURCHASES QUERY
+//     $check_p = $supplier->checkedPurchases();
+
+//     // 🔍 Date Range Filter (billinfo_date_range)
+//     if ($request->filled('billinfo_date_range')) {
+//         $dates = explode(' - ', $request->billinfo_date_range);
+//         if (count($dates) === 2) {
+//             try {
+//                 $start = Carbon::parse($dates[0])->startOfDay();
+//                 $end = Carbon::parse($dates[1])->endOfDay();
+//                 $check_p = $check_p->whereBetween('received_date', [$start, $end]);
+//             } catch (\Exception $e) {
+//                 Log::warning('Invalid date range in Bill Info tab', ['input' => $request->billinfo_date_range]);
+//             }
+//         }
+//     }
+
+//     // 🔎 Search Filter (billinfo_search_text)
+//     if ($request->filled('billinfo_search_text')) {
+//         $term = '%' . $request->billinfo_search_text . '%';
+//         $check_p = $check_p->where(function ($q) use ($term) {
+//             $q->where('dmr_no', 'like', $term)
+//               ->orWhere('chalan_no', 'like', $term)
+//               ->orWhere('bill_no', 'like', $term)
+//               ->orWhere('vehicle_no', 'like', $term)
+//               ->orWhere('product_qty', 'like', $term)
+//               ->orWhere('rate_per_unit', 'like', $term)
+//               ->orWhere('material_cost', 'like', $term)
+//               ->orWhere('truck_rent', 'like', $term)
+//               ->orWhere('unload_bill', 'like', $term)
+//               ->orWhere('total_material_cost', 'like', $term)
+//               ->orWhereHas('product_name', fn($sq) => $sq->where('name', 'like', $term))
+//               ->orWhereHas('supplier', fn($sq) => $sq->where('name', 'like', $term));
+//         });
+//     }
+
+//     // 🌐 Branch Filter (non-admins)
+//     $admin_ids = [1, 21, 22, 23];
+//     if (!in_array($user_data->id, $admin_ids)) {
+//         $check_p = $check_p->where('branchId', $user_data->branchId);
+//     }
+
+//     // ✅ Execute query
+//     $check_p = $check_p->orderByDesc('received_date')->get();
+    
+//     // $purchases unchanged (other tabs will use it)
+// }
+        
+//         //SEARCH ON PAYMENT TAB
+
+//         if ($selected_tab == 'tab-payment') {
+
+//             //  Use query builder
+//             $payments = $supplier->payments();
+            
+
+//             if ($request->filled('payment_date_range')) {
+
+//                 $payment_date_range = date_range_to_arr($request->payment_date_range);
+
+//                 $payments->whereBetween('ref_date', [
+//                     Carbon::parse($payment_date_range[0])->format('Y-m-d'),
+//                     Carbon::parse($payment_date_range[1])->format('Y-m-d')
+//                 ]);
+//             }
+
+//             if ($request->payment_search_text) {
+//                 $payments->where(function ($query) use ($request) {
+//                     $query->where('voucher_no', 'LIKE', $request->payment_search_text . '%')
+//                         ->orWhere('payment_mode', 'LIKE', '%' . $request->payment_search_text . '%')
+//                         ->orWhere('paid_amount', $request->payment_search_text)
+//                         ->orWhereHas('bank_info', function ($q) use ($request) {
+//                             $q->where('bank_name', 'LIKE', '%' . $request->payment_search_text . '%');
+//                         });
+//                 });
+//             }
+
+//             //  Apply order and get results
+//             $payments = $payments->orderByDesc('ref_date')->get();
+
+//         } else {
+//             $payment_date_range = [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+
+
+
+//             // Use query builder here too
+//             $payments = $supplier->payments()
+            
+//                 ->when($request->filled('statement_date_range'), function ($q) use ($payment_date_range) {
+
+//                     $q->whereBetween('ref_date', [
+//                         Carbon::parse($payment_date_range[0])->format('Y-m-d'),
+//                         Carbon::parse($payment_date_range[1])->format('Y-m-d'),
+//                     ]);
+//                 })
+//                 ->orderByDesc('ref_date')
+//                 ->get();
+//         }
+
+
+
+
+//         //SEARCH ON STATEMENT TAB
+//         if ($selected_tab == 'tab-statement') {
+
+//             //  Use query builder
+//             $statements = $supplier->supplierStatements();
+
+
+//             // Apply date range filter
+//             if ($request->filled('date_range')) {
+//                 $statement_date_range = date_range_to_arr($request->date_range);
+
+//             }else{
+//                 $statement_date_range = [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+//             }
+//                 $statements->whereBetween('posting_date',
+//                     [
+//                         Carbon::parse($statement_date_range[0])->format('Y-m-d'),
+//                         Carbon::parse($statement_date_range[1])->format('Y-m-d')
+//                     ]
+//                 );
+
+//             //  Apply search filter
+//             if ($request->statement_search_text != '') {
+//                 $statements->where(function ($query) use ($request) {
+//                     $query->where('transaction_id', 'LIKE', '%' . $request->statement_search_text . '%')
+//                         ->orWhere('description', '=', $request->statement_search_text)
+//                         ->orWhere('debit', 'LIKE', '%' . $request->statement_search_text . '%')
+//                         ->orWhere('credit', 'LIKE', '%' . $request->statement_search_text . '%')
+//                         ->orWhere('balance', 'LIKE', '%' . $request->statement_search_text . '%')
+//                         ->orWhereHas('supplier', function ($q) use ($request) {
+//                             $q->where('name', 'LIKE', '%' . $request->statement_search_text . '%');
+//                         });
+//                 });
+//             }
+
+//             //  Order and get
+//             $statements = $statements->orderByDesc('posting_date')->get();
+
+//         } else {
+//             $statement_date_range = [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+
+
+//             //  Also use query builder here
+//             $statements = $supplier->supplierStatements()->whereBetween('posting_date', [
+//                 Carbon::parse($statement_date_range[0])->format('Y-m-d'),
+//                 Carbon::parse($statement_date_range[1])->format('Y-m-d'),
+//             ])->orderByDesc('posting_date')->get();
+
+//         }
+
+
+
+
+//         $total_purchase = ProductPurchase::where('supplier_id', $id)->sum('material_cost');
+//         $total_payment = SupplierPayment::where('supplier_id', $id)->sum('paid_amount');
+//         // dd(isset($purchases), $purchases->get() ?? 'NO');
+
+      
+
+
+//         return view('admin.supplier.supplier_profile', compact('supplier', 'branches', 'selected_tab',
+//             'purchases', 'check_p', 'payments', 'statements', 'total_purchase', 'total_payment'));
+//     }
+
+
+
+public function show(Request $request, $id)
+{
     $user_data = Auth::user();
     $supplier = Supplier::findOrFail($id);
     $branches = Branch::all();
     $selected_tab = $request->tab_type ?? 'tab-profile';
-    $purchases = $supplier->purchases();
-    $check_p = $supplier->checkedPurchases();
+    
+    $admin_ids = [1, 21, 22, 23];
+    $is_admin = in_array($user_data->id, $admin_ids);
 
-    // Initialize default date ranges
-    $purchase_date_range = $request->filled('purchase_date_range')
-        ? date_range_to_arr($request->purchase_date_range)
-        : null;
-
-    $payment_date_range = $request->filled('payment_date_range')
-        ? date_range_to_arr($request->payment_date_range)
-        : [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
-
-    $statement_date_range = $request->filled('statement_date_range')
-        ? date_range_to_arr($request->statement_date_range)
-        : [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
-
-    // SEARCH ON PURCHASE TAB
+    // ========== PURCHASE DATA (for profile tab summary + purchase tab) ==========
+    // Always load last 30 days data for profile tab summary
+    $purchases = $supplier->purchases()
+        ->whereBetween('received_date', [
+            date('Y-m-d', strtotime('-30 days')),
+            date('Y-m-d')
+        ])
+        ->orderByDesc('received_date')
+        ->get();
+    
+    $check_p = $supplier->checkedPurchases()
+        ->whereBetween('received_date', [
+            date('Y-m-d', strtotime('-30 days')),
+            date('Y-m-d')
+        ])
+        ->orderByDesc('received_date')
+        ->get();
+    
+    // If on PURCHASE tab, apply filters
     if ($selected_tab == 'tab-purchase') {
-        // Apply date range filter
-        $purchases = $purchases->whereBetween('received_date', [
-             Carbon::parse($purchase_date_range[0])->format('Y-m-d'),
-            Carbon::parse($purchase_date_range[1])->format('Y-m-d'),
-        ]);
-
-        $check_p = $check_p->whereBetween('received_date', [
-            Carbon::parse($purchase_date_range[0])->format('Y-m-d'),
-            Carbon::parse($purchase_date_range[1])->format('Y-m-d'),
-        ]);
-
-        // Apply branch filter for non-admin users if tutul is want then open it 
-        // if ($user_data->id != 1) {
-        //     $purchases = $purchases->where('branchId', $user_data->branchId);
-        //     $check_p = $check_p->where('branchId', $user_data->branchId); 
-        // }
-        $admin_ids = [1,21,22,23];
-
-        if (!in_array($user_data->id, $admin_ids)) {
-            $purchases = $purchases->where('branchId', $user_data->branchId);
-            $check_p = $check_p->where('branchId', $user_data->branchId);
-        }
-
-        // Apply search filter
-        if ($request->filled('purchase_search_text')) {
-            $purchases = $purchases->where(function ($query) use ($request) {
-                $query->where('dmr_no', $request->purchase_search_text)
-                    ->orWhere('chalan_no', $request->purchase_search_text)
-                    ->orWhere('product_qty', $request->purchase_search_text)
-                    ->orWhere('rate_per_unit', $request->purchase_search_text)
-                    ->orWhere('material_cost', $request->purchase_search_text)
-                    ->orWhere('total_material_cost', $request->purchase_search_text)
-                    ->orWhereHas('product_name', function ($q) use ($request) {
-                        $q->where('name', 'like', '%' . $request->purchase_search_text . '%');
-                    });
-            });
-
-            $check_p = $check_p->where(function ($query) use ($request) {
-                $query->where('dmr_no', $request->purchase_search_text)
-                    ->orWhere('chalan_no', $request->purchase_search_text)
-                    ->orWhere('product_qty', $request->purchase_search_text)
-                    ->orWhere('rate_per_unit', $request->purchase_search_text)
-                    ->orWhere('material_cost', $request->purchase_search_text)
-                    ->orWhere('total_material_cost', $request->purchase_search_text)
-                    ->orWhereHas('product_name', function ($q) use ($request) {
-                        $q->where('name', 'like', '%' . $request->purchase_search_text . '%');
-                    });
-            });
-        }
-
-        // Execute queries
-        $purchases = $purchases->orderByDesc('received_date')->get();
-        $check_p = $check_p->orderByDesc('received_date')->get();
-    } else {
-        // Default purchase data for other tabs
-        $purchases = $supplier->purchases()->get();
-        $check_p = $supplier->checkedPurchases()->get();
-    }
+        $purchase_date_range = $request->filled('purchase_date_range') 
+            ? date_range_to_arr($request->purchase_date_range)
+            : [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
         
-        //SEARCH ON PAYMENT TAB
+        $start_date = Carbon::parse($purchase_date_range[0])->format('Y-m-d');
+        $end_date = Carbon::parse($purchase_date_range[1])->format('Y-m-d');
+        
+        // Fresh queries with filters
+        $purchases = $supplier->purchases()
+            ->whereBetween('received_date', [$start_date, $end_date])
+            ->when(!$is_admin, function ($q) use ($user_data) {
+                return $q->where('branchId', $user_data->branchId);
+            })
+            ->when($request->filled('purchase_search_text'), function ($q) use ($request) {
+                $search = $request->purchase_search_text;
+                return $q->where(function ($query) use ($search) {
+                    $query->where('dmr_no', $search)
+                        ->orWhere('chalan_no', $search)
+                        ->orWhere('product_qty', $search)
+                        ->orWhere('rate_per_unit', $search)
+                        ->orWhere('material_cost', $search)
+                        ->orWhere('total_material_cost', $search)
+                        ->orWhereHas('product_name', function ($q) use ($search) {
+                            $q->where('name', 'like', '%' . $search . '%');
+                        });
+                });
+            })
+            ->orderByDesc('received_date')
+            ->get();
+        
+        $check_p = $supplier->checkedPurchases()
+            ->whereBetween('received_date', [$start_date, $end_date])
+            ->when(!$is_admin, function ($q) use ($user_data) {
+                return $q->where('branchId', $user_data->branchId);
+            })
+            ->when($request->filled('purchase_search_text'), function ($q) use ($request) {
+                $search = $request->purchase_search_text;
+                return $q->where(function ($query) use ($search) {
+                    $query->where('dmr_no', $search)
+                        ->orWhere('chalan_no', $search)
+                        ->orWhere('product_qty', $search)
+                        ->orWhere('rate_per_unit', $search)
+                        ->orWhere('material_cost', $search)
+                        ->orWhere('total_material_cost', $search)
+                        ->orWhereHas('product_name', function ($q) use ($search) {
+                            $q->where('name', 'like', '%' . $search . '%');
+                        });
+                });
+            })
+            ->orderByDesc('received_date')
+            ->get();
+    }
 
-        if ($selected_tab == 'tab-payment') {
-
-            //  Use query builder
-            $payments = $supplier->payments();
-            
-
-            if ($request->filled('payment_date_range')) {
-
-                $payment_date_range = date_range_to_arr($request->payment_date_range);
-
-                $payments->whereBetween('ref_date', [
-                    Carbon::parse($payment_date_range[0])->format('Y-m-d'),
-                    Carbon::parse($payment_date_range[1])->format('Y-m-d')
-                ]);
+    // ========== BILL INFO TAB ==========
+    // Load ALL data by default (initial state)
+    $check_pb = $supplier->checkedPurchases()
+        ->when(!$is_admin, function ($q) use ($user_data) {
+            return $q->where('branchId', $user_data->branchId);
+        })
+        ->orderByDesc('received_date')
+        ->get();
+    
+    // If on BILL INFO tab, apply filters
+    if ($selected_tab === 'tab-billinfo') {
+        $check_pb_query = $supplier->checkedPurchases();
+        
+        // ONLY apply date filter if user selects a range
+        if ($request->filled('billinfo_date_range')) {
+            $dates = explode(' - ', $request->billinfo_date_range);
+            if (count($dates) === 2) {
+                try {
+                    $start = Carbon::parse($dates[0])->startOfDay();
+                    $end = Carbon::parse($dates[1])->endOfDay();
+                    $check_pb_query = $check_pb_query->whereBetween('received_date', [$start, $end]);
+                } catch (\Exception $e) {
+                    Log::warning('Invalid date range in Bill Info tab', ['input' => $request->billinfo_date_range]);
+                }
             }
+        }
 
-            if ($request->payment_search_text) {
-                $payments->where(function ($query) use ($request) {
-                    $query->where('voucher_no', 'LIKE', $request->payment_search_text . '%')
+        
+        // Search filter
+        if ($request->filled('billinfo_search_text')) {
+    $term = '%' . $request->billinfo_search_text . '%';
+    $check_pb_query = $check_pb_query->where(function ($q) use ($term) {
+        $q->where('dmr_no', 'like', $term)
+            ->orWhere('chalan_no', 'like', $term)
+            ->orWhere('bill_no', 'like', $term)
+            ->orWhere('vehicle_no', 'like', $term)
+            ->orWhere('product_qty', 'like', $term)
+            ->orWhere('rate_per_unit', 'like', $term)
+            ->orWhere('material_cost', 'like', $term)
+            ->orWhere('truck_rent', 'like', $term)
+            ->orWhere('unload_bill', 'like', $term)
+            ->orWhere('total_material_cost', 'like', $term)
+            ->orWhereHas('product_name', function ($sq) use ($term) {
+                $sq->where('name', 'like', $term);
+            })
+            ->orWhereHas('supplier', function ($sq) use ($term) {
+                $sq->where('name', 'like', $term);
+            });
+    });
+}
+        
+        // Branch filter
+        if (!$is_admin) {
+            $check_pb_query = $check_pb_query->where('branchId', $user_data->branchId);
+        }
+        
+        $check_pb = $check_pb_query->orderByDesc('received_date')->get();
+    }
+
+    // ========== PAYMENT TAB ==========
+    $payments = $supplier->payments()
+        ->whereBetween('ref_date', [
+            date('Y-m-d', strtotime('-30 days')),
+            date('Y-m-d')
+        ])
+        ->orderByDesc('ref_date')
+        ->get();
+    
+    if ($selected_tab == 'tab-payment') {
+        $payment_date_range = $request->filled('payment_date_range') 
+            ? date_range_to_arr($request->payment_date_range)
+            : [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+        
+        $payments = $supplier->payments()
+            ->whereBetween('ref_date', [
+                Carbon::parse($payment_date_range[0])->format('Y-m-d'),
+                Carbon::parse($payment_date_range[1])->format('Y-m-d')
+            ])
+            ->when($request->filled('payment_search_text'), function ($q) use ($request) {
+                return $q->where(function ($query) use ($request) {
+                    $query->where('voucher_no', 'LIKE', '%' . $request->payment_search_text . '%')
                         ->orWhere('payment_mode', 'LIKE', '%' . $request->payment_search_text . '%')
                         ->orWhere('paid_amount', $request->payment_search_text)
                         ->orWhereHas('bank_info', function ($q) use ($request) {
                             $q->where('bank_name', 'LIKE', '%' . $request->payment_search_text . '%');
                         });
                 });
-            }
+            })
+            ->orderByDesc('ref_date')
+            ->get();
+    }
 
-            //  Apply order and get results
-            $payments = $payments->orderByDesc('ref_date')->get();
-
-        } else {
-            $payment_date_range = [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
-
-
-
-            // Use query builder here too
-            $payments = $supplier->payments()
-            
-                ->when($request->filled('statement_date_range'), function ($q) use ($payment_date_range) {
-
-                    $q->whereBetween('ref_date', [
-                        Carbon::parse($payment_date_range[0])->format('Y-m-d'),
-                        Carbon::parse($payment_date_range[1])->format('Y-m-d'),
-                    ]);
-                })
-                ->orderByDesc('ref_date')
-                ->get();
-        }
-
-
-
-
-        //SEARCH ON STATEMENT TAB
-        if ($selected_tab == 'tab-statement') {
-
-            //  Use query builder
-            $statements = $supplier->supplierStatements();
-
-
-            // Apply date range filter
-            if ($request->filled('date_range')) {
-                $statement_date_range = date_range_to_arr($request->date_range);
-
-            }else{
-                $statement_date_range = [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
-            }
-                $statements->whereBetween('posting_date',
-                    [
-                        Carbon::parse($statement_date_range[0])->format('Y-m-d'),
-                        Carbon::parse($statement_date_range[1])->format('Y-m-d')
-                    ]
-                );
-
-            //  Apply search filter
-            if ($request->statement_search_text != '') {
-                $statements->where(function ($query) use ($request) {
+    // ========== STATEMENT TAB ==========
+    $statements = $supplier->supplierStatements()
+        ->whereBetween('posting_date', [
+            date('Y-m-d', strtotime('-30 days')),
+            date('Y-m-d')
+        ])
+        ->orderByDesc('posting_date')
+        ->get();
+    
+    if ($selected_tab == 'tab-statement') {
+        $statement_date_range = $request->filled('date_range') 
+            ? date_range_to_arr($request->date_range)
+            : [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+        
+        $statements = $supplier->supplierStatements()
+            ->whereBetween('posting_date', [
+                Carbon::parse($statement_date_range[0])->format('Y-m-d'),
+                Carbon::parse($statement_date_range[1])->format('Y-m-d')
+            ])
+            ->when($request->filled('statement_search_text'), function ($q) use ($request) {
+                return $q->where(function ($query) use ($request) {
                     $query->where('transaction_id', 'LIKE', '%' . $request->statement_search_text . '%')
-                        ->orWhere('description', '=', $request->statement_search_text)
+                        ->orWhere('description', 'LIKE', '%' . $request->statement_search_text . '%')
                         ->orWhere('debit', 'LIKE', '%' . $request->statement_search_text . '%')
                         ->orWhere('credit', 'LIKE', '%' . $request->statement_search_text . '%')
                         ->orWhere('balance', 'LIKE', '%' . $request->statement_search_text . '%')
@@ -345,37 +701,21 @@ class SupplierController extends Controller
                             $q->where('name', 'LIKE', '%' . $request->statement_search_text . '%');
                         });
                 });
-            }
-
-            //  Order and get
-            $statements = $statements->orderByDesc('posting_date')->get();
-
-        } else {
-            $statement_date_range = [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
-
-
-            //  Also use query builder here
-            $statements = $supplier->supplierStatements()->whereBetween('posting_date', [
-                Carbon::parse($statement_date_range[0])->format('Y-m-d'),
-                Carbon::parse($statement_date_range[1])->format('Y-m-d'),
-            ])->orderByDesc('posting_date')->get();
-
-        }
-
-
-
-
-        $total_purchase = ProductPurchase::where('supplier_id', $id)->sum('material_cost');
-        $total_payment = SupplierPayment::where('supplier_id', $id)->sum('paid_amount');
-        // dd(isset($purchases), $purchases->get() ?? 'NO');
-
-      
-
-
-        return view('admin.supplier.supplier_profile', compact('supplier', 'branches', 'selected_tab',
-            'purchases', 'check_p', 'payments', 'statements', 'total_purchase', 'total_payment'));
+            })
+            ->orderByDesc('posting_date')
+            ->get();
     }
 
+    // ========== TOTALS ==========
+    $total_purchase = ProductPurchase::where('supplier_id', $id)->sum('material_cost');
+    $total_payment = SupplierPayment::where('supplier_id', $id)->sum('paid_amount');
+
+    return view('admin.supplier.supplier_profile', compact(
+        'supplier', 'branches', 'selected_tab',
+        'purchases', 'check_p', 'check_pb', 'payments', 'statements', 
+        'total_purchase', 'total_payment'
+    ));
+}
     public function update(Request $request)
     {
         $rules = [

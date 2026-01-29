@@ -43,6 +43,11 @@
                                     <a href="#tab-purchase" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-6"><i class="glyphicon glyphicon-check"></i> Purchase List</a>
                                 </li>
                             @endif
+                            @if($user->hasRole(['super-admin']) || $user->can('product-purchase-list'))
+                                <li class="ui-state-default ui-corner-top {{ $selected_tab=='tab-billinfo'?'ui-tabs-active ui-state-active':'' }}" role="tab" tabindex="-1" aria-controls="tab-purchase" aria-labelledby="ui-id-6" aria-selected="false">
+                                    <a href="#tab-billinfo" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-6"><i class="glyphicon glyphicon-check"></i> Bill Info</a>
+                                </li>
+                            @endif
                             @if($user->hasRole(['super-admin']) || $user->can('supplier-payment-details'))
                                 <li class="ui-state-default ui-corner-top {{ $selected_tab=='tab-payment'?'ui-tabs-active ui-state-active':'' }}" role="tab" tabindex="-1" aria-controls="tab-payment" aria-labelledby="ui-id-7" aria-selected="false">
                                     <a href="#tab-payment" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-7"><i class="glyphicon glyphicon-list-alt"></i> Payment Details</a>
@@ -96,7 +101,7 @@
                                             <div class="isw-documents"></div>
                                             <h1>
                                                 Product Purchase List
-                                                {{-- <span class="src-info">{{ (request('purchase_search_text') == '' && request('purchase_date_range') == '')?'- Last 30 Days':'- '. request('purchase_date_range') }}</span> --}}
+                                                <span class="src-info">{{ (request('purchase_search_text') == '' && request('purchase_date_range') == '')?'- Last 30 Days':'- '. request('purchase_date_range') }}</span>
                                             </h1>
                                         </div>
                                         <div class="col-md-1" style="margin-top: 4px;">
@@ -208,75 +213,6 @@
                                                         ?>
                                                 @endforeach
 
-                                                @if(!empty($check_p))
-                                                {{-- @dd($check_p ) --}}
-                                                    @foreach($check_p as $checkp)
-
-                                                        <tr @if($checkp->check_status == 1) style="color:#09b509;" @endif>
-                                                            <td>
-                                                                @if($checkp->check_status == 0)
-                                                                    <input type="checkbox" id="checkbox" value="{{ $checkp->id }}" name="checkbox[]"/>
-                                                                @else
-                                                                    <span class="glyphicon glyphicon-warning-sign"></span>
-                                                                @endif
-                                                            </td>
-                                                            <td>{{ $checkp->dmr_no }}</td>
-                                                            <td>{{ $checkp->bill_no }}</td>
-                                                            <td>{{ date('d-m-Y', strtotime($checkp->received_date)) }}</td>
-                                                            <td>{{ $checkp->product_name->name }}</td>
-                                                            <td>{{ number_format($checkp->product_qty,2)." ".$checkp->unit_type }}</td>
-                                                            <td>{{ number_format($checkp->rate_per_unit,2) }}</td>
-                                                            <td>{{ number_format($checkp->material_cost,2) }}</td>
-                                                            <td>{{ number_format($checkp->truck_rent,2) }}</td>
-                                                            <td>{{ number_format($checkp->unload_bill,2) }}</td>
-                                                            <td>{{ number_format($checkp->total_material_cost,2) }}</td>
-                                                            <td class="hidden-print">
-                                                                @if($user->hasRole('super-admin') || $user->can('product-purchase-list-details'))
-                                                                    <a role="button" class="view_btn"
-                                                                       data-dmr_no="{{ $checkp->supplier->name }}"
-                                                                       data-chalan_no="{{ $checkp->chalan_no }}"
-                                                                       data-purchase_date="{{ $checkp->purchase_date }}"
-                                                                       data-received_date="{{ $checkp->received_date }}"
-                                                                       data-product_name="{{ $checkp->product_name->name }}"
-                                                                       data-supplier_name="{{ $checkp->supplier->name }}"
-                                                                       data-quantity="{{ $checkp->product_qty }}"
-                                                                       data-rate_per_unit="{{ $checkp->rate_per_unit }}"
-                                                                       data-material_cost="{{ $checkp->material_cost }}"
-                                                                       data-truck_rent="{{ $checkp->truck_rent }}"
-                                                                       data-unload_bill="{{ $checkp->unload_bill }}"
-                                                                       data-total_material_cost="{{ $checkp->total_material_cost }}"
-                                                                       data-vehicle_no="{{ $checkp->vehicle_no }}"
-                                                                       data-description="{{ $checkp->description }}"
-                                                                       data-toggle="modal"
-                                                                       data-target="#detailsModal">
-                                                                        <span class="fa fa-eye"></span>
-                                                                    </a>
-                                                                    <a href="{{ route('purchase.checked.details',$checkp->bill_no) }}" target="_blank"><span class="fa fa-info-circle"></span></a>
-                                                                @endif
-                                                            </td>
-                                                        </tr>
-                                                            <?php
-                                                            $i++; $t_mat += $checkp->material_cost; $tt_mat += $checkp->total_material_cost;
-                                                            $total_qty += $checkp->product_qty; $total_truck_rent += $checkp->truck_rent;
-                                                            $total_unload_bill += $checkp->unload_bill;
-                                                            ?>
-                                                    @endforeach
-                                                @endif
-
-                                                <tr style="background-color:#999999; color: #fff;">
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td>Total:</td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td>{{ number_format($total_qty,2) }}</td>
-                                                    <td></td>
-                                                    <td>{{ number_format($t_mat,2) }}</td>
-                                                    <td>{{ number_format($total_truck_rent,2) }}</td>
-                                                    <td>{{ number_format($total_unload_bill,2) }}</td>
-                                                    <td>{{ number_format($tt_mat,2) }}</td>
-                                                    <td class="hidden-print"></td>
-                                                </tr>
 
                                                 </tbody>
                                             </table>
@@ -287,6 +223,163 @@
                             </div>
                         </div>
                     @endif
+
+                   @if($user->hasRole(['super-admin']) || $user->can('product-purchase-list'))
+    <div id="tab-billinfo" aria-labelledby="ui-id-6" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- Header Section -->
+                <div class="head clearfix">
+                    <div class="col-md-4">
+                        <div class="isw-documents"></div>
+                        <h1>
+                            Bill Info
+                        </h1>
+                    </div>
+                    
+                    <div class="col-md-1" style="margin-top: 4px;">
+                        <a href="#bill_status_modal" role="button" data-toggle="modal" class="btn btn-warning" id="check_btn_div" style="display: none;">
+                            Checked
+                        </a>
+                    </div>
+                    
+                    <div class="col-md-7 search_box" style="margin-top: 4px;">
+                        <form action="" class="form-horizontal">
+                            <input type="hidden" name="tab_type" value="tab-billinfo"/>
+                            <div class="" align="right">
+                                <div class="col-md-6">
+                                    <input type="text" name="billinfo_search_text" id="search_name" value="{{ request('billinfo_search_text') ?? '' }}" class="form-control" placeholder="Enter Search Text" />
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <input type="text" name="billinfo_date_range" value="{{ request('billinfo_date_range') ?? '' }}" class="date_range form-control" placeholder="Date Range" />
+                                        <div class="input-group-btn">
+                                            <button type="submit" class="btn btn-default search-btn">Search</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Table Section -->
+                <div class="block-fluid table-sorting clearfix">
+                    <form action="{{ route('product.purchase.check') }}" method="post" id="checked_bill_form" class="form-horizontal">
+                        @csrf
+                        <input type="hidden" name="bill_no" id="bill_no" value="" />
+                        <input type="hidden" name="adjustment_qty" id="adjustment_amount" value="" />
+                        <input type="hidden" name="adjustment_cost" id="adjustment_cost" value="" />
+                        
+                        <table cellpadding="0" cellspacing="0" width="100%" class="table" id="datatable">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" name="checkall"/></th>
+                                    <th>DMR No</th>
+                                    <th>Chalan/ Bill No</th>
+                                    <th>Rec Date</th>
+                                    <th>Product Name</th>
+                                    <th>Qty</th>
+                                    <th>Rate</th>
+                                    <th>Mat Cost</th>
+                                    <th>Truck Rent</th>
+                                    <th>Unload Bill</th>
+                                    <th>Total Mat Cost</th>
+                                    <th class="hidden-print">Actions</th>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                                <?php
+                                    $i = 1;
+                                    $t_mat = 0;
+                                    $tt_mat = 0;
+                                    $total_qty = 0;
+                                    $total_truck_rent = 0;
+                                    $total_unload_bill = 0;
+                                ?>
+                                
+                                @if(!empty($check_pb))
+                                    @foreach($check_pb as $checkp)
+                                        <tr @if($checkp->check_status == 1) style="color:#09b509;" @endif>
+                                            <td>
+                                                @if($checkp->check_status == 0)
+                                                    <input type="checkbox" id="checkbox" value="{{ $checkp->id }}" name="checkbox[]"/>
+                                                @else
+                                                    <span class="glyphicon glyphicon-warning-sign"></span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $checkp->dmr_no }}</td>
+                                            <td>{{ $checkp->bill_no }}</td>
+                                            <td>{{ date('d-m-Y', strtotime($checkp->received_date)) }}</td>
+                                            <td>{{ $checkp->product_name->name }}</td>
+                                            <td>{{ number_format($checkp->product_qty, 2) . " " . $checkp->unit_type }}</td>
+                                            <td>{{ number_format($checkp->rate_per_unit, 2) }}</td>
+                                            <td>{{ number_format($checkp->material_cost, 2) }}</td>
+                                            <td>{{ number_format($checkp->truck_rent, 2) }}</td>
+                                            <td>{{ number_format($checkp->unload_bill, 2) }}</td>
+                                            <td>{{ number_format($checkp->total_material_cost, 2) }}</td>
+                                            <td class="hidden-print">
+                                                @if($user->hasRole('super-admin') || $user->can('product-purchase-list-details'))
+                                                    <a role="button" class="view_btn"
+                                                        data-dmr_no="{{ $checkp->supplier->name }}"
+                                                        data-chalan_no="{{ $checkp->chalan_no }}"
+                                                        data-purchase_date="{{ $checkp->purchase_date }}"
+                                                        data-received_date="{{ $checkp->received_date }}"
+                                                        data-product_name="{{ $checkp->product_name->name }}"
+                                                        data-supplier_name="{{ $checkp->supplier->name }}"
+                                                        data-quantity="{{ $checkp->product_qty }}"
+                                                        data-rate_per_unit="{{ $checkp->rate_per_unit }}"
+                                                        data-material_cost="{{ $checkp->material_cost }}"
+                                                        data-truck_rent="{{ $checkp->truck_rent }}"
+                                                        data-unload_bill="{{ $checkp->unload_bill }}"
+                                                        data-total_material_cost="{{ $checkp->total_material_cost }}"
+                                                        data-vehicle_no="{{ $checkp->vehicle_no }}"
+                                                        data-description="{{ $checkp->description }}"
+                                                        data-toggle="modal"
+                                                        data-target="#detailsModal">
+                                                        <span class="fa fa-eye"></span>
+                                                    </a>
+                                                    <a href="{{ route('purchase.checked.details', $checkp->bill_no) }}" target="_blank">
+                                                        <span class="fa fa-info-circle"></span>
+                                                    </a>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <?php
+                                            $i++;
+                                            $t_mat += $checkp->material_cost;
+                                            $tt_mat += $checkp->total_material_cost;
+                                            $total_qty += $checkp->product_qty;
+                                            $total_truck_rent += $checkp->truck_rent;
+                                            $total_unload_bill += $checkp->unload_bill;
+                                        ?>
+                                    @endforeach
+                                @endif
+                                
+                                <!-- Total Row -->
+                                <tr style="background-color:#999999; color: #fff;">
+                                    <td></td>
+                                    <td></td>
+                                    <td>Total:</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>{{ number_format($total_qty, 2) }}</td>
+                                    <td></td>
+                                    <td>{{ number_format($t_mat, 2) }}</td>
+                                    <td>{{ number_format($total_truck_rent, 2) }}</td>
+                                    <td>{{ number_format($total_unload_bill, 2) }}</td>
+                                    <td>{{ number_format($tt_mat, 2) }}</td>
+                                    <td class="hidden-print"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endif
 
                     @if($user->hasRole(['super-admin']) || $user->can('supplier-payment-details'))
                         <div id="tab-payment" aria-labelledby="ui-id-7" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;">
