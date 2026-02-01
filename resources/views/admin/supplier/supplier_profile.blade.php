@@ -9,7 +9,7 @@
                 <div class="wBlock red clearfix">
                     <div class="dSpace">
                         <h4>TOTAL PURCHASE</h4>
-                        <span class="number">{{ number_format($total_purchase,2) }}</span>
+                        <span class="number">{{ number_format($total_purchase, 2) }}</span>
                     </div>
                 </div>
             </div>
@@ -17,7 +17,7 @@
                 <div class="wBlock yellow clearfix">
                     <div class="dSpace">
                         <h4>TOTAL PAYMENT</h4>
-                        <span class="number">{{ number_format($total_payment,2) }}</span>
+                        <span class="number">{{ number_format($total_payment, 2) }}</span>
                     </div>
                 </div>
             </div>
@@ -34,34 +34,51 @@
             <div class="col-md-12">
                 <div class="block-fluid tabs ui-tabs ui-widget ui-widget-content ui-corner-all">
                     <div class="head clearfix">
-                        <ul class="buttons ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">
-                            <li class="ui-state-default ui-corner-top {{ $selected_tab=='tab-profile'?'ui-tabs-active ui-state-active':'' }}" role="tab" tabindex="0" aria-controls="tab-profile" aria-labelledby="ui-id-5" aria-selected="true">
-                                <a href="#tab-profile" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-5"> <i class="glyphicon glyphicon-user"></i> Supplier Info</a>
+                        <ul class="buttons ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all"
+                            role="tablist">
+                            <li class="ui-state-default ui-corner-top {{ $selected_tab == 'tab-profile' ? 'ui-tabs-active ui-state-active' : '' }}"
+                                role="tab" tabindex="0" aria-controls="tab-profile" aria-labelledby="ui-id-5"
+                                aria-selected="true">
+                                <a href="#tab-profile" class="ui-tabs-anchor" role="presentation" tabindex="-1"
+                                    id="ui-id-5"> <i class="glyphicon glyphicon-user"></i> Supplier Info</a>
                             </li>
-                            @if($user->hasRole(['super-admin']) || $user->can('product-purchase-list'))
-                                <li class="ui-state-default ui-corner-top {{ $selected_tab=='tab-purchase'?'ui-tabs-active ui-state-active':'' }}" role="tab" tabindex="-1" aria-controls="tab-purchase" aria-labelledby="ui-id-6" aria-selected="false">
-                                    <a href="#tab-purchase" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-6"><i class="glyphicon glyphicon-check"></i> Purchase List</a>
+                            @if ($user->hasRole(['super-admin']) || $user->can('product-purchase-list'))
+                                <li class="ui-state-default ui-corner-top {{ $selected_tab == 'tab-purchase' ? 'ui-tabs-active ui-state-active' : '' }}"
+                                    role="tab" tabindex="-1" aria-controls="tab-purchase" aria-labelledby="ui-id-6"
+                                    aria-selected="false">
+                                    <a href="#tab-purchase" class="ui-tabs-anchor" role="presentation" tabindex="-1"
+                                        id="ui-id-6"><i class="glyphicon glyphicon-check"></i> Purchase List</a>
                                 </li>
                             @endif
-                            @if($user->hasRole(['super-admin']) || $user->can('product-purchase-list'))
-                                <li class="ui-state-default ui-corner-top {{ $selected_tab=='tab-billinfo'?'ui-tabs-active ui-state-active':'' }}" role="tab" tabindex="-1" aria-controls="tab-purchase" aria-labelledby="ui-id-6" aria-selected="false">
-                                    <a href="#tab-billinfo" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-6"><i class="glyphicon glyphicon-check"></i> Bill Info</a>
+                            @if ($user->hasRole(['super-admin']) || $user->can('product-purchase-list'))
+                                <li class="ui-state-default ui-corner-top {{ $selected_tab == 'tab-billinfo' ? 'ui-tabs-active ui-state-active' : '' }}"
+                                    role="tab" tabindex="-1" aria-controls="tab-purchase" aria-labelledby="ui-id-6"
+                                    aria-selected="false">
+                                    <a href="#tab-billinfo" class="ui-tabs-anchor" role="presentation" tabindex="-1"
+                                        id="ui-id-6"><i class="glyphicon glyphicon-check"></i> Bill Info</a>
                                 </li>
                             @endif
-                            @if($user->hasRole(['super-admin']) || $user->can('supplier-payment-details'))
-                                <li class="ui-state-default ui-corner-top {{ $selected_tab=='tab-payment'?'ui-tabs-active ui-state-active':'' }}" role="tab" tabindex="-1" aria-controls="tab-payment" aria-labelledby="ui-id-7" aria-selected="false">
-                                    <a href="#tab-payment" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-7"><i class="glyphicon glyphicon-list-alt"></i> Payment Details</a>
+                            @if ($user->hasRole(['super-admin']) || $user->can('supplier-payment-details'))
+                                <li class="ui-state-default ui-corner-top {{ $selected_tab == 'tab-payment' ? 'ui-tabs-active ui-state-active' : '' }}"
+                                    role="tab" tabindex="-1" aria-controls="tab-payment" aria-labelledby="ui-id-7"
+                                    aria-selected="false">
+                                    <a href="#tab-payment" class="ui-tabs-anchor" role="presentation" tabindex="-1"
+                                        id="ui-id-7"><i class="glyphicon glyphicon-list-alt"></i> Payment Details</a>
                                 </li>
                             @endif
-                            @if($user->hasRole(['super-admin']) || $user->can('supplier-statement-report'))
-                                <li class="ui-state-default ui-corner-top {{ $selected_tab=='tab-statement'?'ui-tabs-active ui-state-active':'' }}" role="tab" tabindex="-1" aria-controls="tab-statement" aria-labelledby="ui-id-7" aria-selected="false">
-                                    <a href="#tab-statement" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-7"><i class="glyphicon glyphicon-list"></i> Statements</a>
+                            @if ($user->hasRole(['super-admin']) || $user->can('supplier-statement-report'))
+                                <li class="ui-state-default ui-corner-top {{ $selected_tab == 'tab-statement' ? 'ui-tabs-active ui-state-active' : '' }}"
+                                    role="tab" tabindex="-1" aria-controls="tab-statement" aria-labelledby="ui-id-7"
+                                    aria-selected="false">
+                                    <a href="#tab-statement" class="ui-tabs-anchor" role="presentation" tabindex="-1"
+                                        id="ui-id-7"><i class="glyphicon glyphicon-list"></i> Statements</a>
                                 </li>
                             @endif
                         </ul>
                     </div>
 
-                    <div id="tab-profile" aria-labelledby="ui-id-5" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="true" aria-hidden="false" style="display: block;">
+                    <div id="tab-profile" aria-labelledby="ui-id-5" class="ui-tabs-panel ui-widget-content ui-corner-bottom"
+                        role="tabpanel" aria-expanded="true" aria-hidden="false" style="display: block;">
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="block ucard">
@@ -91,8 +108,10 @@
                         </div>
                     </div>
 
-                    @if($user->hasRole(['super-admin']) || $user->can('product-purchase-list'))
-                        <div id="tab-purchase" aria-labelledby="ui-id-6" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;">
+                    @if ($user->hasRole(['super-admin']) || $user->can('product-purchase-list'))
+                        <div id="tab-purchase" aria-labelledby="ui-id-6"
+                            class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel"
+                            aria-expanded="false" aria-hidden="true" style="display: none;">
                             <div class="row">
                                 <div class="col-md-12">
 
@@ -101,24 +120,32 @@
                                             <div class="isw-documents"></div>
                                             <h1>
                                                 Product Purchase List
-                                                <span class="src-info">{{ (request('purchase_search_text') == '' && request('purchase_date_range') == '')?'- Last 30 Days':'- '. request('purchase_date_range') }}</span>
+                                                <span
+                                                    class="src-info">{{ request('purchase_search_text') == '' && request('purchase_date_range') == '' ? '- Last 30 Days' : '- ' . request('purchase_date_range') }}</span>
                                             </h1>
                                         </div>
                                         <div class="col-md-1" style="margin-top: 4px;">
-                                            <a href="#bill_status_modal" role="button" data-toggle="modal" class="btn btn-warning" id="check_btn_div"  style="display: none;">Checked</a>
+                                            <a href="#bill_status_modal" role="button" data-toggle="modal"
+                                                class="btn btn-warning" id="check_btn_div"
+                                                style="display: none;">Checked</a>
                                         </div>
                                         <div class="col-md-7 search_box" style="margin-top: 4px;">
                                             <form action="" class="form-horizontal">
-                                                <input type="hidden" name="tab_type" value="tab-purchase"/>
+                                                <input type="hidden" name="tab_type" value="tab-purchase" />
                                                 <div class="" align="right">
                                                     <div class="col-md-6">
-                                                        <input type="text" name="purchase_search_text" id="search_name" value="{{ request('search_text')??'' }}" class="form-control" placeholder="Enter Search Text" />
+                                                        <input type="text" name="purchase_search_text"
+                                                            id="search_name" value="{{ request('search_text') ?? '' }}"
+                                                            class="form-control" placeholder="Enter Search Text" />
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="input-group">
-                                                            <input type="text" name="purchase_date_range" value=""  class="date_range form-control" placeholder="Date Range" />
+                                                            <input type="text" name="purchase_date_range"
+                                                                value="" class="date_range form-control"
+                                                                placeholder="Date Range" />
                                                             <div class="input-group-btn">
-                                                                <button type="submit" class="btn btn-default search-btn">Search</button>
+                                                                <button type="submit"
+                                                                    class="btn btn-default search-btn">Search</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -128,90 +155,108 @@
                                         </div>
                                     </div>
                                     <div class="block-fluid table-sorting clearfix">
-                                        <form action="{{ route('product.purchase.check') }}" method="post" id="checked_bill_form" class="form-horizontal">
-                                            {{csrf_field()}}
+                                        <form action="{{ route('product.purchase.check') }}" method="post"
+                                            id="checked_bill_form" class="form-horizontal">
+                                            {{ csrf_field() }}
                                             <input type="hidden" name="bill_no" id="bill_no" value="" />
-                                            <input type="hidden" name="adjustment_qty" id="adjustment_amount" value="" />
-                                            <input type="hidden" name="adjustment_cost" id="adjustment_cost" value="" />
-                                            <table cellpadding="0" cellspacing="0" width="100%" class="table" id="datatable">
+                                            <input type="hidden" name="adjustment_qty" id="adjustment_amount"
+                                                value="" />
+                                            <input type="hidden" name="adjustment_cost" id="adjustment_cost"
+                                                value="" />
+                                            <table cellpadding="0" cellspacing="0" width="100%" class="table"
+                                                id="datatable">
                                                 <thead>
-                                                <tr>
-                                                    <th><input type="checkbox" name="checkall"/></th>
-                                                    <th>DMR No</th>
-                                                    <th>Chalan/ Bill No</th>
-                                                    <th>Rec Date</th>
-                                                    <th>Product Name</th>
-                                                    <th>Qty</th>
-                                                    <th>Rate</th>
-                                                    <th>Mat Cost</th>
-                                                    <th>Truck Rent</th>
-                                                    <th>Unload Bill</th>
-                                                    <th>Total Mat Cost</th>
-                                                    <th class="hidden-print">Actions</th>
-                                                </tr>
+                                                    <tr>
+                                                        <th><input type="checkbox" name="checkall" /></th>
+                                                        <th>DMR No</th>
+                                                        <th>Chalan/ Bill No</th>
+                                                        <th>Rec Date</th>
+                                                        <th>Product Name</th>
+                                                        <th>Qty</th>
+                                                        <th>Rate</th>
+                                                        <th>Mat Cost</th>
+                                                        <th>Truck Rent</th>
+                                                        <th>Unload Bill</th>
+                                                        <th>Total Mat Cost</th>
+                                                        <th class="hidden-print">Actions</th>
+                                                    </tr>
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    $i = 1;$t_mat = 0;$tt_mat = 0;$total_qty = 0;$total_truck_rent = 0;$total_unload_bill = 0;
+                                                    $i = 1;
+                                                    $t_mat = 0;
+                                                    $tt_mat = 0;
+                                                    $total_qty = 0;
+                                                    $total_truck_rent = 0;
+                                                    $total_unload_bill = 0;
                                                     ?>
                                                     {{-- @dump($purchases) --}}
-                                                @foreach($purchases as $purchase)
-                                                    <tr @if($purchase->check_status == 1) style="color:#09b509;" @endif>
-                                                        <td>
-                                                            @if($purchase->check_status == 0)
-                                                                <input type="checkbox" class="checkbox" value="{{ $purchase->id }}" name="checkbox[]"/>
-                                                            @else
-                                                                <span class="glyphicon glyphicon-warning-sign"></span>
-                                                            @endif
-                                                        </td>
-                                                        <td>{{ $purchase->dmr_no }}</td>
-                                                        <td>{{ $purchase->chalan_no }}</td>
-                                                        <td>{{ date('d-M-y', strtotime($purchase->received_date)) }}</td>
-                                                        <td>{{ $purchase->product_name->name }}</td>
-                                                        <td>{{ number_format($purchase->product_qty,2)." ".$purchase->unit_type }}</td>
-                                                        <td>{{ number_format($purchase->rate_per_unit,2) }}</td>
-                                                        <td>{{ number_format($purchase->material_cost,2) }}</td>
-                                                        <td>{{ number_format($purchase->truck_rent,2) }}</td>
-                                                        <td>{{ number_format($purchase->unload_bill,2) }}</td>
-                                                        <td>{{ number_format($purchase->total_material_cost,2) }}</td>
-                                                        <td class="hidden-print">
-                                                            @if($user->hasRole('super-admin') || $user->can('product-purchase-list-details'))
-                                                                <a role="button" class="view_btn"
-                                                                   data-dmr_no="{{ $purchase->supplier->name }}"
-                                                                   data-chalan_no="{{ $purchase->chalan_no }}"
-                                                                   data-purchase_date="{{ $purchase->purchase_date }}"
-                                                                   data-received_date="{{ $purchase->received_date }}"
-                                                                   data-product_name="{{ $purchase->product_name->name }}"
-                                                                   data-supplier_name="{{ $purchase->supplier->name }}"
-                                                                   data-quantity="{{ $purchase->product_qty }}"
-                                                                   data-rate_per_unit="{{ $purchase->rate_per_unit }}"
-                                                                   data-material_cost="{{ $purchase->material_cost }}"
-                                                                   data-truck_rent="{{ $purchase->truck_rent }}"
-                                                                   data-unload_bill="{{ $purchase->unload_bill }}"
-                                                                   data-total_material_cost="{{ $purchase->total_material_cost }}"
-                                                                   data-vehicle_no="{{ $purchase->vehicle_no }}"
-                                                                   data-description="{{ $purchase->description }}"
-                                                                   data-toggle="modal"
-                                                                   data-target="#purchaseDetailsModal">
-                                                                    <span class="fa fa-eye"></span>
-                                                                </a>
-                                                            @endif
+                                                    @foreach ($purchases as $purchase)
+                                                        <tr @if ($purchase->check_status == 1) style="color:#09b509;" @endif>
+                                                            <td>
+                                                                @if ($purchase->check_status == 0)
+                                                                    <input type="checkbox" class="checkbox"
+                                                                        value="{{ $purchase->id }}" name="checkbox[]" />
+                                                                @else
+                                                                    <span class="glyphicon glyphicon-warning-sign"></span>
+                                                                @endif
+                                                            </td>
+                                                            <td>{{ $purchase->dmr_no }}</td>
+                                                            <td>{{ $purchase->chalan_no }}</td>
+                                                            <td>{{ date('d-M-y', strtotime($purchase->received_date)) }}
+                                                            </td>
+                                                            <td>{{ $purchase->product_name->name }}</td>
+                                                            <td>{{ number_format($purchase->product_qty, 2) . ' ' . $purchase->unit_type }}
+                                                            </td>
+                                                            <td>{{ number_format($purchase->rate_per_unit, 2) }}</td>
+                                                            <td>{{ number_format($purchase->material_cost, 2) }}</td>
+                                                            <td>{{ number_format($purchase->truck_rent, 2) }}</td>
+                                                            <td>{{ number_format($purchase->unload_bill, 2) }}</td>
+                                                            <td>{{ number_format($purchase->total_material_cost, 2) }}</td>
+                                                            <td class="hidden-print">
+                                                                @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details'))
+                                                                    <a role="button" class="view_btn"
+                                                                        data-dmr_no="{{ $purchase->supplier->name }}"
+                                                                        data-chalan_no="{{ $purchase->chalan_no }}"
+                                                                        data-purchase_date="{{ $purchase->purchase_date }}"
+                                                                        data-received_date="{{ $purchase->received_date }}"
+                                                                        data-product_name="{{ $purchase->product_name->name }}"
+                                                                        data-supplier_name="{{ $purchase->supplier->name }}"
+                                                                        data-quantity="{{ $purchase->product_qty }}"
+                                                                        data-rate_per_unit="{{ $purchase->rate_per_unit }}"
+                                                                        data-material_cost="{{ $purchase->material_cost }}"
+                                                                        data-truck_rent="{{ $purchase->truck_rent }}"
+                                                                        data-unload_bill="{{ $purchase->unload_bill }}"
+                                                                        data-total_material_cost="{{ $purchase->total_material_cost }}"
+                                                                        data-vehicle_no="{{ $purchase->vehicle_no }}"
+                                                                        data-description="{{ $purchase->description }}"
+                                                                        data-toggle="modal"
+                                                                        data-target="#purchaseDetailsModal">
+                                                                        <span class="fa fa-eye"></span>
+                                                                    </a>
+                                                                @endif
 
-                                                            @if($user->hasRole('super-admin') || $user->can('product-purchase-edit'))
-                                                                <a href="{{ route('product.purchase.edit', $purchase->id) }}" role="button" class="fa fa-edit"></a>
-                                                            @endif
-                                                            @if($user->hasRole('super-admin') || $user->can('product-purchase-delete'))
-                                                                <a href="{{ route('product.purchase.delete',$purchase->transaction_id) }}" onclick='return confirm("Are you sure you want to delete?");' class="fa fa-trash"></a>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
+                                                                @if ($user->hasRole('super-admin') || $user->can('product-purchase-edit'))
+                                                                    <a href="{{ route('product.purchase.edit', $purchase->id) }}"
+                                                                        role="button" class="fa fa-edit"></a>
+                                                                @endif
+                                                                @if ($user->hasRole('super-admin') || $user->can('product-purchase-delete'))
+                                                                    <a href="{{ route('product.purchase.delete', $purchase->transaction_id) }}"
+                                                                        onclick='return confirm("Are you sure you want to delete?");'
+                                                                        class="fa fa-trash"></a>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
 
                                                         <?php
-                                                        $i++; $t_mat += $purchase->material_cost; $tt_mat += $purchase->total_material_cost;
-                                                        $total_qty += $purchase->product_qty; $total_truck_rent += $purchase->truck_rent;
+                                                        $i++;
+                                                        $t_mat += $purchase->material_cost;
+                                                        $tt_mat += $purchase->total_material_cost;
+                                                        $total_qty += $purchase->product_qty;
+                                                        $total_truck_rent += $purchase->truck_rent;
                                                         $total_unload_bill += $purchase->unload_bill;
                                                         ?>
-                                                @endforeach
+                                                    @endforeach
 
 
                                                 </tbody>
@@ -224,165 +269,189 @@
                         </div>
                     @endif
 
-                   @if($user->hasRole(['super-admin']) || $user->can('product-purchase-list'))
-    <div id="tab-billinfo" aria-labelledby="ui-id-6" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;">
-        <div class="row">
-            <div class="col-md-12">
-                <!-- Header Section -->
-                <div class="head clearfix">
-                    <div class="col-md-4">
-                        <div class="isw-documents"></div>
-                        <h1>
-                            Bill Info
-                        </h1>
-                    </div>
-                    
-                    <div class="col-md-1" style="margin-top: 4px;">
-                        <a href="#bill_status_modal" role="button" data-toggle="modal" class="btn btn-warning" id="check_btn_div" style="display: none;">
-                            Checked
-                        </a>
-                    </div>
-                    
-                    <div class="col-md-7 search_box" style="margin-top: 4px;">
-                        <form action="" class="form-horizontal">
-                            <input type="hidden" name="tab_type" value="tab-billinfo"/>
-                            <div class="" align="right">
-                                <div class="col-md-6">
-                                    <input type="text" name="billinfo_search_text" id="search_name" value="{{ request('billinfo_search_text') ?? '' }}" class="form-control" placeholder="Enter Search Text" />
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="input-group">
-                                        <input type="text" name="billinfo_date_range" value="{{ request('billinfo_date_range') ?? '' }}" class="date_range form-control" placeholder="Date Range" />
-                                        <div class="input-group-btn">
-                                            <button type="submit" class="btn btn-default search-btn">Search</button>
+                    @if ($user->hasRole(['super-admin']) || $user->can('product-purchase-list'))
+                        <div id="tab-billinfo" aria-labelledby="ui-id-6"
+                            class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel"
+                            aria-expanded="false" aria-hidden="true" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <!-- Header Section -->
+                                    <div class="head clearfix">
+                                        <div class="col-md-4">
+                                            <div class="isw-documents"></div>
+                                            <h1>
+                                                Bill Info
+                                            </h1>
                                         </div>
+
+                                        <div class="col-md-1" style="margin-top: 4px;">
+                                            <a href="#bill_status_modal" role="button" data-toggle="modal"
+                                                class="btn btn-warning" id="check_btn_div" style="display: none;">
+                                                Checked
+                                            </a>
+                                        </div>
+
+                                        <div class="col-md-7 search_box" style="margin-top: 4px;">
+                                            <form action="" class="form-horizontal">
+                                                <input type="hidden" name="tab_type" value="tab-billinfo" />
+                                                <div class="" align="right">
+                                                    <div class="col-md-6">
+                                                        <input type="text" name="billinfo_search_text"
+                                                            id="search_name"
+                                                            value="{{ request('billinfo_search_text') ?? '' }}"
+                                                            class="form-control" placeholder="Enter Search Text" />
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="input-group">
+                                                            <input type="text" name="billinfo_date_range"
+                                                                value="{{ request('billinfo_date_range') ?? '' }}"
+                                                                class="date_range form-control"
+                                                                placeholder="Date Range" />
+                                                            <div class="input-group-btn">
+                                                                <button type="submit"
+                                                                    class="btn btn-default search-btn">Search</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- Table Section -->
+                                    <div class="block-fluid table-sorting clearfix">
+                                        <form action="{{ route('product.purchase.check') }}" method="post"
+                                            id="checked_bill_form" class="form-horizontal">
+                                            @csrf
+                                            <input type="hidden" name="bill_no" id="bill_no" value="" />
+                                            <input type="hidden" name="adjustment_qty" id="adjustment_amount"
+                                                value="" />
+                                            <input type="hidden" name="adjustment_cost" id="adjustment_cost"
+                                                value="" />
+
+                                            <table cellpadding="0" cellspacing="0" width="100%" class="table"
+                                                id="datatable">
+                                                <thead>
+                                                    <tr>
+                                                        <th><input type="checkbox" name="checkall" /></th>
+                                                        <th>DMR No</th>
+                                                        <th>Chalan/ Bill No</th>
+                                                        <th>Rec Date</th>
+                                                        <th>Product Name</th>
+                                                        <th>Qty</th>
+                                                        <th>Rate</th>
+                                                        <th>Mat Cost</th>
+                                                        <th>Truck Rent</th>
+                                                        <th>Unload Bill</th>
+                                                        <th>Total Mat Cost</th>
+                                                        <th class="hidden-print">Actions</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <?php
+                                                    $i = 1;
+                                                    $t_mat = 0;
+                                                    $tt_mat = 0;
+                                                    $total_qty = 0;
+                                                    $total_truck_rent = 0;
+                                                    $total_unload_bill = 0;
+                                                    ?>
+
+                                                    @if (!empty($check_pb))
+                                                        @foreach ($check_pb as $checkp)
+                                                            <tr
+                                                                @if ($checkp->check_status == 1) style="color:#09b509;" @endif>
+                                                                <td>
+                                                                    @if ($checkp->check_status == 0)
+                                                                        <input type="checkbox" id="checkbox"
+                                                                            value="{{ $checkp->id }}"
+                                                                            name="checkbox[]" />
+                                                                    @else
+                                                                        <span
+                                                                            class="glyphicon glyphicon-warning-sign"></span>
+                                                                    @endif
+                                                                </td>
+                                                                <td>{{ $checkp->dmr_no }}</td>
+                                                                <td>{{ $checkp->bill_no }}</td>
+                                                                <td>{{ date('d-m-Y', strtotime($checkp->received_date)) }}
+                                                                </td>
+                                                                <td>{{ $checkp->product_name->name }}</td>
+                                                                <td>{{ number_format($checkp->product_qty, 2) . ' ' . $checkp->unit_type }}
+                                                                </td>
+                                                                <td>{{ number_format($checkp->rate_per_unit, 2) }}</td>
+                                                                <td>{{ number_format($checkp->material_cost, 2) }}</td>
+                                                                <td>{{ number_format($checkp->truck_rent, 2) }}</td>
+                                                                <td>{{ number_format($checkp->unload_bill, 2) }}</td>
+                                                                <td>{{ number_format($checkp->total_material_cost, 2) }}
+                                                                </td>
+                                                                <td class="hidden-print">
+                                                                    @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details'))
+                                                                        <a role="button" class="view_btn"
+                                                                            data-dmr_no="{{ $checkp->supplier->name }}"
+                                                                            data-chalan_no="{{ $checkp->chalan_no }}"
+                                                                            data-purchase_date="{{ $checkp->purchase_date }}"
+                                                                            data-received_date="{{ $checkp->received_date }}"
+                                                                            data-product_name="{{ $checkp->product_name->name }}"
+                                                                            data-supplier_name="{{ $checkp->supplier->name }}"
+                                                                            data-quantity="{{ $checkp->product_qty }}"
+                                                                            data-rate_per_unit="{{ $checkp->rate_per_unit }}"
+                                                                            data-material_cost="{{ $checkp->material_cost }}"
+                                                                            data-truck_rent="{{ $checkp->truck_rent }}"
+                                                                            data-unload_bill="{{ $checkp->unload_bill }}"
+                                                                            data-total_material_cost="{{ $checkp->total_material_cost }}"
+                                                                            data-vehicle_no="{{ $checkp->vehicle_no }}"
+                                                                            data-description="{{ $checkp->description }}"
+                                                                            data-toggle="modal"
+                                                                            data-target="#detailsModal">
+                                                                            <span class="fa fa-eye"></span>
+                                                                        </a>
+                                                                        <a href="{{ route('purchase.checked.details', $checkp->bill_no) }}"
+                                                                            target="_blank">
+                                                                            <span class="fa fa-info-circle"></span>
+                                                                        </a>
+                                                                    @endif
+                                                                </td>
+                                                            </tr>
+                                                            <?php
+                                                            $i++;
+                                                            $t_mat += $checkp->material_cost;
+                                                            $tt_mat += $checkp->total_material_cost;
+                                                            $total_qty += $checkp->product_qty;
+                                                            $total_truck_rent += $checkp->truck_rent;
+                                                            $total_unload_bill += $checkp->unload_bill;
+                                                            ?>
+                                                        @endforeach
+                                                    @endif
+
+                                                    <!-- Total Row -->
+                                                    <tr style="background-color:#999999; color: #fff;">
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>Total:</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>{{ number_format($total_qty, 2) }}</td>
+                                                        <td></td>
+                                                        <td>{{ number_format($t_mat, 2) }}</td>
+                                                        <td>{{ number_format($total_truck_rent, 2) }}</td>
+                                                        <td>{{ number_format($total_unload_bill, 2) }}</td>
+                                                        <td>{{ number_format($tt_mat, 2) }}</td>
+                                                        <td class="hidden-print"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                </div>
-                
-                <!-- Table Section -->
-                <div class="block-fluid table-sorting clearfix">
-                    <form action="{{ route('product.purchase.check') }}" method="post" id="checked_bill_form" class="form-horizontal">
-                        @csrf
-                        <input type="hidden" name="bill_no" id="bill_no" value="" />
-                        <input type="hidden" name="adjustment_qty" id="adjustment_amount" value="" />
-                        <input type="hidden" name="adjustment_cost" id="adjustment_cost" value="" />
-                        
-                        <table cellpadding="0" cellspacing="0" width="100%" class="table" id="datatable">
-                            <thead>
-                                <tr>
-                                    <th><input type="checkbox" name="checkall"/></th>
-                                    <th>DMR No</th>
-                                    <th>Chalan/ Bill No</th>
-                                    <th>Rec Date</th>
-                                    <th>Product Name</th>
-                                    <th>Qty</th>
-                                    <th>Rate</th>
-                                    <th>Mat Cost</th>
-                                    <th>Truck Rent</th>
-                                    <th>Unload Bill</th>
-                                    <th>Total Mat Cost</th>
-                                    <th class="hidden-print">Actions</th>
-                                </tr>
-                            </thead>
-                            
-                            <tbody>
-                                <?php
-                                    $i = 1;
-                                    $t_mat = 0;
-                                    $tt_mat = 0;
-                                    $total_qty = 0;
-                                    $total_truck_rent = 0;
-                                    $total_unload_bill = 0;
-                                ?>
-                                
-                                @if(!empty($check_pb))
-                                    @foreach($check_pb as $checkp)
-                                        <tr @if($checkp->check_status == 1) style="color:#09b509;" @endif>
-                                            <td>
-                                                @if($checkp->check_status == 0)
-                                                    <input type="checkbox" id="checkbox" value="{{ $checkp->id }}" name="checkbox[]"/>
-                                                @else
-                                                    <span class="glyphicon glyphicon-warning-sign"></span>
-                                                @endif
-                                            </td>
-                                            <td>{{ $checkp->dmr_no }}</td>
-                                            <td>{{ $checkp->bill_no }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($checkp->received_date)) }}</td>
-                                            <td>{{ $checkp->product_name->name }}</td>
-                                            <td>{{ number_format($checkp->product_qty, 2) . " " . $checkp->unit_type }}</td>
-                                            <td>{{ number_format($checkp->rate_per_unit, 2) }}</td>
-                                            <td>{{ number_format($checkp->material_cost, 2) }}</td>
-                                            <td>{{ number_format($checkp->truck_rent, 2) }}</td>
-                                            <td>{{ number_format($checkp->unload_bill, 2) }}</td>
-                                            <td>{{ number_format($checkp->total_material_cost, 2) }}</td>
-                                            <td class="hidden-print">
-                                                @if($user->hasRole('super-admin') || $user->can('product-purchase-list-details'))
-                                                    <a role="button" class="view_btn"
-                                                        data-dmr_no="{{ $checkp->supplier->name }}"
-                                                        data-chalan_no="{{ $checkp->chalan_no }}"
-                                                        data-purchase_date="{{ $checkp->purchase_date }}"
-                                                        data-received_date="{{ $checkp->received_date }}"
-                                                        data-product_name="{{ $checkp->product_name->name }}"
-                                                        data-supplier_name="{{ $checkp->supplier->name }}"
-                                                        data-quantity="{{ $checkp->product_qty }}"
-                                                        data-rate_per_unit="{{ $checkp->rate_per_unit }}"
-                                                        data-material_cost="{{ $checkp->material_cost }}"
-                                                        data-truck_rent="{{ $checkp->truck_rent }}"
-                                                        data-unload_bill="{{ $checkp->unload_bill }}"
-                                                        data-total_material_cost="{{ $checkp->total_material_cost }}"
-                                                        data-vehicle_no="{{ $checkp->vehicle_no }}"
-                                                        data-description="{{ $checkp->description }}"
-                                                        data-toggle="modal"
-                                                        data-target="#detailsModal">
-                                                        <span class="fa fa-eye"></span>
-                                                    </a>
-                                                    <a href="{{ route('purchase.checked.details', $checkp->bill_no) }}" target="_blank">
-                                                        <span class="fa fa-info-circle"></span>
-                                                    </a>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        <?php
-                                            $i++;
-                                            $t_mat += $checkp->material_cost;
-                                            $tt_mat += $checkp->total_material_cost;
-                                            $total_qty += $checkp->product_qty;
-                                            $total_truck_rent += $checkp->truck_rent;
-                                            $total_unload_bill += $checkp->unload_bill;
-                                        ?>
-                                    @endforeach
-                                @endif
-                                
-                                <!-- Total Row -->
-                                <tr style="background-color:#999999; color: #fff;">
-                                    <td></td>
-                                    <td></td>
-                                    <td>Total:</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>{{ number_format($total_qty, 2) }}</td>
-                                    <td></td>
-                                    <td>{{ number_format($t_mat, 2) }}</td>
-                                    <td>{{ number_format($total_truck_rent, 2) }}</td>
-                                    <td>{{ number_format($total_unload_bill, 2) }}</td>
-                                    <td>{{ number_format($tt_mat, 2) }}</td>
-                                    <td class="hidden-print"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-@endif
+                        </div>
+                    @endif
 
-                    @if($user->hasRole(['super-admin']) || $user->can('supplier-payment-details'))
-                        <div id="tab-payment" aria-labelledby="ui-id-7" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;">
+                    @if ($user->hasRole(['super-admin']) || $user->can('supplier-payment-details'))
+                        <div id="tab-payment" aria-labelledby="ui-id-7"
+                            class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel"
+                            aria-expanded="false" aria-hidden="true" style="display: none;">
 
                             <div class="row">
                                 <div class="col-md-12">
@@ -391,22 +460,28 @@
                                             <div class="isw-documents"></div>
                                             <h1>
                                                 Supplier Payment Details
-                                                <span class="src-info">{{ (request('payment_search_text') == '' && request('payment_date_range') == '')?'- Last 30 Days':'- '. request('payment_date_range') }}</span>
+                                                <span
+                                                    class="src-info">{{ request('payment_search_text') == '' && request('payment_date_range') == '' ? '- Last 30 Days' : '- ' . request('payment_date_range') }}</span>
                                             </h1>
                                         </div>
 
                                         <div class="col-md-7 col-md-offset-1 search_box" style="margin-top: 4px;">
                                             <form action="" class="form-horizontal">
-                                                <input type="hidden" name="tab_type" value="tab-payment"/>
+                                                <input type="hidden" name="tab_type" value="tab-payment" />
                                                 <div class="" align="right">
                                                     <div class="col-md-6">
-                                                        <input type="text" name="payment_search_text" id="search_name" value="{{ request('payment_search_text')??'' }}" class="form-control" placeholder="Enter Search Text" />
+                                                        <input type="text" name="payment_search_text" id="search_name"
+                                                            value="{{ request('payment_search_text') ?? '' }}"
+                                                            class="form-control" placeholder="Enter Search Text" />
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="input-group">
-                                                            <input type="text" name="payment_date_range" value=""  class="date_range form-control" placeholder="Date Range" />
+                                                            <input type="text" name="payment_date_range"
+                                                                value="" class="date_range form-control"
+                                                                placeholder="Date Range" />
                                                             <div class="input-group-btn">
-                                                                <button type="submit" class="btn btn-default search-btn">Search</button>
+                                                                <button type="submit"
+                                                                    class="btn btn-default search-btn">Search</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -416,93 +491,102 @@
                                         </div>
                                     </div>
                                     <div class="block-fluid table-sorting clearfix">
-                                        <table cellpadding="0" cellspacing="0" width="100%" class="table table-striped table-responsive" id="datatable">
+                                        <table cellpadding="0" cellspacing="0" width="100%"
+                                            class="table table-striped table-responsive" id="datatable">
                                             <thead>
-                                            <tr>
-                                                <th>
-                                        <input type="checkbox" value="" name="checkall"/>
-                                        </th>
-                                                <th>Tran Id</th>
-                                                <th>Ref date</th>
-                                                <th>Description</th>
-                                                <th>Payment Mode</th>
-                                                <th>Branch Name</th>
-                                                <th class="text-right">Paid Amount</th>
-                                                <th>Files</th>
-                                                <th class="hidden-print">Actions</th>
-                                            </tr>
+                                                <tr>
+                                                    <th>
+                                                        <input type="checkbox" value="" name="checkall" />
+                                                    </th>
+                                                    <th>Tran Id</th>
+                                                    <th>Ref date</th>
+                                                    <th>Description</th>
+                                                    <th>Payment Mode</th>
+                                                    <th>Branch Name</th>
+                                                    <th class="text-right">Paid Amount</th>
+                                                    <th>Files</th>
+                                                    <th class="hidden-print">Actions</th>
+                                                </tr>
                                             </thead>
                                             <tbody>
-                                                <?php $total = 0;$ad_total = 0;?>
-                                            @foreach($payments as $payment)
-                                                <tr>
-                                                    <td>
-                                                            <input type="checkbox" id="checkbox"
-                                                                    name="checkbox[]"/>
+                                                <?php $total = 0;
+                                                $ad_total = 0; ?>
+                                                @foreach ($payments as $payment)
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" id="checkbox" name="checkbox[]" />
                                                         </td>
-                                                    <td>{{ $payment->transaction_id }}</td>
-                                                    <td>{{ date('d-m-Y',strtotime($payment->ref_date)) }}</td>
-                                                    <td>{{$payment->description}}</td>
-                                                    <td>
-                                                        @if($payment->payment_mode == 'Bank')
-                                                            Bank: {{$payment->bank_info->short_name }},
-                                                            A/C no: {{ $payment->bank_info->account_no }}, Cheque no: {{ $payment->cheque_no }}
-                                                        @else {{'Cash'}}
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $payment->branch->name??'-' }}</td>
-                                                    <td class="text-right">{{ number_format($payment->paid_amount,2) }}</td>
-                                                    <td>
-                                                            <?php $file_text = $payment->file;$files = explode(",", $file_text); ?>
-                                                        @foreach ($files as $file)
-                                                            <a href="{{URL::to('/img/files/expense_files/supplier_payment/'.$file)}}" target="_blank" rel="tag"><?php echo $file;?></a><br>
-                                                        @endforeach
-                                                    </td>
-                                                    <td class="hidden-print">
-                                                        @if($user->branchId == "")
-                                                            @if($user->hasRole('super-admin') || $user->can('supplier-payment-details'))
-                                                                <a role="button" class="view_btn"
-                                                                   data-supplier_name="{{ $payment->supplier->name }}"
-                                                                   data-trx_id="{{ $payment->transaction_id }}"
-                                                                   data-voucher_no="{{ $payment->voucher_no }}"
-                                                                   data-payment_date="{{ $payment->payment_date }}"
-                                                                   data-payment_mode="{{ $payment->payment_mode }}"
-                                                                   data-bank_name="{{ $payment->bank_info->short_name??'-' }}"
-                                                                   data-cheque_no="{{ $payment->cheque_no??'' }}"
-                                                                   data-cheque_date="{{ $payment->ref_date }}"
-                                                                   data-payment_amount="{{ $payment->paid_amount }}"
-                                                                   data-adjustment_amount="{{ $payment->adjustment_amount }}"
-                                                                   data-description="{{ $payment->description }}"
-                                                                   data-toggle="modal"
-                                                                   data-target="#paymentDetailsModal">
-                                                                    <span class="fa fa-eye"></span>
-                                                                </a>
+                                                        <td>{{ $payment->transaction_id }}</td>
+                                                        <td>{{ date('d-m-Y', strtotime($payment->ref_date)) }}</td>
+                                                        <td>{{ $payment->description }}</td>
+                                                        <td>
+                                                            @if ($payment->payment_mode == 'Bank')
+                                                                Bank: {{ $payment->bank_info->short_name }},
+                                                                A/C no: {{ $payment->bank_info->account_no }}, Cheque no:
+                                                                {{ $payment->cheque_no }}
+                                                            @else
+                                                                {{ 'Cash' }}
                                                             @endif
+                                                        </td>
+                                                        <td>{{ $payment->branch->name ?? '-' }}</td>
+                                                        <td class="text-right">
+                                                            {{ number_format($payment->paid_amount, 2) }}</td>
+                                                        <td>
+                                                            <?php $file_text = $payment->file;
+                                                            $files = explode(',', $file_text); ?>
+                                                            @foreach ($files as $file)
+                                                                <a href="{{ URL::to('/img/files/expense_files/supplier_payment/' . $file) }}"
+                                                                    target="_blank"
+                                                                    rel="tag"><?php echo $file; ?></a><br>
+                                                            @endforeach
+                                                        </td>
+                                                        <td class="hidden-print">
+                                                            @if ($user->branchId == '')
+                                                                @if ($user->hasRole('super-admin') || $user->can('supplier-payment-details'))
+                                                                    <a role="button" class="view_btn"
+                                                                        data-supplier_name="{{ $payment->supplier->name }}"
+                                                                        data-trx_id="{{ $payment->transaction_id }}"
+                                                                        data-voucher_no="{{ $payment->voucher_no }}"
+                                                                        data-payment_date="{{ $payment->payment_date }}"
+                                                                        data-payment_mode="{{ $payment->payment_mode }}"
+                                                                        data-bank_name="{{ $payment->bank_info->short_name ?? '-' }}"
+                                                                        data-cheque_no="{{ $payment->cheque_no ?? '' }}"
+                                                                        data-cheque_date="{{ $payment->ref_date }}"
+                                                                        data-payment_amount="{{ $payment->paid_amount }}"
+                                                                        data-adjustment_amount="{{ $payment->adjustment_amount }}"
+                                                                        data-description="{{ $payment->description }}"
+                                                                        data-toggle="modal"
+                                                                        data-target="#paymentDetailsModal">
+                                                                        <span class="fa fa-eye"></span>
+                                                                    </a>
+                                                                @endif
 
-                                                            @if($user->hasRole('super-admin') || $user->can('supplier-payment-delete'))
-                                                                <a href="{{ route('supplier.payment.delete', $payment->transaction_id) }}"
-                                                                   onclick="return confirm('Are you sure you want to delete?')"><span class="fa fa-trash"></span></a>
+                                                                @if ($user->hasRole('super-admin') || $user->can('supplier-payment-delete'))
+                                                                    <a href="{{ route('supplier.payment.delete', $payment->transaction_id) }}"
+                                                                        onclick="return confirm('Are you sure you want to delete?')"><span
+                                                                            class="fa fa-trash"></span></a>
+                                                                @endif
                                                             @endif
-                                                        @endif
+                                                        </td>
+                                                    </tr>
+                                                    <?php $total += $payment->paid_amount;
+                                                    $ad_total += $payment->adjustment_amount; ?>
+                                                @endforeach
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td class="text-right">
+                                                        <b>Total = </b>
                                                     </td>
+                                                    <td class="text-right">
+                                                        <b>{{ number_format($total, 2) }}</b>
+                                                    </td>
+                                                    <td></td>
+                                                    <td class="hidden-print"></td>
                                                 </tr>
-                                                    <?php $total += $payment->paid_amount; $ad_total += $payment->adjustment_amount;?>
-                                            @endforeach
-                                            <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td class="text-right">
-                                                    <b>Total = </b>
-                                                </td>
-                                                <td class="text-right">
-                                                    <b>{{ number_format($total,2) }}</b>
-                                                </td>
-                                                <td></td>
-                                                <td class="hidden-print"></td>
-                                            </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -513,15 +597,19 @@
                         </div>
                     @endif
 
-                    @if($user->hasRole(['super-admin']) || $user->can('supplier-statement-report'))
-                        <div id="tab-statement" aria-labelledby="ui-id-7" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;">
+                    @if ($user->hasRole(['super-admin']) || $user->can('supplier-statement-report'))
+                        <div id="tab-statement" aria-labelledby="ui-id-7"
+                            class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel"
+                            aria-expanded="false" aria-hidden="true" style="display: none;">
                             <div class="row">
                                 <div class="col-md-12">
 
                                     {{-- PRINT BUTTONS --}}
                                     <div style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 10px;">
-                                        <button onclick="printStatement('tab-statement', 'pad')" class="btn btn-sm btn-info no-print">Print (With Pad)</button>
-                                        <button onclick="printStatement('tab-statement', 'non-pad')" class="btn btn-sm btn-success no-print">Print (Without Pad)</button>
+                                        <button onclick="printStatement('tab-statement', 'pad')"
+                                            class="btn btn-sm btn-info no-print">Print (With Pad)</button>
+                                        <button onclick="printStatement('tab-statement', 'non-pad')"
+                                            class="btn btn-sm btn-success no-print">Print (Without Pad)</button>
                                     </div>
 
                                     <div class="head clearfix">
@@ -530,23 +618,30 @@
                                             <h3>
                                                 View Supplier Statement
                                                 <span class="src-info">
-                                {{ (request('statement_search_text') == '' && request('date_range') == '') ? '- Last 30 days' : '- ' . request('date_range') }}
-                            </span>
+                                                    {{ request('statement_search_text') == '' && request('date_range') == '' ? '- Last 30 days' : '- ' . request('date_range') }}
+                                                </span>
                                             </h3>
                                         </div>
 
                                         <div class="col-md-7 search_box" style="margin-top: 4px;">
                                             <form action="" class="form-horizontal">
-                                                <input type="hidden" name="tab_type" value="tab-statement"/>
+                                                <input type="hidden" name="tab_type" value="tab-statement" />
                                                 <div class="" align="right">
                                                     <div class="col-md-6">
-                                                        <input type="text" name="statement_search_text" id="search_name" class="form-control" value="{{ request('statement_search_text') ?? '' }}" placeholder="Enter Search Text" />
+                                                        <input type="text" name="statement_search_text"
+                                                            id="search_name" class="form-control"
+                                                            value="{{ request('statement_search_text') ?? '' }}"
+                                                            placeholder="Enter Search Text" />
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="input-group">
-                                                            <input type="text" name="date_range" value="{{ request('date_range') ?? '' }}" class="date_range form-control" placeholder="Date Range" autocomplete="off"/>
+                                                            <input type="text" name="date_range"
+                                                                value="{{ request('date_range') ?? '' }}"
+                                                                class="date_range form-control" placeholder="Date Range"
+                                                                autocomplete="off" />
                                                             <div class="input-group-btn">
-                                                                <button type="submit" id="btn_search" class="btn btn-default search-btn">Search</button>
+                                                                <button type="submit" id="btn_search"
+                                                                    class="btn btn-default search-btn">Search</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -556,110 +651,150 @@
                                     </div>
 
                                     <div class="block-fluid table-sorting clearfix">
-                                        <table cellpadding="0" cellspacing="0" width="100%" class="table table-striped" id="datatable">
+                                        <table cellpadding="0" cellspacing="0" width="100%"
+                                            class="table table-striped" id="datatable">
                                             <thead>
-                                            <tr>
-                                                <th>
-                                        <input type="checkbox" value="" name="checkall"/>
-                                        </th>
-                                                <th>Trx Id</th>
-                                                <th>Date</th>
-                                                <th>Description</th>
-                                                <th>Quantity</th>
-                                                <th>Truck Rent</th>
-                                                <th>Unload Bill</th>
-                                                <th>Adj Amount</th>
-                                                <th>Debit</th>
-                                                <th>Credit</th>
-                                                <th>Balance</th>
-                                            </tr>
+                                                <tr>
+                                                    <th><input type="checkbox" value="" name="checkall" /></th>
+                                                    <th>Trx Id</th>
+                                                    <th>Chalan No</th>
+                                                    <th>Date</th>
+                                                    <th>Description</th>
+                                                    <th>Quantity</th>
+                                                    <th>Truck Rent</th>
+                                                    <th>Unload Bill</th>
+                                                    <th>Debit</th>
+                                                    <th>Credit</th>
+                                                    <th>Adj Amount</th>
+                                                    <th>Balance</th>
+                                                </tr>
                                             </thead>
                                             <tbody>
-                                                <?php $i = 1;$total_bal = 0;$debit = 0; $credit = 0;
-                                                $qty = 0; $total_truck_rent = 0; $total_unload = 0; $total_adjustment_amount = 0; ?>
-                                            @foreach ($statements as $statement)
-                                                    <?php
-                                                    $payment_details ="";
-                                                    $pay_row = $statement->supplier_payment;
-
-                                                    if($pay_row != "" && $pay_row->bank_id != ""){
-                                                        $payment_details = "{$pay_row->payment_mode}: {$pay_row->bank_info->short_name}, AC No:{$pay_row->bank_info->account_no},Cheque/Receipt no:{$pay_row->cheque_no}";
-                                                    }else{
-                                                        $payment_details = 'Cash';
-                                                    }
-
-                                                    $adjustment_amount = 0;
-                                                    if($pay_row != ""){
-                                                        $adjustment_amount = $pay_row->adjustment_amount;
-                                                    }
-
-                                                    $quantity = "";
-                                                    $truck_rent = "";
-                                                    $unload = "";
-                                                    $pp_row = $statement->product_purchase;
-
-                                                    if($pp_row != ""){
-                                                        $quantity = round($pp_row->product_qty,3)." ".$pp_row->unit_type;
-                                                        $truck_rent = $pp_row->truck_rent;
-                                                        $unload = $pp_row->unload_bill;
-                                                    }
-
-                                                    $trans_id = $statement->transaction_id;
-                                                    $eti= explode("-",$trans_id);
-                                                    $sep_trans_id=($eti[0]);
-                                                    $bill_adjustment = 0;
-                                                    if($sep_trans_id=='BILLAD'){
-                                                        $bill_adjustment = $statement->debit;
-                                                    }
-
-                                                    $two_adjust= $bill_adjustment + $adjustment_amount;
-                                                    ?>
-
-                                                <tr>
-                                                    <td>
-                                                            <input type="checkbox" id="checkbox"
-                                                                   name="checkbox[]"/>
+                                                {{-- Opening Balance Row --}}
+                                                {{-- @if (isset($opening_balance))
+                                                    <tr class="font-weight-bold" style="background-color: #f8f9fa;">
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>{{ isset($opening_date) ? date('d-M-y', strtotime($opening_date)) : date('d-M-y') }}
                                                         </td>
-                                                    <td>{{ $statement->transaction_id }}</td>
-                                                    <td>{{ date('d-M-y', strtotime($statement->posting_date)) }}</td>
-                                                    <td>{{ $statement->description }}</td>
-                                                    <td>
-                                                            <?php if($sep_trans_id=='BILLAD' && $statement->adjustment_amount>0){
-                                                            echo -$statement->adjustment_amount;
-                                                        }else{
-                                                            echo $quantity;
-                                                        }
-                                                            ?>
-                                                    </td>
-                                                    <td>{{ $truck_rent }}</td>
-                                                    <td>{{ round($unload,2) }} </td>
-                                                    <td>{{ $two_adjust }}</td>
-                                                    <td>{{ $statement->debit - $two_adjust }}</td>
-                                                    <td>{{ $statement->credit- $two_adjust }}</td>
-                                                    <td>
-                                                        {{ number_format($statement->balance,4) }}
-                                                    </td>
-                                                </tr>
-                                                    <?php
-                                                    $i++; $qty += (int)$quantity; $debit += (int)$statement->debit - $two_adjust;
-                                                    $credit += (int)$statement->credit - $two_adjust; $total_truck_rent += (int)$truck_rent;
-                                                    $total_unload += (int)$unload; $total_adjustment_amount += $two_adjust;
-                                                    ?>
-                                            @endforeach
+                                                        <td>Opening Balance</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>{{ $opening_balance > 0 ? number_format($opening_balance, 2) : '' }}
+                                                        </td>
+                                                        <td>{{ $opening_balance < 0 ? number_format(abs($opening_balance), 2) : '' }}
+                                                        </td>
+                                                        <td>{{ number_format($opening_balance, 4) }}</td>
+                                                    </tr>
+                                                @endif --}}
 
-                                            <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td><b>Total:</b></td>
-                                                <td><b>{{ number_format($qty,2) }}</b></td>
-                                                <td><b>{{ number_format($total_truck_rent,2) }}</b></td>
-                                                <td><b>{{ number_format($total_unload,2) }}</b></td>
-                                                <td><b>{{ number_format($total_adjustment_amount,2) }}</b></td>
-                                                <td><b>{{ number_format($debit,2) }}</b></td>
-                                                <td><b>{{ number_format($credit,2) }}</b></td>
-                                                <td></td>
-                                            </tr>
+                                               {{-- Initialize variables BEFORE the loop --}}
+@php
+    $total_qty = 0;
+    $total_truck_rent = 0;
+    $total_unload = 0;
+    $total_adjustment = 0;
+    $total_debit = 0;
+    $total_credit = 0;
+    $running_balance = 0;
+@endphp
+
+@foreach ($statements as $index => $statement)
+    @php
+        $payment_details = 'Cash';
+        if (
+            $statement->supplier_payment &&
+            $statement->supplier_payment->bank_id
+        ) {
+            $bank = $statement->supplier_payment->bank_info;
+            $payment_details = "{$statement->supplier_payment->payment_mode}: {$bank->short_name}, AC No:{$bank->account_no}, Cheque/Receipt no:{$statement->supplier_payment->cheque_no}";
+        }
+
+        $adjustment_amount = $statement->supplier_payment
+            ? $statement->supplier_payment->adjustment_amount
+            : 0;
+        $bill_adjustment = 0;
+
+        $trans_id_parts = explode('-', $statement->transaction_id);
+        $trans_prefix = $trans_id_parts[0] ?? '';
+
+        if ($trans_prefix == 'BILLAD') {
+            $bill_adjustment = $statement->debit;
+        }
+
+        $total_adjustment_row = $bill_adjustment + $adjustment_amount;
+
+    
+        $quantity = 0;
+        $quantity_display = '';
+        $truck_rent = 0;
+        $unload = 0;
+
+        if ($statement->product_purchase) {
+            $pp = $statement->product_purchase;
+            $quantity = round($pp->product_qty, 3);
+            $quantity_display = $quantity . ' ' . $pp->unit_type;
+            $truck_rent = $pp->truck_rent ?? 0;
+            $unload = $pp->unload_bill ?? 0;
+        }
+
+
+        $display_qty = $quantity_display;
+        
+        if ($trans_prefix == 'BILLAD' && $statement->adjustment_amount > 0) {
+            $display_qty = -$statement->adjustment_amount;
+            $quantity = -$statement->adjustment_amount; 
+        }
+
+        $display_debit = $statement->debit - $total_adjustment_row;
+        $display_credit = $statement->credit - $total_adjustment_row;
+
+        $running_balance = $running_balance + $display_credit - $display_debit;
+    @endphp
+
+    <tr>
+        <td><input type="checkbox" name="checkbox[]"
+                value="{{ $statement->id }}" /></td>
+        <td>{{ $statement->transaction_id }}</td>
+        <td>{{ $statement->product_purchase->chalan_no ?? '' }}</td>
+        <td>{{ date('d-M-y', strtotime($statement->posting_date)) }}</td>
+        <td>{{ $statement->description }}</td>
+        <td>{{ is_numeric($display_qty) ? number_format($display_qty, 2) : $display_qty }}</td>
+        <td>{{ number_format($truck_rent, 2) }}</td>
+        <td>{{ number_format($unload, 2) }}</td>
+        <td>{{ $display_debit > 0 ? number_format($display_debit, 2) : '' }}</td>
+        <td>{{ $display_credit > 0 ? number_format($display_credit, 2) : '' }}</td>
+        <td>{{ number_format($total_adjustment_row, 2) }}</td>
+        <td class="{{ $running_balance < 0 ? 'text-danger' : 'text-dark' }}">
+            {{ number_format($running_balance, 2) }}
+        </td>
+    </tr>
+
+    @php
+
+        $total_qty += $quantity;
+        $total_truck_rent += $truck_rent;
+        $total_unload += $unload;
+        $total_adjustment += $total_adjustment_row;
+        $total_debit += $display_debit;
+        $total_credit += $display_credit;
+    @endphp
+@endforeach
+
+{{-- Display totals --}}
+<tr class="font-weight-bold">
+    <td colspan="4" class="text-right"><b>Total:</b></td>
+    <td></td>
+    <td><b>{{ number_format($total_qty, 2) }}</b></td>
+    <td><b>{{ number_format($total_truck_rent, 2) }}</b></td>
+    <td><b>{{ number_format($total_unload, 2) }}</b></td>
+    <td><b>{{ number_format($total_debit, 2) }}</b></td>
+    <td><b>{{ number_format($total_credit, 2) }}</b></td>
+    <td><b>{{ number_format($total_adjustment, 2) }}</b></td>
+    <td><b>{{ number_format($running_balance, 2) }}</b></td>
+</tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -678,11 +813,13 @@
     </div>
 
     <!-- purchase details modal form -->
-    <div class="modal fade" id="purchaseDetailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade" id="purchaseDetailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" id="close_modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <button type="button" class="close" data-dismiss="modal" id="close_modal"><span
+                            aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                     <h4>Product Purchase Details</h4>
                 </div>
                 <div class="modal-body modal-body-np">
@@ -750,17 +887,20 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-danger" data-dismiss="modal" id="close_modal1" aria-hidden="true">Close</button>
+                    <button class="btn btn-danger" data-dismiss="modal" id="close_modal1"
+                        aria-hidden="true">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="bill_status_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade" id="bill_status_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <button type="button" class="close" data-dismiss="modal"><span
+                            aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                     <h4>Add Bill No</h4>
                 </div>
                 <div class="modal-body modal-body-np">
@@ -787,19 +927,22 @@
                             <div class="row-form clearfix">
                                 <label class="col-md-3">Bill No: </label>
                                 <div class="col-md-6">
-                                    <input type="text" value="<?php echo mt_rand(10,100000);?>" required="" name="bill_no_modal" id="bill_no_modal"/>
+                                    <input type="text" value="<?php echo mt_rand(10, 100000); ?>" required=""
+                                        name="bill_no_modal" id="bill_no_modal" />
                                 </div>
                             </div>
                             <div class="row-form clearfix">
                                 <label class="col-md-3">Adjustment Qty: </label>
                                 <div class="col-md-6">
-                                    <input type="number" value="" required="" name="ad_qty_modal" id="ad_qty_modal"/>
+                                    <input type="number" value="" required="" name="ad_qty_modal"
+                                        id="ad_qty_modal" />
                                 </div>
                             </div>
                             <div class="row-form clearfix">
                                 <label class="col-md-3">Adjustment Cost: </label>
                                 <div class="col-md-6">
-                                    <input type="number" value="" required="" name="ad_cost_modal" id="ad_cost_modal"/>
+                                    <input type="number" value="" required="" name="ad_cost_modal"
+                                        id="ad_cost_modal" />
                                 </div>
                             </div>
                             <div class="col-md-12" id="error_div" style=""></div>
@@ -815,11 +958,13 @@
         </div>
     </div>
     <!-- payment details modal form -->
-    <div class="modal fade" id="paymentDetailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal fade" id="paymentDetailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <button type="button" class="close" data-dismiss="modal"><span
+                            aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                     <h4>Supplier Payment Details</h4>
                 </div>
                 <div class="modal-body modal-body-np">
@@ -886,204 +1031,204 @@
 @endsection
 
 @section('page-script')
-<script>
-    var t = 0;
-    var new_item = 0;
+    <script>
+        var t = 0;
+        var new_item = 0;
 
-    $(document).ready(function(e) {
-        // Debug: Check if DataTable is initialized
-        console.log("Table instance:", typeof table, table);
-        
-        //update no and change color
-        $("#btn_bill_update").on('click',function(){
-            $("#error_div").empty();
-            var bill_no = $("#bill_no_modal").val();
-            var ad_qty = $("#ad_qty_modal").val();
-            var ad_cost = $("#ad_cost_modal").val();
-            $("#bill_no").val(bill_no);
-            $("#adjustment_amount").val(ad_qty);
-            $("#adjustment_cost").val(ad_cost);
-            
-            if(bill_no === "") {
-                $("#error_div").append("<p>Please enter bill no</p>");
+        $(document).ready(function(e) {
+            // Debug: Check if DataTable is initialized
+            console.log("Table instance:", typeof table, table);
+
+            //update no and change color
+            $("#btn_bill_update").on('click', function() {
+                $("#error_div").empty();
+                var bill_no = $("#bill_no_modal").val();
+                var ad_qty = $("#ad_qty_modal").val();
+                var ad_cost = $("#ad_cost_modal").val();
+                $("#bill_no").val(bill_no);
+                $("#adjustment_amount").val(ad_qty);
+                $("#adjustment_cost").val(ad_cost);
+
+                if (bill_no === "") {
+                    $("#error_div").append("<p>Please enter bill no</p>");
+                    return false;
+                }
+
+                // Use setTimeout to ensure modal animation completes
+                setTimeout(function() {
+                    $("#checked_bill_form").submit();
+                }, 300);
+            });
+
+            // Row click handler
+            $("#datatable tbody").on('click', 'tr', function(e) {
+                // Don't trigger on checkbox click
+                if ($(e.target).is('input[type="checkbox"]')) return;
+
+                var checkbox = $(this).find("input[type=checkbox]");
+                var isChecked = checkbox.prop('checked');
+
+                // Toggle checkbox
+                checkbox.prop('checked', !isChecked);
+
+                // Toggle selected class
+                if (!isChecked) {
+                    $(this).addClass('selected');
+                } else {
+                    $(this).removeClass('selected');
+                }
+
+                // Trigger change event
+                checkbox.trigger('change');
+            });
+
+            // Select all checkbox handler
+            $("#datatable thead tr input[type=checkbox]").on('click', function() {
+                var isChecked = $(this).prop('checked');
+
+                // Check/uncheck all checkboxes
+                $("#datatable tbody input[type=checkbox]").prop('checked', isChecked);
+
+                // Add/remove selected class
+                if (isChecked) {
+                    $("#datatable tbody tr").addClass('selected');
+                } else {
+                    $("#datatable tbody tr").removeClass('selected');
+                }
+
+                // Trigger change event on all checkboxes
+                $("#datatable tbody input[type=checkbox]").trigger('change');
+            });
+
+            // Checkbox change handler
+            $(document).on('change', '#datatable tbody input[type=checkbox]', function() {
+                console.log("Checkbox changed");
+
+                var checkedBoxes = $("#datatable tbody input[type=checkbox]:checked");
+                var len = checkedBoxes.length;
+                var total_mat_cost = 0;
+                var total_qty = 0;
+
+                console.log("Checked boxes count:", len);
+
+                if (len > 0) {
+                    checkedBoxes.each(function(index) {
+                        console.log("Processing checkbox", index);
+
+                        var $row = $(this).closest('tr');
+                        var rowIndex = $row.index();
+
+                        // Try multiple ways to get row data
+                        var rowData = null;
+
+                        // Method 1: Using DataTables API if available
+                        if (typeof table !== 'undefined' && table) {
+                            try {
+                                rowData = table.row($row).data();
+                                console.log("Row data from DataTable API:", rowData);
+                            } catch (e) {
+                                console.log("Error getting DataTable row:", e);
+                            }
+                        }
+
+                        // Method 2: Get data from table cells directly
+                        if (!rowData || rowData.length === 0) {
+                            rowData = [];
+                            $row.find('td').each(function(i, cell) {
+                                rowData.push($(cell).text().trim());
+                            });
+                            console.log("Row data from DOM:", rowData);
+                        }
+
+                        if (rowData && rowData.length > 0) {
+                            // Parse quantity (assuming column 6, index 5)
+                            var qtyCell = rowData[5] || rowData[6] || '0';
+                            console.log("Quantity cell text:", qtyCell);
+
+                            // Extract numeric value from string
+                            var qtyValue = 0;
+                            if (typeof qtyCell === 'string') {
+                                // Remove commas and extract number
+                                var cleanQty = qtyCell.replace(/,/g, '');
+                                var qtyMatch = cleanQty.match(/[-+]?[0-9]*\.?[0-9]+/);
+                                qtyValue = qtyMatch ? parseFloat(qtyMatch[0]) : 0;
+                            } else {
+                                qtyValue = parseFloat(qtyCell) || 0;
+                            }
+
+                            console.log("Parsed quantity:", qtyValue);
+                            total_qty += qtyValue;
+
+                            // Parse material cost (assuming column 8, index 7)
+                            var costCell = rowData[7] || rowData[8] || '0';
+                            console.log("Cost cell text:", costCell);
+
+                            // Extract numeric value from string
+                            var costValue = 0;
+                            if (typeof costCell === 'string') {
+                                // Remove currency symbols, commas and extract number
+                                var cleanCost = costCell.replace(/[$,]/g, '');
+                                var costMatch = cleanCost.match(/[-+]?[0-9]*\.?[0-9]+/);
+                                costValue = costMatch ? parseFloat(costMatch[0]) : 0;
+                            } else {
+                                costValue = parseFloat(costCell) || 0;
+                            }
+
+                            console.log("Parsed cost:", costValue);
+                            total_mat_cost += costValue;
+                        }
+                    });
+
+                    console.log("Total Quantity:", total_qty);
+                    console.log("Total Mat Cost:", total_mat_cost);
+
+                    // Update display with formatted numbers
+                    $("#total_pro_qty").html('<b>' + total_qty.toFixed(2) + '</b>');
+                    $("#total_mat_cost").html('<b>' + total_mat_cost.toFixed(2) + '</b>');
+                    $("#total_selected").html('<b>' + len + '</b>');
+                    $("#check_btn_div").css('display', 'inline-block');
+                } else {
+                    $("#total_pro_qty").html('<b>0.00</b>');
+                    $("#total_mat_cost").html('<b>0.00</b>');
+                    $("#total_selected").html('<b>0</b>');
+                    $("#check_btn_div").css('display', 'none');
+                }
+
+                // Prevent default if needed
                 return false;
-            }
-            
-            // Use setTimeout to ensure modal animation completes
+            });
+
+            // View button handler
+            $(document).on('click', '.view_btn', function(e) {
+                e.preventDefault();
+
+                // Get data attributes
+                var $btn = $(this);
+                $('#dmr_no').html($btn.data('dmr_no') || '');
+                $('#chalan_no').html($btn.data('chalan_no') || '');
+                $('#purchase_date').html($btn.data('purchase_date') || '');
+                $('#received_date').html($btn.data('received_date') || '');
+                $('#product_name').html($btn.data('product_name') || '');
+                $('#supplier_name').html($btn.data('supplier_name') || '');
+                $('#quantity').html($btn.data('quantity') || '');
+                $('#rate_per_unit').html($btn.data('rate_per_unit') || '');
+                $('#material_cost').html($btn.data('material_cost') || '');
+                $('#truck_rent').html($btn.data('truck_rent') || '');
+                $('#unload_bill').html($btn.data('unload_bill') || '');
+                $('#total_material_cost').html($btn.data('total_material_cost') || '');
+                $('#vehicle_no').html($btn.data('vehicle_no') || '');
+                $('#description').html($btn.data('description') || '');
+
+                // Show modal
+                $('#viewModal').modal('show');
+            });
+
+            // Initialize event for the first time
             setTimeout(function() {
-                $("#checked_bill_form").submit();
-            }, 300);
+                $("#datatable tbody input[type=checkbox]:checked").trigger('change');
+            }, 1000);
         });
-
-        // Row click handler
-        $("#datatable tbody").on('click', 'tr', function(e) {
-            // Don't trigger on checkbox click
-            if($(e.target).is('input[type="checkbox"]')) return;
-            
-            var checkbox = $(this).find("input[type=checkbox]");
-            var isChecked = checkbox.prop('checked');
-            
-            // Toggle checkbox
-            checkbox.prop('checked', !isChecked);
-            
-            // Toggle selected class
-            if(!isChecked) {
-                $(this).addClass('selected');
-            } else {
-                $(this).removeClass('selected');
-            }
-            
-            // Trigger change event
-            checkbox.trigger('change');
-        });
-
-        // Select all checkbox handler
-        $("#datatable thead tr input[type=checkbox]").on('click', function() {
-            var isChecked = $(this).prop('checked');
-            
-            // Check/uncheck all checkboxes
-            $("#datatable tbody input[type=checkbox]").prop('checked', isChecked);
-            
-            // Add/remove selected class
-            if(isChecked) {
-                $("#datatable tbody tr").addClass('selected');
-            } else {
-                $("#datatable tbody tr").removeClass('selected');
-            }
-            
-            // Trigger change event on all checkboxes
-            $("#datatable tbody input[type=checkbox]").trigger('change');
-        });
-
-        // Checkbox change handler
-        $(document).on('change', '#datatable tbody input[type=checkbox]', function(){
-            console.log("Checkbox changed");
-            
-            var checkedBoxes = $("#datatable tbody input[type=checkbox]:checked");
-            var len = checkedBoxes.length;
-            var total_mat_cost = 0;
-            var total_qty = 0;
-            
-            console.log("Checked boxes count:", len);
-            
-            if(len > 0) {
-                checkedBoxes.each(function(index) {
-                    console.log("Processing checkbox", index);
-                    
-                    var $row = $(this).closest('tr');
-                    var rowIndex = $row.index();
-                    
-                    // Try multiple ways to get row data
-                    var rowData = null;
-                    
-                    // Method 1: Using DataTables API if available
-                    if(typeof table !== 'undefined' && table) {
-                        try {
-                            rowData = table.row($row).data();
-                            console.log("Row data from DataTable API:", rowData);
-                        } catch(e) {
-                            console.log("Error getting DataTable row:", e);
-                        }
-                    }
-                    
-                    // Method 2: Get data from table cells directly
-                    if(!rowData || rowData.length === 0) {
-                        rowData = [];
-                        $row.find('td').each(function(i, cell) {
-                            rowData.push($(cell).text().trim());
-                        });
-                        console.log("Row data from DOM:", rowData);
-                    }
-                    
-                    if(rowData && rowData.length > 0) {
-                        // Parse quantity (assuming column 6, index 5)
-                        var qtyCell = rowData[5] || rowData[6] || '0';
-                        console.log("Quantity cell text:", qtyCell);
-                        
-                        // Extract numeric value from string
-                        var qtyValue = 0;
-                        if(typeof qtyCell === 'string') {
-                            // Remove commas and extract number
-                            var cleanQty = qtyCell.replace(/,/g, '');
-                            var qtyMatch = cleanQty.match(/[-+]?[0-9]*\.?[0-9]+/);
-                            qtyValue = qtyMatch ? parseFloat(qtyMatch[0]) : 0;
-                        } else {
-                            qtyValue = parseFloat(qtyCell) || 0;
-                        }
-                        
-                        console.log("Parsed quantity:", qtyValue);
-                        total_qty += qtyValue;
-                        
-                        // Parse material cost (assuming column 8, index 7)
-                        var costCell = rowData[7] || rowData[8] || '0';
-                        console.log("Cost cell text:", costCell);
-                        
-                        // Extract numeric value from string
-                        var costValue = 0;
-                        if(typeof costCell === 'string') {
-                            // Remove currency symbols, commas and extract number
-                            var cleanCost = costCell.replace(/[$,]/g, '');
-                            var costMatch = cleanCost.match(/[-+]?[0-9]*\.?[0-9]+/);
-                            costValue = costMatch ? parseFloat(costMatch[0]) : 0;
-                        } else {
-                            costValue = parseFloat(costCell) || 0;
-                        }
-                        
-                        console.log("Parsed cost:", costValue);
-                        total_mat_cost += costValue;
-                    }
-                });
-                
-                console.log("Total Quantity:", total_qty);
-                console.log("Total Mat Cost:", total_mat_cost);
-                
-                // Update display with formatted numbers
-                $("#total_pro_qty").html('<b>'+total_qty.toFixed(2)+'</b>');
-                $("#total_mat_cost").html('<b>'+total_mat_cost.toFixed(2)+'</b>');
-                $("#total_selected").html('<b>'+len+'</b>');
-                $("#check_btn_div").css('display','inline-block');
-            } else {
-                $("#total_pro_qty").html('<b>0.00</b>');
-                $("#total_mat_cost").html('<b>0.00</b>');
-                $("#total_selected").html('<b>0</b>');
-                $("#check_btn_div").css('display','none');
-            }
-            
-            // Prevent default if needed
-            return false;
-        });
-
-        // View button handler
-        $(document).on('click','.view_btn', function(e){
-            e.preventDefault();
-            
-            // Get data attributes
-            var $btn = $(this);
-            $('#dmr_no').html($btn.data('dmr_no') || '');
-            $('#chalan_no').html($btn.data('chalan_no') || '');
-            $('#purchase_date').html($btn.data('purchase_date') || '');
-            $('#received_date').html($btn.data('received_date') || '');
-            $('#product_name').html($btn.data('product_name') || '');
-            $('#supplier_name').html($btn.data('supplier_name') || '');
-            $('#quantity').html($btn.data('quantity') || '');
-            $('#rate_per_unit').html($btn.data('rate_per_unit') || '');
-            $('#material_cost').html($btn.data('material_cost') || '');
-            $('#truck_rent').html($btn.data('truck_rent') || '');
-            $('#unload_bill').html($btn.data('unload_bill') || '');
-            $('#total_material_cost').html($btn.data('total_material_cost') || '');
-            $('#vehicle_no').html($btn.data('vehicle_no') || '');
-            $('#description').html($btn.data('description') || '');
-            
-            // Show modal
-            $('#viewModal').modal('show');
-        });
-
-        // Initialize event for the first time
-        setTimeout(function() {
-            $("#datatable tbody input[type=checkbox]:checked").trigger('change');
-        }, 1000);
-    });
-</script>
+    </script>
 @endsection
 <script>
     function printStatement(elementId, mode) {
@@ -1107,7 +1252,8 @@
         // Extract supplier info from the page
         const supplierName = document.querySelector('.supplier-name')?.innerText?.trim() || '';
         const supplierAddress = document.querySelector('.supplier-address')?.innerText?.trim() || '';
-        const statementRange = container.querySelector('.src-info')?.innerText?.replace('- ','').trim() || 'Last 30 days';
+        const statementRange = container.querySelector('.src-info')?.innerText?.replace('- ', '').trim() ||
+            'Last 30 days';
 
         // Get thead and rows
         const theadHtml = table.querySelector('thead').outerHTML;
@@ -1130,7 +1276,7 @@
             const creditVal = parseFloat((cells[8].innerText || '0').replace(/,/g, '')) || 0;
             const balanceVal = parseFloat((cells[9].innerText || '0').replace(/,/g, '')) || 0;
             if (openingBalance === null) openingBalance = balanceVal;
-            closingBalance += balanceVal;  // Changed here to sum all balances
+            closingBalance += balanceVal; // Changed here to sum all balances
             debitTotal += debitVal;
             creditTotal += creditVal;
             if (debitVal > 0) debitCount++;
@@ -1140,8 +1286,8 @@
         // ---- Build Supplier Info Block ----
         const supplierInfoHtml = `
         <div class="supplier-info" style="margin-bottom:15px; font-size:13px; padding-left:10px">
-              <div><strong>Client Name:</strong> {{$supplier->name}}</div>
-        <div><strong>Client Address:</strong>  {{$supplier->address}}</div>
+              <div><strong>Client Name:</strong> {{ $supplier->name }}</div>
+        <div><strong>Client Address:</strong>  {{ $supplier->address }}</div>
             <div><strong>Statement Period:</strong> ${statementRange}</div>
         </div>
     `;
@@ -1404,8 +1550,3 @@
         };
     }
 </script>
-
-
-
-
-

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Log;
 use App\Models\Branch;
 use App\Models\BankInfo;
 use App\Models\Supplier;
@@ -14,6 +13,7 @@ use App\Models\ProductPurchase;
 use App\Models\SupplierPayment;
 use App\Models\SupplierStatement;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -672,40 +672,87 @@ public function show(Request $request, $id)
     }
 
     // ========== STATEMENT TAB ==========
+    // $statements = $supplier->supplierStatements()
+    //     ->whereBetween('posting_date', [
+    //         date('Y-m-d', strtotime('-30 days')),
+    //         date('Y-m-d')
+    //     ])
+    //     ->orderByDesc('posting_date')
+    //     ->get();
+    
+    // if ($selected_tab == 'tab-statement') {
+    //     $statement_date_range = $request->filled('date_range') 
+    //         ? date_range_to_arr($request->date_range)
+    //         : [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+
+            
+        
+    //     $statements = $supplier->supplierStatements()
+    //         ->whereBetween('posting_date', [
+    //             Carbon::parse($statement_date_range[0])->format('Y-m-d'),
+    //             Carbon::parse($statement_date_range[1])->format('Y-m-d')
+    //         ])
+    //         ->when($request->filled('statement_search_text'), function ($q) use ($request) {
+    //             return $q->where(function ($query) use ($request) {
+    //                 $query->where('transaction_id', 'LIKE', '%' . $request->statement_search_text . '%')
+    //                     ->orWhere('description', 'LIKE', '%' . $request->statement_search_text . '%')
+    //                     ->orWhere('debit', 'LIKE', '%' . $request->statement_search_text . '%')
+    //                     ->orWhere('credit', 'LIKE', '%' . $request->statement_search_text . '%')
+    //                     ->orWhere('balance', 'LIKE', '%' . $request->statement_search_text . '%')
+    //                     ->orWhereHas('supplier', function ($q) use ($request) {
+    //                         $q->where('name', 'LIKE', '%' . $request->statement_search_text . '%');
+    //                     });
+    //             });
+    //         })
+    //         ->orderByDesc('posting_date')
+    //         ->get();
+    // }
+$statements = $supplier->supplierStatements()
+    ->whereBetween('posting_date', [
+        date('Y-m-d', strtotime('-30 days')),
+        date('Y-m-d')
+    ])
+    ->orderByDesc('posting_date')
+    ->get();
+$opening_balance = 0;
+$opening_date = date('Y-m-d');
+
+if ($selected_tab == 'tab-statement') {
+    $statement_date_range = $request->filled('date_range') 
+        ? date_range_to_arr($request->date_range)
+        : [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+
+    // Calculate Opening Balance (sum of all transactions BEFORE the start date)
+    $opening_balance = $supplier->supplierStatements()
+        ->where('posting_date', '<', Carbon::parse($statement_date_range[0])->format('Y-m-d'))
+        ->sum(DB::raw('credit - debit'));
+    
+    // Get opening balance date (last transaction before start date or first day of range - 1)
+    $opening_date = Carbon::parse($statement_date_range[0])->subDay()->format('Y-m-d');
+
     $statements = $supplier->supplierStatements()
         ->whereBetween('posting_date', [
-            date('Y-m-d', strtotime('-30 days')),
-            date('Y-m-d')
+            Carbon::parse($statement_date_range[0])->format('Y-m-d'),
+            Carbon::parse($statement_date_range[1])->format('Y-m-d')
         ])
-        ->orderByDesc('posting_date')
+        ->when($request->filled('statement_search_text'), function ($q) use ($request) {
+            return $q->where(function ($query) use ($request) {
+                $query->where('transaction_id', 'LIKE', '%' . $request->statement_search_text . '%')
+                    ->orWhere('description', 'LIKE', '%' . $request->statement_search_text . '%')
+                    ->orWhere('debit', 'LIKE', '%' . $request->statement_search_text . '%')
+                    ->orWhere('credit', 'LIKE', '%' . $request->statement_search_text . '%')
+                    ->orWhere('balance', 'LIKE', '%' . $request->statement_search_text . '%')
+                    ->orWhereHas('supplier', function ($q) use ($request) {
+                        $q->where('name', 'LIKE', '%' . $request->statement_search_text . '%');
+                    });
+            });
+        })
+        ->with(['supplier_payment.bank_info', 'product_purchase'])
+        ->orderBy('posting_date')
+        ->orderBy('id')
         ->get();
-    
-    if ($selected_tab == 'tab-statement') {
-        $statement_date_range = $request->filled('date_range') 
-            ? date_range_to_arr($request->date_range)
-            : [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
-        
-        $statements = $supplier->supplierStatements()
-            ->whereBetween('posting_date', [
-                Carbon::parse($statement_date_range[0])->format('Y-m-d'),
-                Carbon::parse($statement_date_range[1])->format('Y-m-d')
-            ])
-            ->when($request->filled('statement_search_text'), function ($q) use ($request) {
-                return $q->where(function ($query) use ($request) {
-                    $query->where('transaction_id', 'LIKE', '%' . $request->statement_search_text . '%')
-                        ->orWhere('description', 'LIKE', '%' . $request->statement_search_text . '%')
-                        ->orWhere('debit', 'LIKE', '%' . $request->statement_search_text . '%')
-                        ->orWhere('credit', 'LIKE', '%' . $request->statement_search_text . '%')
-                        ->orWhere('balance', 'LIKE', '%' . $request->statement_search_text . '%')
-                        ->orWhereHas('supplier', function ($q) use ($request) {
-                            $q->where('name', 'LIKE', '%' . $request->statement_search_text . '%');
-                        });
-                });
-            })
-            ->orderByDesc('posting_date')
-            ->get();
-    }
-
+        $purchases = $supplier->purchases()->get();
+}
     // ========== TOTALS ==========
     $total_purchase = ProductPurchase::where('supplier_id', $id)->sum('material_cost');
     $total_payment = SupplierPayment::where('supplier_id', $id)->sum('paid_amount');
@@ -713,7 +760,7 @@ public function show(Request $request, $id)
     return view('admin.supplier.supplier_profile', compact(
         'supplier', 'branches', 'selected_tab',
         'purchases', 'check_p', 'check_pb', 'payments', 'statements', 
-        'total_purchase', 'total_payment'
+        'total_purchase', 'total_payment','opening_balance','opening_date'
     ));
 }
     public function update(Request $request)
