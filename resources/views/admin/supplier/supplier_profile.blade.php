@@ -87,19 +87,19 @@
                                             <li class="heading">Supplier Info</li>
                                             <li>
                                                 <div class="title">Name:</div>
-                                                <div class="text">{{ $supplier->name }}</div>
+                                                <div class="text supplier-name">{{ $supplier->name }}</div>
                                             </li>
                                             <li>
-                                                <div class="title">Email:</div>
-                                                <div class="text">{{ $supplier->email }}</div>
+                                                <div class="title ">Email:</div>
+                                                <div class="text ">{{ $supplier->email }}</div>
                                             </li>
                                             <li>
                                                 <div class="title">Mobile No:</div>
-                                                <div class="text">{{ $supplier->phone }}</div>
+                                                <div class="text supplier-phone">{{ $supplier->phone }}</div>
                                             </li>
                                             <li>
                                                 <div class="title">Address:</div>
-                                                <div class="text">{{ $supplier->address }}</div>
+                                                <div class="text supplier-address">{{ $supplier->address }}</div>
                                             </li>
                                         </ul>
                                     </div>
@@ -690,111 +690,118 @@
                                                     </tr>
                                                 @endif --}}
 
-                                               {{-- Initialize variables BEFORE the loop --}}
-@php
-    $total_qty = 0;
-    $total_truck_rent = 0;
-    $total_unload = 0;
-    $total_adjustment = 0;
-    $total_debit = 0;
-    $total_credit = 0;
-    $running_balance = 0;
-@endphp
+                                                {{-- Initialize variables BEFORE the loop --}}
+                                                @php
+                                                    $total_qty = 0;
+                                                    $total_truck_rent = 0;
+                                                    $total_unload = 0;
+                                                    $total_adjustment = 0;
+                                                    $total_debit = 0;
+                                                    $total_credit = 0;
+                                                    $running_balance = 0;
+                                                @endphp
 
-@foreach ($statements as $index => $statement)
-    @php
-        $payment_details = 'Cash';
-        if (
-            $statement->supplier_payment &&
-            $statement->supplier_payment->bank_id
-        ) {
-            $bank = $statement->supplier_payment->bank_info;
-            $payment_details = "{$statement->supplier_payment->payment_mode}: {$bank->short_name}, AC No:{$bank->account_no}, Cheque/Receipt no:{$statement->supplier_payment->cheque_no}";
-        }
+                                                @foreach ($statements as $index => $statement)
+                                                    @php
+                                                        $payment_details = 'Cash';
+                                                        if (
+                                                            $statement->supplier_payment &&
+                                                            $statement->supplier_payment->bank_id
+                                                        ) {
+                                                            $bank = $statement->supplier_payment->bank_info;
+                                                            $payment_details = "{$statement->supplier_payment->payment_mode}: {$bank->short_name}, AC No:{$bank->account_no}, Cheque/Receipt no:{$statement->supplier_payment->cheque_no}";
+                                                        }
 
-        $adjustment_amount = $statement->supplier_payment
-            ? $statement->supplier_payment->adjustment_amount
-            : 0;
-        $bill_adjustment = 0;
+                                                        $adjustment_amount = $statement->supplier_payment
+                                                            ? $statement->supplier_payment->adjustment_amount
+                                                            : 0;
+                                                        $bill_adjustment = 0;
 
-        $trans_id_parts = explode('-', $statement->transaction_id);
-        $trans_prefix = $trans_id_parts[0] ?? '';
+                                                        $trans_id_parts = explode('-', $statement->transaction_id);
+                                                        $trans_prefix = $trans_id_parts[0] ?? '';
 
-        if ($trans_prefix == 'BILLAD') {
-            $bill_adjustment = $statement->debit;
-        }
+                                                        if ($trans_prefix == 'BILLAD') {
+                                                            $bill_adjustment = $statement->debit;
+                                                        }
 
-        $total_adjustment_row = $bill_adjustment + $adjustment_amount;
+                                                        $total_adjustment_row = $bill_adjustment + $adjustment_amount;
 
-    
-        $quantity = 0;
-        $quantity_display = '';
-        $truck_rent = 0;
-        $unload = 0;
+                                                        $quantity = 0;
+                                                        $quantity_display = '';
+                                                        $truck_rent = 0;
+                                                        $unload = 0;
 
-        if ($statement->product_purchase) {
-            $pp = $statement->product_purchase;
-            $quantity = round($pp->product_qty, 3);
-            $quantity_display = $quantity . ' ' . $pp->unit_type;
-            $truck_rent = $pp->truck_rent ?? 0;
-            $unload = $pp->unload_bill ?? 0;
-        }
+                                                        if ($statement->product_purchase) {
+                                                            $pp = $statement->product_purchase;
+                                                            $quantity = round($pp->product_qty, 3);
+                                                            $quantity_display = $quantity . ' ' . $pp->unit_type;
+                                                            $truck_rent = $pp->truck_rent ?? 0;
+                                                            $unload = $pp->unload_bill ?? 0;
+                                                        }
 
+                                                        $display_qty = $quantity_display;
 
-        $display_qty = $quantity_display;
-        
-        if ($trans_prefix == 'BILLAD' && $statement->adjustment_amount > 0) {
-            $display_qty = -$statement->adjustment_amount;
-            $quantity = -$statement->adjustment_amount; 
-        }
+                                                        if (
+                                                            $trans_prefix == 'BILLAD' &&
+                                                            $statement->adjustment_amount > 0
+                                                        ) {
+                                                            $display_qty = -$statement->adjustment_amount;
+                                                            $quantity = -$statement->adjustment_amount;
+                                                        }
 
-        $display_debit = $statement->debit - $total_adjustment_row;
-        $display_credit = $statement->credit - $total_adjustment_row;
+                                                        $display_debit = $statement->debit - $total_adjustment_row;
+                                                        $display_credit = $statement->credit - $total_adjustment_row;
 
-        $running_balance = $running_balance + $display_credit - $display_debit;
-    @endphp
+                                                        $running_balance =
+                                                            $running_balance + $display_credit - $display_debit;
+                                                    @endphp
 
-    <tr>
-        <td><input type="checkbox" name="checkbox[]"
-                value="{{ $statement->id }}" /></td>
-        <td>{{ $statement->transaction_id }}</td>
-        <td>{{ $statement->product_purchase->chalan_no ?? '' }}</td>
-        <td>{{ date('d-M-y', strtotime($statement->posting_date)) }}</td>
-        <td>{{ $statement->description }}</td>
-        <td>{{ is_numeric($display_qty) ? number_format($display_qty, 2) : $display_qty }}</td>
-        <td>{{ number_format($truck_rent, 2) }}</td>
-        <td>{{ number_format($unload, 2) }}</td>
-        <td>{{ $display_debit > 0 ? number_format($display_debit, 2) : '' }}</td>
-        <td>{{ $display_credit > 0 ? number_format($display_credit, 2) : '' }}</td>
-        <td>{{ number_format($total_adjustment_row, 2) }}</td>
-        <td class="{{ $running_balance < 0 ? 'text-danger' : 'text-dark' }}">
-            {{ number_format($running_balance, 2) }}
-        </td>
-    </tr>
+                                                    <tr>
+                                                        <td><input type="checkbox" name="checkbox[]"
+                                                                value="{{ $statement->id }}" /></td>
+                                                        <td>{{ $statement->transaction_id }}</td>
+                                                        <td>{{ $statement->product_purchase->chalan_no ?? '' }}</td>
+                                                        <td>{{ date('d-M-y', strtotime($statement->posting_date)) }}</td>
+                                                        <td>{{ $statement->description }}</td>
+                                                        <td>{{ is_numeric($display_qty) ? number_format($display_qty, 2) : $display_qty }}
+                                                        </td>
+                                                        <td>{{ number_format($truck_rent, 2) }}</td>
+                                                        <td>{{ number_format($unload, 2) }}</td>
+                                                        <td>{{ $display_debit > 0 ? number_format($display_debit, 2) : '' }}
+                                                        </td>
+                                                        <td>{{ $display_credit > 0 ? number_format($display_credit, 2) : '' }}
+                                                        </td>
+                                                        <td>{{ number_format($total_adjustment_row, 2) }}</td>
+                                                        <td
+                                                            class="{{ $running_balance < 0 ? 'text-danger' : 'text-dark' }}">
+                                                            {{ number_format($running_balance, 2) }}
+                                                        </td>
+                                                    </tr>
 
-    @php
+                                                    @php
 
-        $total_qty += $quantity;
-        $total_truck_rent += $truck_rent;
-        $total_unload += $unload;
-        $total_adjustment += $total_adjustment_row;
-        $total_debit += $display_debit;
-        $total_credit += $display_credit;
-    @endphp
-@endforeach
+                                                        $total_qty += $quantity;
+                                                        $total_truck_rent += $truck_rent;
+                                                        $total_unload += $unload;
+                                                        $total_adjustment += $total_adjustment_row;
+                                                        $total_debit += $display_debit;
+                                                        $total_credit += $display_credit;
+                                                    @endphp
+                                                @endforeach
 
-{{-- Display totals --}}
-<tr class="font-weight-bold">
-    <td colspan="4" class="text-right"><b>Total:</b></td>
-    <td></td>
-    <td><b>{{ number_format($total_qty, 2) }}</b></td>
-    <td><b>{{ number_format($total_truck_rent, 2) }}</b></td>
-    <td><b>{{ number_format($total_unload, 2) }}</b></td>
-    <td><b>{{ number_format($total_debit, 2) }}</b></td>
-    <td><b>{{ number_format($total_credit, 2) }}</b></td>
-    <td><b>{{ number_format($total_adjustment, 2) }}</b></td>
-    <td><b>{{ number_format($running_balance, 2) }}</b></td>
-</tr>
+                                                {{-- Display totals --}}
+                                                <tr class="font-weight-bold">
+
+                                                    <td colspan="4" class="text-right"><b>Balance:</b></td>
+                                                    <td></td>
+                                                    <td><b>{{ number_format($total_qty, 2) }}</b></td>
+                                                    <td><b>{{ number_format($total_truck_rent, 2) }}</b></td>
+                                                    <td><b>{{ number_format($total_unload, 2) }}</b></td>
+                                                    <td><b>{{ number_format($total_debit, 2) }}</b></td>
+                                                    <td><b>{{ number_format($total_credit, 2) }}</b></td>
+                                                    <td><b>{{ number_format($total_adjustment, 2) }}</b></td>
+                                                    <td><b>{{ number_format($running_balance, 2) }}</b></td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -1232,7 +1239,8 @@
 @endsection
 <script>
     function printStatement(elementId, mode) {
-        const PAGE_ROW_LIMIT = 19;
+        const FIRST_PAGE_ROW_LIMIT = 17;
+        const OTHER_PAGE_ROW_LIMIT = 16;
 
         const container = document.getElementById(elementId);
         if (!container) {
@@ -1252,31 +1260,95 @@
         // Extract supplier info from the page
         const supplierName = document.querySelector('.supplier-name')?.innerText?.trim() || '';
         const supplierAddress = document.querySelector('.supplier-address')?.innerText?.trim() || '';
+        const supplierPhone = document.querySelector('.supplier-phone')?.innerText?.trim() || '';
         const statementRange = container.querySelector('.src-info')?.innerText?.replace('- ', '').trim() ||
             'Last 30 days';
 
         // Get thead and rows
-        const theadHtml = table.querySelector('thead').outerHTML;
+        const thead = table.querySelector('thead');
+        const theadHtml = thead.outerHTML;
         const tbodyRows = Array.from(table.querySelectorAll('tbody tr'));
 
-        // ---- Calculate summary ----
-        let openingBalance = null;
+        // Get column count from table header
+        const headerCells = thead.querySelectorAll('th');
+        const columnCount = headerCells.length;
+
+        // ---- Calculate summary (Updated Logic for Footer Rows) ----
+        let openingBalance = 0;
         let closingBalance = 0;
         let debitTotal = 0;
         let creditTotal = 0;
         let debitCount = 0;
         let creditCount = 0;
+        let isFirstRowFound = false;
 
         tbodyRows.forEach((tr) => {
             const cells = tr.querySelectorAll('td');
-            if (cells.length < 10) return;
-            if (cells[2]?.innerText.trim().toLowerCase().startsWith('total')) return;
+            if (cells.length === 0) return;
 
-            const debitVal = parseFloat((cells[7].innerText || '0').replace(/,/g, '')) || 0;
-            const creditVal = parseFloat((cells[8].innerText || '0').replace(/,/g, '')) || 0;
-            const balanceVal = parseFloat((cells[9].innerText || '0').replace(/,/g, '')) || 0;
-            if (openingBalance === null) openingBalance = balanceVal;
-            closingBalance += balanceVal; // Changed here to sum all balances
+            // Check if this row looks like a "Total" / Footer row
+            const isTotalTextRow = Array.from(cells).some(cell =>
+                cell.innerText.trim().toLowerCase().includes('total') ||
+                cell.innerText.trim().toLowerCase().includes('trash')
+            );
+
+            // Column indices based on your table structure
+            let debitIdx, creditIdx, balanceIdx;
+
+            if (columnCount === 9) {
+                debitIdx = 6;
+                creditIdx = 7;
+                balanceIdx = 8;
+            } else if (columnCount >= 11) {
+                debitIdx = 8;
+                creditIdx = 9;
+                balanceIdx = 10;
+            } else {
+                debitIdx = cells.length - 3;
+                creditIdx = cells.length - 2;
+                balanceIdx = cells.length - 1;
+            }
+
+            let balanceVal = 0;
+            let debitVal = 0;
+            let creditVal = 0;
+            let isFooterStructure = false;
+
+            // If indices are out of bounds, it means the row has merged columns (likely the Total row)
+            if (debitIdx >= cells.length || creditIdx >= cells.length || balanceIdx >= cells.length) {
+                isFooterStructure = true;
+                // Try to find the numeric balance manually in the cells (usually the last cell with a number)
+                for (let i = cells.length - 1; i >= 0; i--) {
+                    const cellText = cells[i].innerText.replace(/,/g, '');
+                    const val = parseFloat(cellText);
+                    if (!isNaN(val)) {
+                        balanceVal = val;
+                        break;
+                    }
+                }
+            } else {
+                // Normal row structure
+                debitVal = parseFloat((cells[debitIdx].innerText || '0').replace(/,/g, '')) || 0;
+                creditVal = parseFloat((cells[creditIdx].innerText || '0').replace(/,/g, '')) || 0;
+                balanceVal = parseFloat((cells[balanceIdx].innerText || '0').replace(/,/g, '')) || 0;
+            }
+
+            // --- CLOSING BALANCE LOGIC ---
+            // Always update closingBalance. The last valid value found will persist.
+            closingBalance = balanceVal;
+
+            // Skip calculation for Total/Trash rows or Footer structures
+            if (isTotalTextRow || isFooterStructure) {
+                return;
+            }
+
+            // --- OPENING BALANCE LOGIC ---
+            if (!isFirstRowFound) {
+                openingBalance = balanceVal - debitVal + creditVal;
+                isFirstRowFound = true;
+            }
+
+            // Accumulate totals
             debitTotal += debitVal;
             creditTotal += creditVal;
             if (debitVal > 0) debitCount++;
@@ -1285,63 +1357,86 @@
 
         // ---- Build Supplier Info Block ----
         const supplierInfoHtml = `
-        <div class="supplier-info" style="margin-bottom:15px; font-size:13px; padding-left:10px">
-              <div><strong>Client Name:</strong> {{ $supplier->name }}</div>
-        <div><strong>Client Address:</strong>  {{ $supplier->address }}</div>
-            <div><strong>Statement Period:</strong> ${statementRange}</div>
-        </div>
+      <div class="supplier-info" 
+     style="margin-bottom:15px; font-size:13px; padding-left:10px; display:flex; flex-direction:column; gap:5px;">
+    <div><strong>Supplier Name:</strong> ${supplierName}</div>
+    <div><strong>Supplier Address:</strong> ${supplierAddress}</div>
+    <div><strong>Supplier Phone:</strong> ${supplierPhone}</div>
+    <div><strong>Statement Period:</strong> ${statementRange}</div>
+</div>
+
     `;
 
         // ---- Summary Table ----
         const summaryHtml = `
-        <div class="statement-summary" style="margin-top:5px; font-size:13px;">
-            <table style="width:100%; border-collapse:collapse; border:none;">
-                <tr>
+       <div class="statement-summary" 
+     style="margin-top:8px; font-size:15px; font-weight:bold; background:#f3f3f3; padding:10px; border-radius:6px;">
+    
+    <table style="width:100%; border-collapse:collapse; border:none;">
+        <tr>
+            <td style="border:none;"></td>
+            <td style="border:none;">Opening Balance</td>
+            <td style="text-align:right; border:none;">
+                ${openingBalance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}
+            </td>
+            <td style="border:none;"></td>
+            <td style="border:none;">Closing Balance</td>
+            <td style="text-align:right; border:none;">
+                ${closingBalance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}
+            </td>
+            <td style="border:none;"></td>
+        </tr>
 
-                    <td style="border:none;"></td>
- <td style="border:none;">Opening Balance</td>
-                    <td style="text-align:right; border:none;">
-                        ${openingBalance?.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) ?? '0.00'}
-                    </td>
-                    <td style="border:none;"></td>
-                    <td style="border:none;">Closing Balance</td>
-                    <td style="text-align:right; border:none;">
-                        ${closingBalance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}
-                    </td>
-                    <td style="border:none;"></td>
-                </tr>
-                <tr>
-                    <td style="border:none;"></td>
-                    <td style="border:none;">Total Debit</td>
-                    <td style="text-align:right; border:none;">
-                        ${debitTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}
-                    </td>
-                    <td style="border:none;"></td>
-                    <td style="border:none;">Debit Count</td>
-                    <td style="text-align:right; border:none;">${debitCount}</td>
-                    <td style="border:none;"></td>
-                </tr>
-                <tr>
-                    <td style="border:none;"></td>
-                    <td style="border:none;">Total Credit</td>
-                    <td style="text-align:right; border:none;">
-                        ${creditTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}
-                    </td>
-                    <td style="border:none;"></td>
-                    <td style="border:none;">Credit Count</td>
-                    <td style="text-align:right; border:none;">${creditCount}</td>
-                    <td style="border:none;"></td>
-                </tr>
-            </table>
-        </div>
+        <tr>
+            <td style="border:none;"></td>
+            <td style="border:none;">Total Debit</td>
+            <td style="text-align:right; border:none;">
+                ${debitTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}
+            </td>
+            <td style="border:none;"></td>
+            <td style="border:none;">Debit Count</td>
+            <td style="text-align:right; border:none;">${debitCount}</td>
+            <td style="border:none;"></td>
+        </tr>
+
+        <tr>
+            <td style="border:none;"></td>
+            <td style="border:none;">Total Credit</td>
+            <td style="text-align:right; border:none;">
+                ${creditTotal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}
+            </td>
+            <td style="border:none;"></td>
+            <td style="border:none;">Credit Count</td>
+            <td style="text-align:right; border:none;">${creditCount}</td>
+            <td style="border:none;"></td>
+        </tr>
+       
+    </table>
+ <p style="text-align:center; font-size:10px;">Please note that if no reply is received from you within a 14 days, it will be assumed that you have accepted the balance shown Above.</p>
+
+</div>
+
     `;
 
-        // ---- Split Pages ----
+        // ---- Split Pages with different row limits ----
         const pages = [];
-        for (let i = 0; i < tbodyRows.length; i += PAGE_ROW_LIMIT) {
-            const rowsSlice = tbodyRows.slice(i, i + PAGE_ROW_LIMIT);
+        let currentIndex = 0;
+        let pageNumber = 0;
+
+        const filteredRows = tbodyRows.filter(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length === 0) return false;
+            const anyCellHasTotal = Array.from(cells).some(cell =>
+                cell.innerText.trim().toLowerCase().includes('total')
+            );
+            return !anyCellHasTotal;
+        });
+
+        while (currentIndex < filteredRows.length) {
+            const rowLimit = pageNumber === 0 ? FIRST_PAGE_ROW_LIMIT : OTHER_PAGE_ROW_LIMIT;
+            const rowsSlice = filteredRows.slice(currentIndex, currentIndex + rowLimit);
             const rowsHtml = rowsSlice.map(r => r.outerHTML).join('');
-            const isLastPage = (i + PAGE_ROW_LIMIT >= tbodyRows.length);
+            const isLastPage = (currentIndex + rowLimit >= filteredRows.length);
 
             const tableHtml = `
             <table cellpadding="0" cellspacing="0" width="100%" class="table">
@@ -1355,18 +1450,20 @@
     <img src="{{ asset('assets/images/logo.png') }}" class="watermark" />
 ` : '';
 
-
             const pageContent = `
             <div class="content">
                 ${watermarkHtml}
                 <div class="invoice-title" style="text-align:center; font-weight:bold; font-size:18px;">
                     ${headingText}
                 </div>
-                ${supplierInfoHtml}
+                ${pageNumber === 0 ? supplierInfoHtml : ''}
                 ${tableHtml}
             </div>
-        `;
+            `;
+
             pages.push(pageContent);
+            currentIndex += rowLimit;
+            pageNumber++;
         }
 
         // ---- Header/Footer ----
@@ -1382,13 +1479,13 @@
             <div class="border-green"></div>
             <div class="border-black"></div>
             <div class="footer-content">
-                Head Office: 1 No. Joykali Mondir Road (1st Floor), Wari, Dhaka-1203. ðŸ“ž02-9592241 âœ‰ccbd16@gmail.com ðŸ…µ/cclbd16
+                Head Office: 1 No. Joykali Mondir Road (1st Floor), Wari, Dhaka-1203. 📞02-9592241 📧ccbd16@gmail.com 🌐/cclbd16
             </div>
         </div>
     `;
 
         // ---- Compose All Pages ----
-        const allPagesHtml = pages.map(page => `
+        const allPagesHtml = pages.map((page, index) => `
         <div class="page">
             ${mode === 'non-pad' ? headerHtml : ''}
             ${page}
@@ -1411,48 +1508,57 @@
                     margin: 0;
                     font-family: Arial, sans-serif;
                     font-size: 10px;
+                    background: #fff;
                 }
+                
+                .page {
+                    position: relative;
+                    width: 100%;
+                    height: 297mm;
+                    min-height: 297mm;
+                    box-sizing: border-box;
+                    overflow: hidden;
+                    page-break-after: always;
+                    break-after: page;
+                }
+                
+                .page:last-child {
+                    page-break-after: auto;
+                    break-after: auto;
+                    height: auto;
+                    min-height: 297mm;
+                }
+
                 table {
                     width: 100%;
                     border-collapse: collapse;
-                    page-break-inside: auto;
                     table-layout: fixed;
                 }
+                
                 thead {
                     display: table-header-group;
                 }
-                tfoot {
-                    display: table-footer-group;
-                }
-                tr {
-                    page-break-inside: avoid;
-                    page-break-after: auto;
-                }
-                table, th, td {
-                    border: 1px solid #ddd;
-                }
+                
                 th, td {
                     padding: 4px;
                     text-align: left;
                     word-wrap: break-word;
+                    font-size: 9px;
+                    border: 1px solid #ddd;
                 }
-                .header, .footer {
-                    position: fixed;
-                    left: 0;
-                    right: 0;
+
+                .header {
+                    position: relative;
+                    width: 100%;
+                    height: 135px;
+                    padding: 30px 45px;
+                    border-bottom: 4px solid green;
+                    box-sizing: border-box;
+                    display: flex;
+                    align-items: center;
                     background: white;
                     z-index: 10;
-                    box-sizing: border-box;
                 }
-                .header {
-    height: 135px;
-    padding: 30px 45px;
-    border-bottom: 4px solid green;
-    top: 0;
-    display: flex;
-    align-items: center;
-}
-
                 .logo {
                     height: 70px;
                     margin-right: 15px;
@@ -1463,14 +1569,36 @@
                     color: #00aeef;
                     flex: 1;
                 }
+
+                .content {
+                    padding: 20px 20px 90px 20px;
+                    box-sizing: border-box;
+                    position: relative;
+                    z-index: 1;
+                    height: calc(100% - 135px);
+                }
+                
+                .invoice-title {
+                    text-align: center;
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin: 20px 0 10px 0;
+                }
+
                 .footer {
-                    height: 80px;
+                    position: absolute;
                     bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 80px;
                     padding: 0 35px;
                     font-size: 13px;
+                    box-sizing: border-box;
                     border-top: 4px solid black;
-                    page-break-inside: avoid;
+                    background: white;
+                    z-index: 10;
                 }
+                
                 .footer .border-green {
                     height: 4px;
                     background-color: green;
@@ -1485,12 +1613,7 @@
                     text-align: center;
                     margin-top: 5px;
                 }
-                .content {
-                    padding: 120px 20px 100px 20px;
-                    box-sizing: border-box;
-                    min-height: calc(297mm - 180px);
-                    position: relative;
-                }
+                
                 .watermark {
                     position: absolute;
                     top: 50%;
@@ -1500,32 +1623,21 @@
                     width: 500px;
                     height: auto;
                     z-index: 0;
+                    pointer-events: none;
                 }
-                  .invoice-title {
-        text-align: center;
-        font-size: 16px;
-        font-weight: bold;
-        margin: 20px 0 10px 0;
-    }
-                .supplier-info {
-                    margin-bottom: 15px;
+                
+                .supplier-info, .statement-summary table, .statement-summary th, .statement-summary td {
                     position: relative;
                     z-index: 1;
-                    font-size: 13px;
                 }
                 .statement-summary table, .statement-summary th, .statement-summary td {
                     border: 1px solid #333;
                     border-collapse: collapse;
-                    position: relative;
-                    z-index: 1;
                 }
+
                 @media print {
-                    .no-print, .hidden-print {
-                        display: none !important;
-                    }
-                    .header, .footer {
-                        position: fixed;
-                    }
+                    body { -webkit-print-color-adjust: exact; }
+                    .no-print, .hidden-print { display: none !important; }
                 }
             </style>
         </head>
