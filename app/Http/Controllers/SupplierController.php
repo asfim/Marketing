@@ -1102,6 +1102,52 @@ if ($selected_tab == 'tab-statement') {
     }
 
 
+public function Billinfo(Request $request)
+ {
+   $check_pb_query = ProductPurchase::with(['supplier', 'product_name'])
+    ->where('check_status', 1);
+
+if ($request->filled('billinfo_date_range')) {
+    $dates = explode(' - ', $request->billinfo_date_range);
+    if (count($dates) === 2) {
+        try {
+            $start = Carbon::parse($dates[0])->startOfDay();
+            $end = Carbon::parse($dates[1])->endOfDay();
+            $check_pb_query->whereBetween('received_date', [$start, $end]);
+        } catch (\Exception $e) {
+            Log::warning('Invalid date range in Bill Info', [
+                'input' => $request->billinfo_date_range
+            ]);
+        }
+    }
+} else {
+    $check_pb_query->where('received_date', '>=', Carbon::now()->subDays(30)->startOfDay());
+}
+
+if ($request->filled('billinfo_search_text')) {
+    $term = '%' . trim($request->billinfo_search_text) . '%';
+    $check_pb_query->where(function ($q) use ($term) {
+
+        $q->where('dmr_no', 'like', $term)
+          ->orWhere('chalan_no', 'like', $term)
+          ->orWhere('bill_no', 'like', $term)
+          ->orWhereHas('product_name', function($sq) use ($term) {
+              $sq->where('name', 'like', $term);
+          })
+          ->orWhereHas('supplier', function($sq) use ($term) {
+              $sq->where('name', 'like', $term);
+          });
+    });
+}
+
+$check_pb = $check_pb_query->orderByDesc('received_date')->get();
+
+    return view('admin.supplier.supplier_billinfo', compact('check_pb'));
+ }
+
+
+
+
 
 public function monthlyReport2(Request $request)
 {
@@ -1285,4 +1331,6 @@ public function monthlyReport2(Request $request)
 
     return view('admin.supplier.monthly_supplier_report', compact('supplierReports', 'date_info'));
 }
+    
+
 }

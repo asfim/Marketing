@@ -125,6 +125,7 @@ Route::group(['middleware' => ['role:super-admin|admin|manager']], function () {
     Route::get('/delete-supplier-payment/{tansaction_id}', [SupplierController::class, 'deleteSupplierPayment'])->name('supplier.payment.delete');
     Route::post('/supplier/balance', [SupplierController::class, 'loadSupplierBalance'])->name('supplier.balance');
     Route::get('/supplier/statement', [SupplierController::class, 'viewSupplierStatement'])->name('supplier.statement');
+    Route::get('/supplier/billinfo', [SupplierController::class, 'Billinfo'])->name('supplier.billinfo');
     Route::get('ajax', function () {
         return view('ajax');
     });

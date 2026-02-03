@@ -27,5 +27,10 @@ class ProductPurchase extends Model
     {
     return $this->belongsTo(Branch::class, 'branchId', 'id');
     }
+    public function checkedPurchases()
+{
+    return $this->hasMany(ProductPurchase::class)->where('check_status', 1);
+}
+
 
 }

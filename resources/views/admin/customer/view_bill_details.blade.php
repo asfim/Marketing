@@ -301,7 +301,7 @@
         <div class="dr"><span></span></div>
     </div>
 @endsection
-<script>
+{{-- <script>
 
 
     // SHIZAN WORKS
@@ -611,4 +611,299 @@
     };
 }
 
+</script> --}}
+<script>
+
+    function printBill(elementId, mode) {
+
+        const FIRST_PAGE_ROW_LIMIT = 19;
+
+        const OTHER_PAGE_ROW_LIMIT = 20;
+
+        const billContent = document.getElementById(elementId);
+
+        const summaryTable = billContent.querySelector('#summary_table')?.outerHTML || '';
+
+        const datatable1 = billContent.querySelector('#datatable1');
+        if (!datatable1) {
+            alert('Data table not found!');
+            return;
+        }
+
+        const thead = datatable1.querySelector('thead').outerHTML;
+        const tbodyRows = Array.from(datatable1.querySelectorAll('tbody tr'));
+        const tfoot = datatable1.querySelector('tfoot')?.outerHTML || '';
+        const totalRows = tbodyRows.length;
+
+        const pagesHtml = [];
+        let startIndex = 0;
+        let pageNumber = 0;
+
+        while (startIndex < totalRows) {
+            // পেজ নম্বর অনুযায়ী রো লিমিট ঠিক করা
+            const rowLimit = (pageNumber === 0) ? FIRST_PAGE_ROW_LIMIT : OTHER_PAGE_ROW_LIMIT;
+            
+            let endIndex = startIndex + rowLimit;
+            let isLastPage = endIndex >= totalRows;
+
+            const pageRows = tbodyRows.slice(startIndex, endIndex).map(row => row.outerHTML).join('');
+
+            let tableHtml = `
+                <table cellpadding="0" cellspacing="0" width="100%" class="table">
+                    ${thead}
+                    <tbody>${pageRows}</tbody>
+                    ${isLastPage ? tfoot : ''}
+                </table>
+            `;
+
+            // Summary শুধুমাত্র প্রথম পেজে দেখাবে
+            let summarySection = (pageNumber === 0) ? summaryTable : '';
+
+            pagesHtml.push(createPageContent(summarySection, tableHtml, isLastPage, mode, pageNumber === 0));
+            
+            startIndex = endIndex;
+            pageNumber++;
+        }
+
+        function createPageContent(summarySection, tableHtml, isLastPage, mode, isFirstPage) {
+            let invoiceTitle = isFirstPage ? '<div class="invoice-title">Invoice</div>' : '';
+
+            let paymentSection = isLastPage ? `
+                <div class="payment-note" style="font-size: 15px; font-weight: bold;">
+                    <b>In Words:</b> {{ $grand_total_in_words }}<br><br>
+                </div>
+                <div class="appreciate">
+                    We will highly appreciate to receive the payment at the earliest
+                </div>
+                <div class="signature-area">
+                    <span>Received By</span>
+                    <span>Confirmed By</span>
+                </div>
+            ` : '';
+
+            const watermarkHtml = (mode !== 'pad') ? `
+                <img src="{{ asset('assets/images/logo.png') }}" class="watermark" />
+            ` : '';
+
+            return `
+                <div class="content">
+                    ${watermarkHtml}
+                    ${invoiceTitle}
+                    ${summarySection}
+                    <div style="margin-bottom:20px;"></div>
+                    ${tableHtml}
+                    ${paymentSection}
+                </div>
+            `;
+        }
+
+        const headerHtml = `
+            <div class="header">
+                <div class="header-content">
+                    <img src="{{ asset('assets/images/logo.png') }}" class="logo">
+                    <div class="company-name">Concept Concrete Limited</div>
+                </div>
+            </div>
+        `;
+
+        const footerHtml = `
+            <div class="footer">
+                <div class="border-green"></div>
+                <div class="border-black"></div>
+                <div class="footer-content">
+                    Head Office: 1 No. Joykali Mondir Road (1st Floor), Wari, Dhaka-1203. 📞02-226638877 ✉ccbd16@gmail.com 🅵/cclbd16
+                </div>
+            </div>
+        `;
+
+        const allPagesHtml = pagesHtml.map(content => `
+            <div class="page">
+                ${mode === 'non-pad' ? headerHtml : ''}
+                ${content}
+                ${mode === 'non-pad' ? footerHtml : ''}
+            </div>
+        `).join('');
+
+        const fullHtml = `<!DOCTYPE html>
+            <html>
+            <head>
+                <title>Invoice</title>
+                <style>
+                    @page {
+                        size: A4;
+                        margin: 0;
+                    }
+                    body {
+                        margin: 0;
+                        font-family: Arial, sans-serif;
+                        font-size: 12px;
+                    }
+                    @media print {
+                        .no-print {
+                            display: none !important;
+                        }
+                        .print-only {
+                            display: block !important;
+                        }
+                    }
+                    table tbody.client_info tr td {
+                        padding: 0;
+                    }
+                    .header, .footer {
+                        position: fixed;
+                        left: 0;
+                        right: 0;
+                        background: white;
+                        z-index: 10;
+                    }
+                    .watermark {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        opacity: 0.07;
+                        width: 500px;
+                        height: auto;
+                        z-index: 0;
+                    }
+                    .header {
+                        height: 90px;
+                        padding: 20px 45px 20px 45px;
+                        border-bottom: 4px solid green;
+                        top: 0;
+                    }
+                    .footer {
+                        height: 80px;
+                        bottom: 0;
+                        width: 100%;
+                        padding: 0 35px;
+                        box-sizing: border-box;
+                        page-break-inside: avoid;
+                        z-index: 10;
+                        font-size: 13px;
+                        border-top: 4px solid black;
+                    }
+                    .footer-content p {
+                        margin: 0;
+                    }
+                    .content {
+                        margin: 0;
+                        padding: 120px 20px 100px 20px;
+                        box-sizing: border-box;
+                        min-height: calc(297mm - 180px);
+                    }
+                    .invoice-title {
+                        text-align: center;
+                        font-size: 25px;
+                        font-weight: bold;
+                        margin: 30px 0 20px 0;
+                    }
+                    .payment-note {
+                        font-size: 14px;
+                        text-align: center;
+                        margin: 20px 0;
+                    }
+                    .appreciate {
+                        font-size: 16px;
+                        text-align: center;
+                        margin: 10px 0;
+                    }
+                    .signature-area {
+                        margin-top: 60px;
+                        padding: 0 70px;
+                        display: flex;
+                        justify-content: space-between;
+                    }
+                    .logo {
+                        height: 70px;
+                        margin-right: 15px;
+                    }
+                    .company-name {
+                        font-size: 40px;
+                        font-weight: bold;
+                        color: #00aeef;
+                        flex: 1;
+                    }
+                    .header-content {
+                        display: flex;
+                        align-items: center;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        page-break-inside: auto;
+                    }
+                    thead {
+                        display: table-header-group;
+                    }
+                    tfoot {
+                        display: table-footer-group;
+                    }
+                    tr {
+                        page-break-inside: avoid;
+                        page-break-after: auto;
+                    }
+                    table, th, td {
+                        border: 1px solid #ddd;
+
+                    }
+                    th, td {
+                        padding: 8px;
+                        text-align: left;
+                    }
+                    #summary_table,
+                    #summary_table th,
+                    #summary_table td {
+                        border: none !important;
+                    }
+                    #summary_table h5 {
+                        margin: 0;
+                        padding: 2px 4px;
+                        font-size: 12px;
+                        font-weight: normal;
+                    }
+                    .page {
+                        page-break-after: always;
+                        position: relative;
+                        height: 297mm;
+                        width: 210mm;
+                    }
+
+                    .footer .border-green {
+                        height: 4px;
+                        background-color: green;
+                        width: 100%;
+                    }
+                    .footer .border-black {
+                        height: 4px;
+                        background-color: black;
+                        width: 100%;
+                    }
+                          .table tbody tr:nth-child(even) {
+                        background-color: #f2f2f2;
+                    }
+                    .table tbody tr:nth-child(odd) {
+                        background-color: #ffffff;
+                    }
+                </style>
+            </head>
+            <body>
+                ${allPagesHtml}
+            </body>
+            </html>
+        `;
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.open();
+        printWindow.document.write(fullHtml);
+        printWindow.document.close();
+
+        printWindow.onload = () => {
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        };
+    }
 </script>

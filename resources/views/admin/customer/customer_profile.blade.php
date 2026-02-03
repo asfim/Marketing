@@ -1475,8 +1475,8 @@
                                                     <th>Rate</th>
                                                     <th>Payment Details</th>
                                                     <th>Debit</th>
-                                                    <th>Adjust</th>
                                                     <th>Credit</th>
+                                                    <th>Adjust</th>
                                                     <th>Balance</th>
                                                     @if ($user->branchId == '')
                                                         <th class="no-print">Branch</th>
@@ -1558,9 +1558,10 @@
                                                         <td>{{ $rate }}</td>
                                                         <td>{{ $payment_details }}</td>
                                                         <td>{{ number_format($statement->debit - $adjustment, 2) }}</td>
-                                                        <td>{{ number_format($adjustment, 2) }}</td>
+                                                        
                                                         <td>{{ number_format($statement->credit, 2) }}</td>
                                                         {{-- <td>{{ number_format($statement->balance, 2) }}</td> --}}
+                                                        <td>{{ number_format($adjustment, 2) }}</td>
                                                         <td>{{ number_format($final_balance, 2) }}</td>
 
                                                         @if ($user->branchId == '')
@@ -1571,9 +1572,9 @@
                                                     <?php
                                                     $i++;
                                                     $total_qty += $qty;
-                                                    $debit += $statement->debit - $adjustment;
+                                                    $debit += $statement->debit;
                                                     $total_adjustment += $adjustment;
-                                                    $credit += $statement->credit - $adjustment;
+                                                    $credit += $statement->credit;
                                                     // $total_balance += $statement->balance;
                                                     // $total_balance += $final_balance;
 
@@ -1588,8 +1589,9 @@
                                                     <td></td>
                                                     <td></td>
                                                     <td><b>{{ number_format($debit, 3) }}</b></td>
-                                                    <td><b>{{ number_format($total_adjustment, 3) }}</b></td>
+                                                    
                                                     <td><b>{{ number_format($credit, 3) }}</b></td>
+                                                    <td><b>{{ number_format($total_adjustment, 3) }}</b></td>
                                                     <td><b>{{ number_format($credit - $debit, 2) }}</b></td>
                                                     @if ($user->branchId == '')
                                                         <td class="no-print"></td>
@@ -2525,9 +2527,13 @@
 
 @endsection
 
+
+
+
 <script>
     function printStatement(elementId, mode) {
-        const PAGE_ROW_LIMIT = 13;
+        const FIRST_PAGE_ROW_LIMIT = 12; 
+        const OTHER_PAGE_ROW_LIMIT = 14; 
 
         const container = document.getElementById(elementId);
         if (!container) {
@@ -2554,50 +2560,102 @@
         const theadHtml = table.querySelector('thead').outerHTML;
         const tbodyRows = Array.from(table.querySelectorAll('tbody tr'));
 
+        // ---- HYBRID COLUMN DETECTION (Name First, Then Position) ----
+        let debitIdx = -1, creditIdx = -1, balanceIdx = -1;
+        const headers = table.querySelectorAll('th');
+
+        // 1. Try to find columns by Header Text (Most Reliable)
+        headers.forEach((th, index) => {
+            const text = th.innerText.trim().toLowerCase();
+            if (debitIdx === -1 && (text.includes('debit') || text.includes('dr.'))) {
+                debitIdx = index;
+            }
+            if (creditIdx === -1 && (text.includes('credit') || text.includes('cr.'))) {
+                creditIdx = index;
+            }
+            if (balanceIdx === -1 && (text.includes('balance') || text.includes('bal'))) {
+                balanceIdx = index;
+            }
+        });
+
+        // 2. Fallback: If not found by name, find last 3 numeric columns
+        if (debitIdx === -1 || creditIdx === -1 || balanceIdx === -1) {
+            const sampleRow = Array.from(tbodyRows).find(tr => {
+                const cells = tr.querySelectorAll('td');
+                if (cells.length < 3) return false;
+                const txt = tr.innerText.toLowerCase();
+                return !txt.includes('total') && !txt.includes('trash');
+            });
+
+            if (sampleRow) {
+                const cells = sampleRow.querySelectorAll('td');
+                let numericIndices = [];
+                
+                cells.forEach((cell, index) => {
+                    const val = parseFloat(cell.innerText.replace(/,/g, ''));
+                    if (!isNaN(val)) {
+                        numericIndices.push(index);
+                    }
+                });
+
+                if (numericIndices.length >= 3) {
+                    if (debitIdx === -1) debitIdx = numericIndices[numericIndices.length - 3];
+                    if (creditIdx === -1) creditIdx = numericIndices[numericIndices.length - 2];
+                    if (balanceIdx === -1) balanceIdx = numericIndices[numericIndices.length - 1];
+                } else if (numericIndices.length === 2) {
+                    if (creditIdx === -1) creditIdx = numericIndices[0];
+                    if (balanceIdx === -1) balanceIdx = numericIndices[1];
+                }
+            }
+        }
+
+        // Final fallback if still failed (based on typical table length)
+        if (debitIdx === -1) debitIdx = 6; // Default guess
+        if (creditIdx === -1) creditIdx = 8;
+        if (balanceIdx === -1) balanceIdx = 9;
+
+
         // ---- Calculate summary ----
-        let openingBalance = null;
-        let closingBalance = null;
+        let openingBalance = 0;
+        let closingBalance = 0;
         let debitTotal = 0;
         let creditTotal = 0;
         let debitCount = 0;
         let creditCount = 0;
+        let isFirstRowFound = false;
 
-        // Collect valid rows (skip rows with 'total' in 2nd column)
+        // Collect valid rows (skip rows with 'total' in 2nd column or keywords)
         const validRows = tbodyRows.filter(tr => {
             const cells = tr.querySelectorAll('td');
             return cells.length >= 2 && !cells[1]?.innerText.trim().toLowerCase().startsWith('total');
         });
 
-        // Determine rows to use for summing (skip last row if there are multiple)
-        const rowsToSum = validRows.length > 1 ? validRows.slice(0, -1) : validRows;
-
-        rowsToSum.forEach((tr, idx) => {
+        validRows.forEach((tr) => {
             const cells = tr.querySelectorAll('td');
+            
+            // Ensure row has enough columns
+            if (cells.length <= balanceIdx) return;
 
-            const debitVal = parseFloat((cells[6]?.innerText || '0').replace(/,/g, '')) || 0;
-            const creditVal = parseFloat((cells[8]?.innerText || '0').replace(/,/g, '')) || 0;
-            const balanceVal = parseFloat((cells[9]?.innerText || '0').replace(/,/g, '')) || 0;
+            const debitVal = parseFloat((cells[debitIdx]?.innerText || '0').replace(/,/g, '')) || 0;
+            const creditVal = parseFloat((cells[creditIdx]?.innerText || '0').replace(/,/g, '')) || 0;
+            const balanceVal = parseFloat((cells[balanceIdx]?.innerText || '0').replace(/,/g, '')) || 0;
 
-            // first valid row → opening balance
-            if (openingBalance === null) {
+            // --- OPENING BALANCE LOGIC (First Row Value) ---
+            if (!isFirstRowFound) {
                 openingBalance = balanceVal;
+                isFirstRowFound = true;
             }
 
-            debitTotal += debitVal;
-            creditTotal += creditVal;
+            // --- CLOSING BALANCE LOGIC (Last Row Value) ---
+            closingBalance = balanceVal;
+
+            // --- TOTALS LOGIC (Sum all Debit and Credit) ---
+            debitTotal = debitVal;
+            creditTotal = creditVal;
+            
             if (debitVal > 0) debitCount++;
             if (creditVal > 0) creditCount++;
-
-            // closing balance = last row of rowsToSum
-            if (idx === rowsToSum.length - 1) {
-                closingBalance = balanceVal;
-            }
         });
-
-        // If there was only one valid row, use its balance as closing balance
-        if (closingBalance === null && validRows.length > 0) {
-            closingBalance = validRows[0].querySelectorAll('td')[9]?.innerText || 0;
-        }
 
 
         // ---- Build customer info block ----
@@ -2605,68 +2663,70 @@
         <div class="client-info" style="margin-bottom:10px; font-size:13px;">
             <div><strong>Client Name:</strong> ${@json($customer->name)}</div>
             <div><strong>Client Address:</strong> ${@json($customer->address)}</div>
+            <div><strong>Client Phone:</strong> ${@json($customer->phone)}</div>
             <div><strong>Statement Period:</strong> ${statementRange}</div>
         </div>
     `;
 
         // ---- Summary Table ----
         const summaryHtml = `
-        <div class="statement-summary" style="margin-top:5px; font-size:13px;">
-            <table style="width:100%; border-collapse:collapse; border:none;">
+        <div class="statement-summary" style="margin-top:8px; font-size:15px; font-weight:bold; background:yellow; padding:10px; border-radius:6px;">
+            <table style="width:100%; border-collapse:collapse; border:none; ">
                 <tr>
-  <td style="border:none;"></td>
-
-                    <td style="  border:none;">Opening Balance</td>
-                    <td style="  text-align:right; border:none;">
-                        ${openingBalance?.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }) ?? '0.00'}
+                    <td style="border:none;"></td>
+                    <td style="border:none;">Opening Balance</td>
+                    <td style="text-align:right; border:none;">
+                        ${openingBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                     </td>
-   <td style="border:none;"></td>
-                    <td style="  border:none;">Closing Balance</td>
-                    <td style="  text-align:right; border:none;">
-                        ${closingBalance.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        })}
+                    <td style="border:none;"></td>
+                    <td style="border:none;">Closing Balance</td>
+                    <td style="text-align:right; border:none;">
+                        ${closingBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                     </td>
-   <td style="border:none;"></td>
+                    <td style="border:none;"></td>
                 </tr>
                 <tr>
-  <td style="border:none;"></td>
-
-                    <td style="  border:none;">Total Debit</td>
-                    <td style="  text-align:right; border:none;">
+                    <td style="border:none;"></td>
+                    <td style="border:none;">Total Debit</td>
+                    <td style="text-align:right; border:none;">
                         ${debitTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                     </td>
-   <td style="border:none;"></td>
-                    <td style="  border:none;">Debit Count</td>
-                    <td style="  text-align:right; border:none;">${debitCount}</td>
-   <td style="border:none;"></td>
+                    <td style="border:none;"></td>
+                    <td style="border:none;">Debit Count</td>
+                    <td style="text-align:right; border:none;">${debitCount}</td>
+                    <td style="border:none;"></td>
                 </tr>
                 <tr>
-  <td style="border:none;"></td>
-
-                    <td style="  border:none;">Total Credit</td>
-                    <td style="  text-align:right; border:none;">
+                    <td style="border:none;"></td>
+                    <td style="border:none;">Total Credit</td>
+                    <td style="text-align:right; border:none;">
                         ${creditTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                     </td>
-   <td style="border:none;"></td>
-                    <td style=" border:none;">Credit Count</td>
-                    <td style=" text-align:right; border:none;">${creditCount}</td>
-   <td style="border:none;"></td>
+                    <td style="border:none;"></td>
+                    <td style="border:none;">Credit Count</td>
+                    <td style="text-align:right; border:none;">${creditCount}</td>
+                    <td style="border:none;"></td>
                 </tr>
             </table>
+             <p style="text-align:center; font-size:15px;">Please note that if no reply is received from you within a 14 days, it will be assumed that you have accepted the balance shown Above.</p>
+
         </div>
     `;
 
         // ---- Split Pages ----
         const pages = [];
-        for (let i = 0; i < tbodyRows.length; i += PAGE_ROW_LIMIT) {
-            const rowsSlice = tbodyRows.slice(i, i + PAGE_ROW_LIMIT);
+        let currentIndex = 0;
+        let pageNumber = 0;
+        
+        // Use validRows for printing
+        const rowsToPrint = validRows;
+
+        while (currentIndex < rowsToPrint.length) {
+            const rowLimit = (pageNumber === 0) ? FIRST_PAGE_ROW_LIMIT : OTHER_PAGE_ROW_LIMIT;
+            
+            const rowsSlice = rowsToPrint.slice(currentIndex, currentIndex + rowLimit);
             const rowsHtml = rowsSlice.map(r => r.outerHTML).join('');
-            const isLastPage = (i + PAGE_ROW_LIMIT >= tbodyRows.length);
+            const isLastPage = (currentIndex + rowLimit >= rowsToPrint.length);
 
             const tableHtml = `
             <table cellpadding="0" cellspacing="0" width="100%" class="table">
@@ -2687,12 +2747,14 @@
     <div class="invoice-title" style="text-align:center; font-weight:bold; font-size:18px;">
         ${headingText}
     </div>
-    ${i === 0 ? clientInfoHtml : ''}
+    ${pageNumber === 0 ? clientInfoHtml : ''}
     ${tableHtml}
   </div>
 `;
 
             pages.push(pageContent);
+            currentIndex += rowLimit;
+            pageNumber++;
         }
 
         // ---- Header/Footer ----
@@ -2714,8 +2776,8 @@
     `;
 
         // ---- Compose All Pages ----
-        const allPagesHtml = pages.map(page => `
-        <div class="page">
+        const allPagesHtml = pages.map((page, index) => `
+        <div class="page ${index === pages.length - 1 ? 'last-page' : ''}">
             ${mode === 'non-pad' ? headerHtml : ''}
             ${page}
             ${mode === 'non-pad' ? footerHtml : ''}
@@ -2815,9 +2877,9 @@
     }
     .content {
         margin: 0;
-        padding: 120px 20px 100px 20px; /* header + footer spacing */
+        padding: 120px 20px 100px 20px;
         box-sizing: border-box;
-        min-height: calc(297mm - 180px);
+        min-height: calc(297mm - 180px); 
         position: relative;
     }
     .invoice-title {
@@ -2826,17 +2888,6 @@
         font-weight: bold;
         margin: 20px 0 10px 0;
     }
-    .payment-note {
-        font-size: 11px;
-        text-align: center;
-        margin: 20px 0;
-    }
-    .signature-area {
-        margin-top: 110px;
-        padding: 0 70px;
-        display: flex;
-        justify-content: space-between;
-    }
     table {
         width: 100%;
         border-collapse: collapse;
@@ -2844,9 +2895,6 @@
     }
     thead {
         display: table-header-group;
-    }
-    tfoot {
-        display: table-footer-group;
     }
     tr {
         page-break-inside: avoid;
@@ -2859,33 +2907,19 @@
         padding: 8px;
         text-align: left;
     }
-    #summary_table,
-    #summary_table th,
-    #summary_table td {
-        border: none !important;
-    }
-    #summary_table h5 {
-        margin: 0;
-        padding: 2px 4px;
-        font-size: 12px;
-        font-weight: normal;
-    }
-    .dataTables_length,
-    .dataTables_filter,
-    .dataTables_info,
-    .dataTables_paginate,
-    .dt-buttons {
+    .dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_paginate, .dt-buttons {
         display: none !important;
     }
     .page {
         page-break-after: always;
         position: relative;
     }
+    /* FIX FOR BLANK PAGE */
+    .page.last-child, .page:last-child {
+        page-break-after: auto;
+    }
     @media print {
-        .no-print,
-        .hidden-print {
-            display: none !important;
-        }
+        .no-print, .hidden-print { display: none !important; }
     }
 </style>
 
@@ -2911,3 +2945,5 @@
         };
     }
 </script>
+
+

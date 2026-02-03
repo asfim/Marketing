@@ -140,6 +140,15 @@
                         </li>
                     @endif
 
+                    @if ($user->hasRole(['super-admin']) || $user->can('supplier-billinfo-report'))
+                        <li class="{{ \Route::is('supplier.billinfo') ? 'active' : '' }}">
+                            <a href="{{ route('supplier.billinfo') }}">
+                                <span class="glyphicon glyphicon-usd"></span><span class="text">View Supplier
+                                    Bill Info</span>
+                            </a>
+                        </li>
+                    @endif
+
 
 
                 </ul>
