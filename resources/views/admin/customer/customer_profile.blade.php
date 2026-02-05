@@ -2670,7 +2670,7 @@
 
         // ---- Summary Table ----
         const summaryHtml = `
-        <div class="statement-summary" style="margin-top:8px; font-size:15px; font-weight:bold; background:yellow; padding:10px; border-radius:6px;">
+        <div class="statement-summary" style="margin-top:8px; font-size:11px; font-weight:bold; background:yellow; padding:10px; border-radius:6px;">
             <table style="width:100%; border-collapse:collapse; border:none; ">
                 <tr>
                     <td style="border:none;"></td>
@@ -2708,7 +2708,7 @@
                     <td style="border:none;"></td>
                 </tr>
             </table>
-             <p style="text-align:center; font-size:15px;">Please note that if no reply is received from you within a 14 days, it will be assumed that you have accepted the balance shown Above.</p>
+             <p style="text-align:center; font-size:11px;">Please note that if no reply is received from you within a 14 days, it will be assumed that you have accepted the balance shown Above.</p>
 
         </div>
     `;

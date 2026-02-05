@@ -780,57 +780,131 @@ class CustomerController extends Controller
     }
 
 
-    public function viewCustomerStatement(Request $request)
-    {
-        $user = Auth::user();
-        $branchId = $request->branchId ?? $user->branchId;
+    // public function viewCustomerStatement(Request $request)
+    // {
+    //     $user = Auth::user();
+    //     $branchId = $request->branchId ?? $user->branchId;
 
-        if ($request->date_range) {
-            $date_range = date_range_to_arr($request->date_range);
-        } elseif ($request->date_range == '' && $request->search_text == '') {
-            $date_range = [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+    //     if ($request->date_range) {
+    //         $date_range = date_range_to_arr($request->date_range);
+    //     } elseif ($request->date_range == '' && $request->search_text == '') {
+    //         $date_range = [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+    //     }
+
+    //     $statements = new CustomerStatement();
+
+    //     if ($branchId == 'head_office') {
+    //         $statements = $statements->where('branchId', null);
+    //     } elseif ($branchId != '') {
+    //         $statements = $statements->where('branchId', $branchId);
+    //     }
+
+    //     if (isset($date_range)) {
+    //         $statements = $statements->whereBetween('posting_date', $date_range);
+    //     }
+
+    //     if ($request->search_text != '') {
+    //         $statements = $statements->where(function ($query) use ($request) {
+    //             $query->where('transaction_id', 'LIKE', '%' . $request->search_text . '%')
+    //                 ->orWhere('description', 'LIKE', '%' . $request->search_text . '%')
+    //                 ->orWhere('debit', 'LIKE', '%' . $request->search_text . '%')
+    //                 ->orWhere('credit', 'LIKE', '%' . $request->search_text . '%')
+    //                 ->orWhere('balance', 'LIKE', '%' . $request->search_text . '%')
+    //                 ->orWhereHas('customer', function ($q) use ($request) {
+    //                     $q->where('name', 'LIKE', '%' . $request->search_text . '%');
+    //                 });
+    //         });
+    //     }
+
+    //     // Calculate balance: sum(credit - debit)
+    //     $bal_f = $statements->sum(DB::raw('credit - debit'));
+
+    //     // Order by posting_date descending, then by id descending
+    //     $statements = $statements->orderBy('posting_date', 'DESC')->orderBy('id', 'DESC')->get();
+
+    //     // Fetch customers matching search text
+    //     $customer = Customer::where('name', 'LIKE', '%' . $request->search_text . '%')->get();
+
+    //     $branches = Branch::orderBy('name')->get();
+
+    //     return view('admin.customer.view_customer_statement', compact('statements', 'bal_f', 'customer', 'branches'));
+    // }
+
+public function viewCustomerStatement(Request $request)
+{
+    $user = Auth::user();
+    $branchId = $request->branchId ?? $user->branchId;
+
+    // ALWAYS set default date range first (last 30 days)
+    $start_date = date('Y-m-d', strtotime('-30 days'));
+    $end_date = date('Y-m-d');
+    $date_range = [$start_date, $end_date];
+    
+    // Override with user's date range if provided
+    if ($request->filled('date_range')) {
+        $dates = explode(' - ', $request->date_range);
+        
+        if (count($dates) === 2) {
+            try {
+                // Parse dates (handles MM/DD/YYYY format from date picker)
+                $start_date = date('Y-m-d', strtotime(trim($dates[0])));
+                $end_date = date('Y-m-d', strtotime(trim($dates[1])));
+                
+                $date_range = [$start_date, $end_date];
+            } catch (\Exception $e) {
+                // If parsing fails, keep default date range
+                Log::warning('Invalid date range format in customer statement', [
+                    'input' => $request->date_range,
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
-
-        $statements = new CustomerStatement();
-
-        if ($branchId == 'head_office') {
-            $statements = $statements->where('branchId', null);
-        } elseif ($branchId != '') {
-            $statements = $statements->where('branchId', $branchId);
-        }
-
-        if (isset($date_range)) {
-            $statements = $statements->whereBetween('posting_date', $date_range);
-        }
-
-        if ($request->search_text != '') {
-            $statements = $statements->where(function ($query) use ($request) {
-                $query->where('transaction_id', 'LIKE', '%' . $request->search_text . '%')
-                    ->orWhere('description', 'LIKE', '%' . $request->search_text . '%')
-                    ->orWhere('debit', 'LIKE', '%' . $request->search_text . '%')
-                    ->orWhere('credit', 'LIKE', '%' . $request->search_text . '%')
-                    ->orWhere('balance', 'LIKE', '%' . $request->search_text . '%')
-                    ->orWhereHas('customer', function ($q) use ($request) {
-                        $q->where('name', 'LIKE', '%' . $request->search_text . '%');
-                    });
-            });
-        }
-
-        // Calculate balance: sum(credit - debit)
-        $bal_f = $statements->sum(DB::raw('credit - debit'));
-
-        // Order by posting_date descending, then by id descending
-        $statements = $statements->orderBy('posting_date', 'DESC')->orderBy('id', 'DESC')->get();
-
-        // Fetch customers matching search text
-        $customer = Customer::where('name', 'LIKE', '%' . $request->search_text . '%')->get();
-
-        $branches = Branch::orderBy('name')->get();
-
-        return view('admin.customer.view_customer_statement', compact('statements', 'bal_f', 'customer', 'branches'));
     }
 
+    // Build query
+    $statements = CustomerStatement::query();
 
+    // Branch filter
+    if ($branchId == 'head_office') {
+        $statements = $statements->whereNull('branchId');
+    } elseif ($branchId != '') {
+        $statements = $statements->where('branchId', $branchId);
+    }
+
+    // Date range filter (always applied)
+    $statements = $statements->whereBetween('posting_date', $date_range);
+
+    // Search filter
+    if ($request->filled('search_text')) {
+        $search_term = '%' . trim($request->search_text) . '%';
+        $statements = $statements->where(function ($query) use ($search_term) {
+            $query->where('transaction_id', 'LIKE', $search_term)
+                ->orWhere('description', 'LIKE', $search_term)
+                ->orWhere('debit', 'LIKE', $search_term)
+                ->orWhere('credit', 'LIKE', $search_term)
+                ->orWhere('balance', 'LIKE', $search_term)
+                ->orWhereHas('customer', function ($q) use ($search_term) {
+                    $q->where('name', 'LIKE', $search_term);
+                });
+        });
+    }
+
+    // Calculate balance: sum(credit - debit)
+    $bal_f = $statements->sum(DB::raw('credit - debit'));
+
+    // Order by posting_date descending, then by id descending
+    $statements = $statements->orderBy('posting_date', 'DESC')->orderBy('id', 'DESC')->get();
+
+    // Fetch customers matching search text
+    $customer = Customer::where('name', 'LIKE', '%' . $request->search_text . '%')->get();
+
+    $branches = Branch::orderBy('name')->get();
+
+    // Pass date range info to view for display
+    $date_range_display = date('d-m-Y', strtotime($date_range[0])) . ' to ' . date('d-m-Y', strtotime($date_range[1]));
+
+    return view('admin.customer.view_customer_statement', compact('statements', 'bal_f', 'customer', 'branches', 'date_range_display'));
+}
 
 
 public function monthlyReport(Request $request)

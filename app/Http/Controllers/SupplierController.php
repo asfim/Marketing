@@ -1047,59 +1047,90 @@ if ($selected_tab == 'tab-statement') {
     }
 
     public function viewSupplierStatement(Request $request)
-    {
-        $user = Auth::user();
-        $branchId = $request->branchId ?? $user->branchId;
+{
+    $user = Auth::user();
+    $branchId = $request->branchId ?? $user->branchId;
 
-        if ($request->date_range) {
-            $date_range = date_range_to_arr($request->date_range);
-        } elseif ($request->date_range == '' && $request->search_text == '') {
-            $date_range = [date('Y-m-d', strtotime('-30 days')), date('Y-m-d')];
+    // ALWAYS set default date range first (last 30 days)
+    $start_date = date('Y-m-d', strtotime('-30 days'));
+    $end_date = date('Y-m-d');
+    $date_range = [$start_date, $end_date];
+    
+    // Override with user's date range if provided
+    if ($request->filled('date_range')) {
+        $dates = explode(' - ', $request->date_range);
+        
+        if (count($dates) === 2) {
+            try {
+                // Parse dates (handles MM/DD/YYYY format from date picker)
+                $start_date = date('Y-m-d', strtotime(trim($dates[0])));
+                $end_date = date('Y-m-d', strtotime(trim($dates[1])));
+                
+                $date_range = [$start_date, $end_date];
+            } catch (\Exception $e) {
+                // If parsing fails, keep default date range
+                Log::warning('Invalid date range format', [
+                    'input' => $request->date_range,
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
-
-        $statements = new SupplierStatement();
-
-        if ($branchId == 'head_office') {
-            $statements = $statements->where('branchId', null);
-        } elseif ($branchId != '') {
-            $statements = $statements->where('branchId', $branchId);
-        }
-
-        if (isset($date_range)) {
-            $statements = $statements->whereBetween('posting_date', $date_range);
-        }
-        if ($request->search_text != '') {
-            $statements = $statements->where(function ($query) use ($request) {
-                $query->where('transaction_id', 'LIKE', '%' . $request->search_text . '%')
-                    ->orwhere('description', '=', $request->search_text)
-                    ->orwhere('debit', 'LIKE', '%' . $request->search_text . '%')
-                    ->orwhere('credit', 'LIKE', '%' . $request->search_text . '%')
-                    ->orwhere('balance', 'LIKE', '%' . $request->search_text . '%')
-                    ->orWhereHas('supplier', function ($q) use ($request) {
-                        $q->where('name', 'LIKE', '%' . $request->search_text . '%');
-                    });
-            });
-        }
-        $statements = $statements->orderBy('posting_date', 'DESC')->get();
-        // dd($statements);
-
-        $today = date('Y-m-d');
-        $this_month = date('Y-m-01', strtotime('this month'));
-        $grant_totalq_qty = ProductPurchase::sum('product_qty');
-
-        $grant_total_qty = ProductPurchase::sum('product_qty') - SupplierStatement::sum('adjustment_qty');
-        $grant_total_tr = ProductPurchase::sum('truck_rent');
-        $grant_total_u = ProductPurchase::sum('unload_bill');
-        $grant_total_adj = SupplierPayment::sum('adjustment_amount') + SupplierStatement::where('transaction_id', 'like', '%BILLAD%')->sum('debit');
-        $grand_total_debit = SupplierStatement::sum('debit');
-        $grand_total_credit = SupplierStatement::sum('credit');
-
-        $branches = Branch::orderBy('name')->get();
-
-
-        return view('admin.supplier.view_supplier_statement', compact('statements', 'grant_total_qty', 'grant_total_tr', 'grant_total_u', 'grant_total_adj', 'branches'));
-
     }
+
+    // Build query
+    $statements = SupplierStatement::query();
+
+    // Branch filter
+    if ($branchId == 'head_office') {
+        $statements = $statements->whereNull('branchId');
+    } elseif ($branchId != '') {
+        $statements = $statements->where('branchId', $branchId);
+    }
+
+    // Date range filter (always applied)
+    $statements = $statements->whereBetween('posting_date', $date_range);
+
+    // Search filter
+    if ($request->filled('search_text')) {
+        $search_term = '%' . trim($request->search_text) . '%';
+        $statements = $statements->where(function ($query) use ($search_term) {
+            $query->where('transaction_id', 'LIKE', $search_term)
+                ->orWhere('description', 'LIKE', $search_term)
+                ->orWhere('debit', 'LIKE', $search_term)
+                ->orWhere('credit', 'LIKE', $search_term)
+                ->orWhere('balance', 'LIKE', $search_term)
+                ->orWhereHas('supplier', function ($q) use ($search_term) {
+                    $q->where('name', 'LIKE', $search_term);
+                });
+        });
+    }
+
+    // Execute query
+    $statements = $statements->orderBy('posting_date', 'DESC')->get();
+
+    // Calculate totals
+    $grant_totalq_qty = ProductPurchase::sum('product_qty');
+    $grant_total_qty = ProductPurchase::sum('product_qty') - SupplierStatement::sum('adjustment_qty');
+    $grant_total_tr = ProductPurchase::sum('truck_rent');
+    $grant_total_u = ProductPurchase::sum('unload_bill');
+    $grant_total_adj = SupplierPayment::sum('adjustment_amount') + 
+                       SupplierStatement::where('transaction_id', 'like', '%BILLAD%')->sum('debit');
+
+    $branches = Branch::orderBy('name')->get();
+
+    // Pass date range info to view for display
+    $date_range_display = date('d-m-Y', strtotime($date_range[0])) . ' to ' . date('d-m-Y', strtotime($date_range[1]));
+
+    return view('admin.supplier.view_supplier_statement', compact(
+        'statements', 
+        'grant_total_qty', 
+        'grant_total_tr', 
+        'grant_total_u', 
+        'grant_total_adj', 
+        'branches',
+        'date_range_display'
+    ));
+}
 
 
 public function Billinfo(Request $request)

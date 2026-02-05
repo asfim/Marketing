@@ -66,8 +66,8 @@
                             <th>Rate</th>
                             <th>Payment Details</th>
                             <th>Debit</th>
-                            <th>Adjustment</th>
                             <th>Credit</th>
+                            <th>Adjustment</th>
                             <th>Balance</th>
                             @if($user->branchId == '')
                                 <th>Branch</th>
@@ -131,8 +131,9 @@
                                 <td>{{ $rate }}</td>
                                 <td>{{ $payment_details }}</td>
                                 <td>{{ number_format($statement->debit  - $adjustment,2) }}</td>
-                                <td>{{ number_format($adjustment,2) }}</td>
                                 <td>{{ number_format($statement->credit,2) }}</td>
+                                <td>{{ number_format($adjustment,2) }}</td>
+
                                 <td>
                                     {{ number_format($statement->balance,2) }}
                                 </td>
@@ -161,8 +162,8 @@
                             <td></td>
                             <td></td>
                             <td><b>{{number_format($debit,2)}}</b></td>
-                            <td><b>{{number_format($total_adjustment,2)}}</b></td>
                             <td><b>{{number_format($credit,2)}}</b></td>
+                            <td><b>{{number_format($total_adjustment,2)}}</b></td>
                             <td></td>
                             @if($user->branchId == '')
                                 <td></td>

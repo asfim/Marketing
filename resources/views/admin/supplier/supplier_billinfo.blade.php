@@ -83,11 +83,11 @@
                                 @endphp
 
                                 @forelse ($check_pb as $checkp)
-                                    <tr @if ($checkp->check_status == 1) style="color:#09b509;" @endif>
+                                    <tr @if ($checkp->check_status == 1) style="color:dark;" @endif>
                                         <td>
-                                            @if ($checkp->check_status == 0)
-                                                <input type="checkbox" class="checkbox" value="{{ $checkp->id }}"
-                                                    name="checkbox[]" />
+                                            @if ($checkp->check_status == 1)
+                                                <input type="checkbox" class="" value="{{ $checkp->id }}"
+                                                    name="" />
                                             @else
                                                 <span class="glyphicon glyphicon-warning-sign"></span>
                                             @endif

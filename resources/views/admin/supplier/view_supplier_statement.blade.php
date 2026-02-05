@@ -64,9 +64,9 @@
                             <th>Qty</th>
                             <th>Truck Rent</th>
                             <th>Unload Bill</th>
-                            <th>Adj Amount</th>
                             <th>Debit</th>
                             <th>Credit</th>
+                            <th>Adj Amount</th>
                             <th>Balance</th>
                             @if($user->branchId == '')
                             <th>Branch</th>
@@ -129,9 +129,10 @@
 
                                 <td>{{ number_format((float) $truck_rent, 2) }}</td>
                                 <td>{{ number_format((float) $unload, 2) }}</td>
-                                <td>{{ number_format((float) $two_adjust, 2) }}</td>
+                                
                                 <td>{{ number_format((float) ($statement->debit - $two_adjust), 2) }}</td>
                                 <td>{{ number_format((float) ($statement->credit ), 2) }}</td>
+                                <td>{{ number_format((float) $two_adjust, 2) }}</td>
                                 <td>{{ number_format((float) $statement->balance, 2) }}</td>
 
                                 @if($user->branchId == '')
@@ -157,9 +158,10 @@
                             <td><b>{{ $qty - $total_adjustment_amount }}</b></td>
                             <td><b>{{ number_format($total_truck_rent,2) }}</b></td>
                             <td><b>{{ number_format($total_unload,2) }}</b></td>
-                            <td><b>{{ number_format($total_adjustment_amount,2) }}</b></td>
+                            
                             <td><b>{{ number_format($debit,2) }}</b></td>
                             <td><b>{{ number_format($credit,2) }}</b></td>
+                            <td><b>{{ number_format($total_adjustment_amount,2) }}</b></td>
                             <td></td>
                             @if($user->branchId == '')
                                 <td></td>

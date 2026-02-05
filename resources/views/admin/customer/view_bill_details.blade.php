@@ -199,7 +199,7 @@
                                     <td style="text-align: center">{{number_format($challan_row->cuM * 35.315 * $rate_per_cft,2)}}</td>
                                 @else
                                     {{--                                    after edit rate show will be here--}}
-                                    <td>{{ number_format($challan_row->rate,2) }}</td>
+                                    <td style="text-align: center">{{ number_format($challan_row->rate,2) }}</td>
                                     <td style="text-align: center">{{number_format($challan_row->cuM * 35.315 *$challan_row->rate,2)}}</td>
                                 @endif
 
