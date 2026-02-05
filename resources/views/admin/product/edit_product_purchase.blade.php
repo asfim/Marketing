@@ -24,9 +24,14 @@
                             <input type="text" value="{{ $purchase->chalan_no }}" name="chalan_no" class="form-control" id="chalan_no" required/>
                         </div>
                         <div class="col-md-4">
-                            <label>Received Date*</label>
-                            <input type="text" value="{{ $purchase->received_date }}" name="received_date" class="form-control datepicker" id="received_date" required/>
-                        </div>
+    <label>Received Date*</label>
+    <input type="text" 
+           value="{{ $purchase->received_date ? \Carbon\Carbon::parse($purchase->received_date)->format('d-m-Y') : '' }}" 
+           name="received_date" 
+           class="form-control datepicker" 
+           id="received_date" 
+           required/>
+</div>
                         <div class="col-md-4">
                             <label>Select a supplier*</label>
                             <select name="supplier_id" id="supplier_id" class="form-control select2" required>
@@ -254,5 +259,26 @@
 
             });
         });
+
+        
+$(document).ready(function() {
+    var existingDate = $('#received_date').val();
+    
+    // Datepicker initialize with EXACT format match
+    $('#received_date').datepicker({
+        format: 'yyyy-mm-dd',  // Must match PHP format 'Y-m-d'
+        autoclose: true,
+        todayHighlight: true,
+        startDate: '2000-01-01',
+        endDate: '2030-12-31'
+    });
+    
+    // Critical: Set the date AFTER initialization
+    if (existingDate) {
+        $('#received_date').datepicker('update', existingDate);
+        console.log('Date set to:', existingDate);
+    }
+});
+
     </script>
 @endsection

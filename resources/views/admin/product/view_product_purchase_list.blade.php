@@ -18,7 +18,7 @@
                             </span>
                         </h1>
                     </div>
-                    <!-- Checked Button - সবাই দেখতে পাবে -->
+                    
                     <div class="col-md-1" style="margin-top: 4px;">
                         <a href="#bill_status_modal" role="button" data-toggle="modal" class="btn btn-warning"
                            id="check_btn_div" style="display: none;">Checked</a>
@@ -183,22 +183,7 @@
                                             @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details') || $user->can('product-purchase-edit') || $user->can('product-purchase-delete'))
                                                 <td class="hidden-print">
                                                     @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details'))
-                                                        <a role="button" class="view_btn"
-                                                           data-dmr_no="{{ $purchase->dmr_no }}"
-                                                           data-chalan_no="{{ $purchase->chalan_no }}"
-                                                           data-purchase_date="{{ date('d-M-y', strtotime($purchase->purchase_date)) }}"
-                                                           data-received_date="{{ date('d-M-y', strtotime($purchase->received_date)) }}"
-                                                           data-product_name="{{ $purchase->product_name->name }}"
-                                                           data-supplier_name="{{ $purchase->supplier->name }}"
-                                                           data-quantity="{{ number_format($purchase->product_qty, 2) . ' ' . $purchase->unit_type }}"
-                                                           data-rate_per_unit="{{ number_format($purchase->rate_per_unit, 2) }}"
-                                                           data-material_cost="{{ number_format($purchase->material_cost, 2) }}"
-                                                           data-truck_rent="{{ number_format($purchase->truck_rent, 2) }}"
-                                                           data-unload_bill="{{ number_format($purchase->unload_bill, 2) }}"
-                                                           data-total_material_cost="{{ number_format($purchase->total_material_cost, 2) }}"
-                                                           data-vehicle_no="{{ $purchase->vehicle_no }}"
-                                                           data-description="{{ $purchase->description }}"
-                                                           data-toggle="modal" data-target="#detailsModal">
+                                                        <a href="{{ route('purchase.checked.details2', $purchase->bill_no) }}" role="button" class="view_btn">
                                                             <span class="fa fa-eye"></span>
                                                         </a>
                                                         <a href="{{ route('purchase.checked.details', $purchase->bill_no) }}"
@@ -255,12 +240,66 @@
                     <div class="modal-body modal-body-np">
                         <div class="row">
                             <div class="block-fluid">
-                                <!-- ... বাকি মডাল কন্টেন্ট একই থাকবে (dmr_no, chalan_no, etc.) ... -->
-                                <div class="row-form clearfix">
-                                    <label class="col-md-3">DMR No: </label>
-                                    <div class="col-md-6" id="dmr_no"></div>
-                                </div>
-                                <!-- ... বাকি ফিল্ডগুলো ... -->
+                                
+                              <div class="row-form clearfix">
+                                <label class="col-md-3">DMR No: </label>
+                                <div class="col-md-6" id="dmr_no"></div>
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Chalan No: </label>
+                                <div class="col-md-6" id="chalan_no"></div>
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Purchase Date : </label>
+                                <div class="col-md-6" id="purchase_date"></div>
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Received Date : </label>
+                                <div class="col-md-6" id="received_date"></div>
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Product Name </label>
+                                <div class="col-md-6" id="product_name"></div>
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Supplier Name : </label>
+                                <div class="col-md-6" id="supplier_name"></div>
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Quantity :</label>
+                                <div class="col-md-6" id="quantity"></div>
+
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Rate Per Unit :</label>
+                                <div class="col-md-6" id="rate_per_unit"></div>
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Material Cost :</label>
+                                <div class="col-md-6" id="material_cost"></div>
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Truck Rent :</label>
+                                <div class="col-md-6" id="truck_rent"></div>
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Unload Bill :</label>
+                                <div class="col-md-6" id="unload_bill"></div>
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Total Material Cost :</label>
+                                <div class="col-md-6" id="total_material_cost"></div>
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Vehicle No</label>
+                                <div class="col-md-6" id="vehicle_no"></div>
+                            </div>
+                            <div class="row-form clearfix">
+                                <label class="col-md-3">Description</label>
+                                <div class="col-md-6" id="description"></div>
+                            </div>
+                        </div>
+                               
                             </div>
                         </div>
                     </div>
@@ -271,7 +310,7 @@
             </div>
         </div>
 
-        <!-- Bill Status Modal - সবাই দেখতে পাবে -->
+
         <div class="modal fade" id="bill_status_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">

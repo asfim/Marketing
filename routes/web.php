@@ -113,6 +113,7 @@ Route::group(['middleware' => ['role:super-admin|admin|manager']], function () {
     // Route::post('/supplier/updateBalance', 'SupplierController@updateBalance')->name('supplier.updateBalance');
 
     Route::get('/suppliers', [SupplierController::class, 'index'])->name('supplier.index');
+    Route::get('/supplier-bill-info-details', [SupplierController::class, 'billinfodetails'])->name('supplier.billinfodetails');
     Route::post('/supplier/store', [SupplierController::class, 'store'])->name('supplier.store');
     Route::post('/supplier/update', [SupplierController::class, 'update'])->name('supplier.update');
     Route::get('/supplier/{id}/profile', [SupplierController::class, 'show'])->name('supplier.profile');
@@ -147,6 +148,7 @@ Route::group(['middleware' => ['role:super-admin|admin|manager']], function () {
     Route::post('/product/purchase/update', [ProductPurchaseController::class, 'updateProductPurchase'])->name('product.purchase.update');
     Route::get('/product/purchase/delete/{id}', [ProductPurchaseController::class, 'deleteProductPurchase'])->name('product.purchase.delete');
     Route::get('/product/purchase/checked/details/{bill_no}', [ProductPurchaseController::class, 'viewProductCheckDetails'])->name('purchase.checked.details');
+    Route::get('/product/purchase/checked/details2/{bill_no}', [ProductPurchaseController::class, 'viewProductCheckDetails2'])->name('purchase.checked.details2');
     Route::post('/product/purchase/bill-check', [ProductPurchaseController::class, 'purchaseCheck'])->name('product.purchase.check');
 
     //PRODUCT STOCK

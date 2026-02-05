@@ -205,8 +205,8 @@ class CustomerController extends Controller
             }
 
 
-            if ($request->search_text != '') {
-                $challans->where('challan_no', $request->search_text);
+            if ($request->challan_search_text != '') {
+                $challans->where('challan_no', $request->challan_search_text);
             }
 
             //  Order by date descending and get

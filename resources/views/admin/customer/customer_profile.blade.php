@@ -2531,6 +2531,8 @@
 
 
 <script>
+
+  //preetom
     function printStatement(elementId, mode) {
         const FIRST_PAGE_ROW_LIMIT = 12; 
         const OTHER_PAGE_ROW_LIMIT = 14; 
@@ -2623,6 +2625,10 @@
         let debitCount = 0;
         let creditCount = 0;
         let isFirstRowFound = false;
+        let totalBillableAmount = {{ $total_billable }};
+        let balanceText = `{!! strip_tags($customer->balanceText()) !!}`;
+let totalClosingBillableAmount = parseFloat(balanceText.replace(/[^0-9.-]/g, '')) || 0;
+      
 
         // Collect valid rows (skip rows with 'total' in 2nd column or keywords)
         const validRows = tbodyRows.filter(tr => {
@@ -2670,18 +2676,34 @@
 
         // ---- Summary Table ----
         const summaryHtml = `
-        <div class="statement-summary" style="margin-top:8px; font-size:11px; font-weight:bold; background:yellow; padding:10px; border-radius:6px;">
+        <div class="statement-summary" style="margin-top:8px; font-size:11px; font-weight:bold; background:white; padding:10px; border-radius:6px;">
+            <table>
+               
+            </table>
             <table style="width:100%; border-collapse:collapse; border:none; ">
+
+                  <tr>
+                      <td style="border:none;"></td>
+                    <td style="border:none;"></td>
+                    <td style="text-align:right; border:none;">
+                    </td>
+                    <td style="border:none;"></td>
+                    <td style="border:none;">Invoice Amount</td>
+                    <td style="text-align:right; border:none;">
+                        ${totalBillableAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                    </td>
+                    <td style="border:none;"></td>
+                 </tr>
                 <tr>
                     <td style="border:none;"></td>
                     <td style="border:none;">Opening Balance</td>
                     <td style="text-align:right; border:none;">
                         ${openingBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                     </td>
-                    <td style="border:none;"></td>
-                    <td style="border:none;">Closing Balance</td>
+                        <td style="border:none;"></td>
+                    <td style="border:none;">Total Closing Balance</td>
                     <td style="text-align:right; border:none;">
-                        ${closingBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                        ${totalClosingBillableAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                     </td>
                     <td style="border:none;"></td>
                 </tr>
@@ -2707,6 +2729,10 @@
                     <td style="text-align:right; border:none;">${creditCount}</td>
                     <td style="border:none;"></td>
                 </tr>
+                
+                 
+
+                
             </table>
              <p style="text-align:center; font-size:11px;">Please note that if no reply is received from you within a 14 days, it will be assumed that you have accepted the balance shown Above.</p>
 

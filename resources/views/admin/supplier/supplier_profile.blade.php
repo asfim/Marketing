@@ -387,23 +387,7 @@
                                                                 </td>
                                                                 <td class="hidden-print">
                                                                     @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details'))
-                                                                        <a role="button" class="view_btn"
-                                                                            data-dmr_no="{{ $checkp->supplier->name }}"
-                                                                            data-chalan_no="{{ $checkp->chalan_no }}"
-                                                                            data-purchase_date="{{ $checkp->purchase_date }}"
-                                                                            data-received_date="{{ $checkp->received_date }}"
-                                                                            data-product_name="{{ $checkp->product_name->name }}"
-                                                                            data-supplier_name="{{ $checkp->supplier->name }}"
-                                                                            data-quantity="{{ $checkp->product_qty }}"
-                                                                            data-rate_per_unit="{{ $checkp->rate_per_unit }}"
-                                                                            data-material_cost="{{ $checkp->material_cost }}"
-                                                                            data-truck_rent="{{ $checkp->truck_rent }}"
-                                                                            data-unload_bill="{{ $checkp->unload_bill }}"
-                                                                            data-total_material_cost="{{ $checkp->total_material_cost }}"
-                                                                            data-vehicle_no="{{ $checkp->vehicle_no }}"
-                                                                            data-description="{{ $checkp->description }}"
-                                                                            data-toggle="modal"
-                                                                            data-target="#detailsModal">
+                                                                        <a href="{{ route('purchase.checked.details2', $checkp->bill_no) }}" role="button">
                                                                             <span class="fa fa-eye"></span>
                                                                         </a>
                                                                         <a href="{{ route('purchase.checked.details', $checkp->bill_no) }}"

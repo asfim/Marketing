@@ -1,6 +1,6 @@
 @extends('admin.layouts.master')
-@section('title', 'Supplier Bill Info  List')
-@section('breadcrumb', 'Supplier Bill Info  List')
+@section('title', 'Supplier Bill info Details')
+@section('breadcrumb', 'Supplier Bill info Details')
 
 <?php $user = Auth::user(); ?>
 
@@ -12,7 +12,7 @@
                     <div class="col-md-4">
                         <div class="isw-documents"></div>
                         <h1>
-                            Supplier Bill Info 
+                            Supplier Bill info Details
                             <span class="src-info">
                                 {{ request('search_text') == '' && request('search_text2') == '' && request('date_range') == '' ? '- Last 30 Days' : '- ' . request('date_range') }}
                             </span>
@@ -21,22 +21,26 @@
                     
                     <div class="col-md-1" style="margin-top: 4px;">
                         <a href="#bill_status_modal" role="button" data-toggle="modal" class="btn btn-warning"
-                            id="check_btn_div" style="display: none;">Checked</a>
+                           id="check_btn_div" style="display: none;">Checked</a>
                     </div>
                     <div class="col-md-7 search_box" style="margin-top: 4px;">
-                        <form action="" method="GET" class="form-horizontal">
-                            <input type="hidden" />
-                            <div align="right">
-                                <div class="col-md-6">
-                                    <input type="text" name="billinfo_search_text" id="search_name"
-                                        value="{{ request('billinfo_search_text') ?? '' }}" class="form-control"
-                                        placeholder="Enter Supplier Name" />
+                        <form action="" class="form-horizontal">
+                            <div class="" align="right">
+                                <div class="col-md-4">
+                                    <input type="text" name="search_text" id="search_name"
+                                           value="{{ request('search_text') ?? '' }}" class="form-control"
+                                           placeholder="Enter Supplier Name" />
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                    <input type="text" name="search_text2" id="search_name2"
+                                           value="{{ request('search_text2') ?? '' }}" class="form-control"
+                                           placeholder="Enter Product Name" />
+                                </div>
+                                <div class="col-md-4">
                                     <div class="input-group">
-                                        <input type="text" name="billinfo_date_range"
-                                            value="{{ request('billinfo_date_range') ?? '' }}"
-                                            class="date_range form-control" placeholder="Date Range" autocomplete="off" />
+                                        <input type="text" name="date_range" id="date_range"
+                                               value="{{ request('date_range') ?? '' }}" class="form-control"
+                                               placeholder="Date Range" autocomplete="off" />
                                         <div class="input-group-btn">
                                             <button type="submit" class="btn btn-default search-btn">Search</button>
                                         </div>
@@ -49,7 +53,7 @@
 
                 <div class="block-fluid table-sorting clearfix">
                     <form action="{{ route('product.purchase.check') }}" method="post" id="checked_bill_form"
-                        class="form-horizontal">
+                          class="form-horizontal">
                         {{ csrf_field() }}
                         <input type="hidden" name="bill_no" id="bill_no" value="" />
                         <input type="hidden" name="adjustment_qty" id="adjustment_qty" value="" />
@@ -60,7 +64,7 @@
                                 <tr>
                                     <th><input type="checkbox" name="checkall" /></th>
                                     <th>DMR No</th>
-                                    <th>Chalan / Bill No</th>
+                                    <th>Challan/ Bill No</th>
                                     <th>Rec Date</th>
                                     <th>Supplier Name</th>
                                     <th>Product Name</th>
@@ -70,81 +74,153 @@
                                     <th>Truck Rent</th>
                                     <th>Unload Bill</th>
                                     <th>Total Mat Cost</th>
-                                    <th class="hidden-print">Actions</th>
+                                    <th>Branch</th>
+                                    @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details') || $user->can('product-purchase-edit') || $user->can('product-purchase-delete'))
+                                        <th class="hidden-print">Actions</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
-                                @php
+                                <?php
+                                    $i = 1;
                                     $t_mat = 0;
                                     $tt_mat = 0;
                                     $total_qty = 0;
                                     $total_truck_rent = 0;
                                     $total_unload_bill = 0;
-                                @endphp
-
-                                @forelse ($check_pb as $checkp)
-                                    <tr @if ($checkp->check_status == 1) style="color:dark;" @endif>
+                                ?>
+                                @foreach ($purchases as $purchase)
+                                    <tr @if ($purchase->check_status == 1) style="color:#09b509;" @endif>
                                         <td>
-                                            @if ($checkp->check_status == 1)
-                                                <input type="checkbox" class="" value="{{ $checkp->id }}"
-                                                    name="" />
+                                            @if ($purchase->check_status == 0)
+                                                <input type="checkbox" class="checkbox" value="{{ $purchase->id }}"
+                                                       name="checkbox[]" />
                                             @else
                                                 <span class="glyphicon glyphicon-warning-sign"></span>
                                             @endif
                                         </td>
-                                        <td>{{ $checkp->dmr_no }}</td>
-                                        <td>{{ $checkp->bill_no }}</td>
-                                        <td>{{ date('d-m-Y', strtotime($checkp->received_date)) }}</td>
-                                        <td>{{ $checkp->Supplier->name ?? '' }}</td>
-                                        <td>{{ $checkp->product_name->name ?? '' }}</td>
-                                        <td>{{ number_format($checkp->product_qty, 2) . ' ' . $checkp->unit_type }}</td>
-                                        <td>{{ number_format($checkp->rate_per_unit, 2) }}</td>
-                                        <td>{{ number_format($checkp->material_cost, 2) }}</td>
-                                        <td>{{ number_format($checkp->truck_rent, 2) }}</td>
-                                        <td>{{ number_format($checkp->unload_bill, 2) }}</td>
-                                        <td>{{ number_format($checkp->total_material_cost, 2) }}</td>
-                                        <td class="hidden-print">
-                                            <a class="view_btn" role="button" data-dmr_no="{{ $checkp->dmr_no }}"
-                                                data-chalan_no="{{ $checkp->bill_no }}"
-                                                data-purchase_date="{{ $checkp->purchase_date }}"
-                                                data-received_date="{{ $checkp->received_date }}"
-                                                data-product_name="{{ $checkp->product_name->name }}"
-                                                data-supplier_name="{{ $checkp->supplier->name ?? '' }}"
-                                                data-quantity="{{ $checkp->product_qty }}"
-                                                data-rate_per_unit="{{ $checkp->rate_per_unit }}"
-                                                data-material_cost="{{ $checkp->material_cost }}"
-                                                data-truck_rent="{{ $checkp->truck_rent }}"
-                                                data-unload_bill="{{ $checkp->unload_bill }}"
-                                                data-total_material_cost="{{ $checkp->total_material_cost }}"
-                                                data-vehicle_no="{{ $checkp->vehicle_no }}"
-                                                data-description="{{ $checkp->description }}" data-toggle="modal"
-                                                data-target="#detailsModal">
-                                                <span class="fa fa-eye"></span>
-                                            </a>
-                                            <a href="{{ route('purchase.checked.details', $checkp->bill_no) }}"
-                                                target="_blank">
-                                                <span class="fa fa-info-circle"></span>
-                                            </a>
-                                        </td>
-                                    </tr>
+                                        <td>{{ $purchase->dmr_no }}</td>
+                                        <td>{{ $purchase->chalan_no }}</td>
+                                        <td>{{ date('d-M-y', strtotime($purchase->received_date)) }}</td>
+                                        <td>{{ $purchase->supplier->name }}</td>
+                                        <td>{{ $purchase->product_name->name }}</td>
+                                        <td>{{ number_format($purchase->product_qty, 2) . ' ' . $purchase->unit_type }}</td>
+                                        <td>{{ number_format($purchase->rate_per_unit, 2) }}</td>
+                                        <td>{{ number_format($purchase->material_cost, 2) }}</td>
+                                        <td>{{ number_format($purchase->truck_rent, 2) }}</td>
+                                        <td>{{ number_format($purchase->unload_bill, 2) }}</td>
+                                        <td>{{ number_format($purchase->total_material_cost, 2) }}</td>
+                                        <td>{{ $purchase->branch->name ?? '-' }}</td>
 
-                                    @php
-                                        $t_mat += $checkp->material_cost;
-                                        $tt_mat += $checkp->total_material_cost;
-                                        $total_qty += $checkp->product_qty;
-                                        $total_truck_rent += $checkp->truck_rent;
-                                        $total_unload_bill += $checkp->unload_bill;
-                                    @endphp
-                                @empty
-                                    <tr>
-                                        <td colspan="12" class="text-center text-danger">No records found</td>
+                                        @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details') || $user->can('product-purchase-edit') || $user->can('product-purchase-delete'))
+                                            <td class="hidden-print">
+                                                @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details'))
+                                                    <a role="button" class="view_btn"
+                                                       data-dmr_no="{{ $purchase->dmr_no }}"
+                                                       data-chalan_no="{{ $purchase->chalan_no }}"
+                                                       data-purchase_date="{{ $purchase->purchase_date }}"
+                                                       data-received_date="{{ $purchase->received_date }}"
+                                                       data-product_name="{{ $purchase->product_name->name }}"
+                                                       data-supplier_name="{{ $purchase->supplier->name }}"
+                                                       data-quantity="{{ number_format($purchase->product_qty, 2) . ' ' . $purchase->unit_type }}"
+                                                       data-rate_per_unit="{{ number_format($purchase->rate_per_unit, 2) }}"
+                                                       data-material_cost="{{ number_format($purchase->material_cost, 2) }}"
+                                                       data-truck_rent="{{ number_format($purchase->truck_rent, 2) }}"
+                                                       data-unload_bill="{{ number_format($purchase->unload_bill, 2) }}"
+                                                       data-total_material_cost="{{ number_format($purchase->total_material_cost, 2) }}"
+                                                       data-vehicle_no="{{ $purchase->vehicle_no }}"
+                                                       data-description="{{ $purchase->description }}"
+                                                       data-toggle="modal" data-target="#detailsModal">
+                                                        <span class="fa fa-eye"></span>
+                                                    </a>
+                                                @endif
+                                                @if ($user->hasRole('super-admin') || $user->can('product-purchase-edit'))
+                                                    <a href="{{ route('product.purchase.edit', $purchase->id) }}"
+                                                       role="button" class="fa fa-edit"></a>
+                                                @endif
+                                                
+                                            </td>
+                                        @endif
                                     </tr>
-                                @endforelse
+                                    <?php
+                                        $i++;
+                                        $t_mat += $purchase->material_cost;
+                                        $tt_mat += $purchase->total_material_cost;
+                                        $total_qty += $purchase->product_qty;
+                                        $total_truck_rent += $purchase->truck_rent;
+                                        $total_unload_bill += $purchase->unload_bill;
+                                    ?>
+                                @endforeach
+
+                                @if (!empty($check_p))
+                                    @foreach ($check_p as $purchase)
+                                        <tr @if ($purchase->check_status == 1) style="color:#09b509;" @endif>
+                                            <td>
+                                                @if ($purchase->check_status == 0)
+                                                    <input type="checkbox" class="checkbox" value="{{ $purchase->id }}"
+                                                           name="checkbox[]" />
+                                                @else
+                                                    <span class="glyphicon glyphicon-warning-sign"></span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $purchase->dmr_no }}</td>
+                                            <td>{{ $purchase->bill_no }}</td>
+                                            <td>{{ date('d-M-y', strtotime($purchase->received_date)) }}</td>
+                                            <td>{{ $purchase->supplier->name }}</td>
+                                            <td>{{ $purchase->product_name->name }}</td>
+                                            <td>{{ number_format($purchase->product_qty, 2) . ' ' . $purchase->unit_type }}</td>
+                                            <td>{{ number_format($purchase->rate_per_unit, 2) }}</td>
+                                            <td>{{ number_format($purchase->material_cost, 2) }}</td>
+                                            <td>{{ number_format($purchase->truck_rent, 2) }}</td>
+                                            <td>{{ number_format($purchase->unload_bill, 2) }}</td>
+                                            <td>{{ number_format($purchase->total_material_cost, 2) }}</td>
+                                            <td>{{ $purchase->branch->name ?? '-' }}</td>
+
+                                            @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details') || $user->can('product-purchase-edit') || $user->can('product-purchase-delete'))
+                                                <td class="hidden-print">
+                                                    @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details'))
+                                                        <a role="button" class="view_btn"
+                                                           data-dmr_no="{{ $purchase->dmr_no }}"
+                                                           data-chalan_no="{{ $purchase->chalan_no }}"
+                                                           data-purchase_date="{{ date('d-M-y', strtotime($purchase->purchase_date)) }}"
+                                                           data-received_date="{{ date('d-M-y', strtotime($purchase->received_date)) }}"
+                                                           data-product_name="{{ $purchase->product_name->name }}"
+                                                           data-supplier_name="{{ $purchase->supplier->name }}"
+                                                           data-quantity="{{ number_format($purchase->product_qty, 2) . ' ' . $purchase->unit_type }}"
+                                                           data-rate_per_unit="{{ number_format($purchase->rate_per_unit, 2) }}"
+                                                           data-material_cost="{{ number_format($purchase->material_cost, 2) }}"
+                                                           data-truck_rent="{{ number_format($purchase->truck_rent, 2) }}"
+                                                           data-unload_bill="{{ number_format($purchase->unload_bill, 2) }}"
+                                                           data-total_material_cost="{{ number_format($purchase->total_material_cost, 2) }}"
+                                                           data-vehicle_no="{{ $purchase->vehicle_no }}"
+                                                           data-description="{{ $purchase->description }}"
+                                                           data-toggle="modal" data-target="#detailsModal">
+                                                            <span class="fa fa-eye"></span>
+                                                        </a>
+                                                        <a href="{{ route('purchase.checked.details', $purchase->bill_no) }}"
+                                                           target="_blank"><span class="fa fa-info-circle"></span></a>
+                                                    @endif
+                                                </td>
+                                            @endif
+                                        </tr>
+                                        <?php
+                                            $i++;
+                                            $t_mat += $purchase->material_cost;
+                                            $tt_mat += $purchase->total_material_cost;
+                                            $total_qty += $purchase->product_qty;
+                                            $total_truck_rent += $purchase->truck_rent;
+                                            $total_unload_bill += $purchase->unload_bill;
+                                        ?>
+                                    @endforeach
+                                @endif
                             </tbody>
-
                             <tfoot>
-                                <tr style="background-color:#999999; color:#fff;">
-                                    <td colspan="5">Total:</td>
+                                <tr style="background-color:#999999; color: #fff;">
+                                    <td></td>
+                                    <td></td>
+                                    <td>Total:</td>
+                                    <td></td>
+                                    <td></td>
                                     <td></td>
                                     <td>{{ number_format($total_qty, 2) }}</td>
                                     <td></td>
@@ -153,6 +229,9 @@
                                     <td>{{ number_format($total_unload_bill, 2) }}</td>
                                     <td>{{ number_format($tt_mat, 2) }}</td>
                                     <td></td>
+                                    @if ($user->hasRole('super-admin') || $user->can('product-purchase-list-details') || $user->can('product-purchase-edit') || $user->can('product-purchase-delete'))
+                                        <td class="hidden-print"></td>
+                                    @endif
                                 </tr>
                             </tfoot>
                         </table>
@@ -162,20 +241,18 @@
         </div>
 
         <!-- Details Modal -->
-        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"><span
-                                aria-hidden="true">&times;</span></button>
-                        <h4>Suppliers Bill Info</h4>
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+                        <h4>Product Purchase Details</h4>
                     </div>
                     <div class="modal-body modal-body-np">
                         <div class="row">
                             <div class="block-fluid">
-                               
-                               <div class="row-form clearfix">
+                                
+                              <div class="row-form clearfix">
                                 <label class="col-md-3">DMR No: </label>
                                 <div class="col-md-6" id="dmr_no"></div>
                             </div>
@@ -244,14 +321,11 @@
             </div>
         </div>
 
-       
-        <div class="modal fade" id="bill_status_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="bill_status_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"><span
-                                aria-hidden="true">&times;</span></button>
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
                         <h4>Add Bill No</h4>
                     </div>
                     <div class="modal-body modal-body-np">
@@ -272,22 +346,19 @@
                                 <div class="row-form clearfix">
                                     <label class="col-md-3">Bill No: </label>
                                     <div class="col-md-6">
-                                        <input type="text" value="{{ mt_rand(10000, 999999) }}" required
-                                            name="bill_no_modal" id="bill_no_modal" class="form-control" />
+                                        <input type="text" value="{{ mt_rand(10000, 999999) }}" required name="bill_no_modal" id="bill_no_modal" class="form-control" />
                                     </div>
                                 </div>
                                 <div class="row-form clearfix">
                                     <label class="col-md-3">Adjustment Qty: </label>
                                     <div class="col-md-6">
-                                        <input type="number" value="" name="ad_qty_modal" id="ad_qty_modal"
-                                            class="form-control" />
+                                        <input type="number" value="" name="ad_qty_modal" id="ad_qty_modal" class="form-control" />
                                     </div>
                                 </div>
                                 <div class="row-form clearfix">
                                     <label class="col-md-3">Adjustment Cost: </label>
                                     <div class="col-md-6">
-                                        <input type="number" value="" name="ad_cost_modal" id="ad_cost_modal"
-                                            class="form-control" />
+                                        <input type="number" value="" name="ad_cost_modal" id="ad_cost_modal" class="form-control" />
                                     </div>
                                 </div>
                                 <div class="col-md-12" id="error_div"></div>
@@ -326,8 +397,7 @@
                 table.rows(':has(input.checkbox:checked)').every(function() {
                     let row = this.node();
                     let qtyCell = $(row).find('td:eq(6)').text().trim(); // Qty column (index 6)
-                    let matCostCell = $(row).find('td:eq(11)').text()
-                .trim(); // Total Mat Cost column (index 11)
+                    let matCostCell = $(row).find('td:eq(11)').text().trim(); // Total Mat Cost column (index 11)
 
                     // Parse Quantity
                     let qtyMatch = qtyCell.match(/^([\d,.]+)/);

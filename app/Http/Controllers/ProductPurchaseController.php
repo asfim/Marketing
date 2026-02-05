@@ -881,5 +881,12 @@ public function productPurchaseList(Request $request)
         $suppliers = Supplier::orderBy('name', 'ASC')->get();
         return view('admin.product.view_check_product', compact('purchases', 'product_names', 'suppliers'));
     }
+    public function viewProductCheckDetails2(Request $request)
+    {
+        $purchases = ProductPurchase::where('bill_no', $request->bill_no)->get();
+        $product_names = ProductName::all();
+        $suppliers = Supplier::orderBy('name', 'ASC')->get();
+        return view('admin.product.supplier_view_checkdetails', compact('purchases', 'product_names', 'suppliers'));
+    }
 
 }
