@@ -44,7 +44,7 @@
                             <th>Phone</th>
                             <th>Extra Phone</th>
                             <th>Address</th>
-                            @if($user->branchId == '')
+                            @if(($user->branchId == '14') || $user->hasRole('super-admin'))
                             <th>Balance</th>
                             @endif
                             <th class="hidden-print">Actions</th>
@@ -64,7 +64,7 @@
                                 <td style="font-size: 13px; width: 90px" >{{ $supplier->phone }}</td>
                                 <td style="font-size: 13px">{{ $supplier->extra_phone_no }}</td>
                                 <td style="font-size: 13px">{{ $supplier->address }}</td>
-                                @if($user->branchId == '')
+                                @if(($user->branchId == '14') || $user->hasRole('super-admin'))
                                 <td style="width: 220px;font-size: 15px;">{!! $supplier->balanceText() !!}</td>
                                 @endif
                                 <td class="hidden-print">
@@ -81,7 +81,7 @@
                                             <span class="fa fa-edit"></span>
                                         </a>
                                     @endif
-                                    @if($user->branchId == '' && ($user->hasRole(['super-admin']) || $user->can('supplier-profile')))
+                                    @if($user->branchId == '14' || ($user->hasRole(['super-admin']) || $user->can('supplier-profile')))
                                         <a href="{{ route('supplier.profile',$supplier->id)}}" target="_blank" class="fa fa-eye"></a>
                                     @endif
                                 </td>

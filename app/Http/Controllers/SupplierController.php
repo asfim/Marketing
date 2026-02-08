@@ -1134,48 +1134,74 @@ if ($selected_tab == 'tab-statement') {
 
 
 public function Billinfo(Request $request)
- {
-   $check_pb_query = ProductPurchase::with(['supplier', 'product_name'])
-    ->where('check_status', 1);
+{
+    $billNumbers = ProductPurchase::select('bill_no')
+        ->where('check_status', 1);
 
-if ($request->filled('billinfo_date_range')) {
-    $dates = explode(' - ', $request->billinfo_date_range);
-    if (count($dates) === 2) {
-        try {
-            $start = Carbon::parse($dates[0])->startOfDay();
-            $end = Carbon::parse($dates[1])->endOfDay();
-            $check_pb_query->whereBetween('received_date', [$start, $end]);
-        } catch (\Exception $e) {
-            Log::warning('Invalid date range in Bill Info', [
-                'input' => $request->billinfo_date_range
-            ]);
+    if ($request->filled('billinfo_date_range')) {
+        $dates = explode(' - ', $request->billinfo_date_range);
+        if (count($dates) === 2) {
+            try {
+                $start = Carbon::parse($dates[0])->startOfDay();
+                $end = Carbon::parse($dates[1])->endOfDay();
+                $billNumbers->whereBetween('received_date', [$start, $end]);
+            } catch (\Exception $e) {
+                Log::warning('Invalid date range', ['input' => $request->billinfo_date_range]);
+            }
         }
+    } else {
+        $billNumbers->where('received_date', '>=', Carbon::now()->subDays(30)->startOfDay());
     }
-} else {
-    $check_pb_query->where('received_date', '>=', Carbon::now()->subDays(30)->startOfDay());
+
+    // Search filter (for bill selection)
+    if ($request->filled('billinfo_search_text')) {
+        $term = '%' . trim($request->billinfo_search_text) . '%';
+        $billNumbers->where(function ($q) use ($term) {
+            $q->where('dmr_no', 'like', $term)
+              ->orWhere('chalan_no', 'like', $term)
+              ->orWhere('bill_no', 'like', $term)
+              ->orWhereHas('product_name', fn($sq) => $sq->where('name', 'like', $term))
+              ->orWhereHas('supplier', fn($sq) => $sq->where('name', 'like', $term));
+        });
+    }
+
+    $billNumbers = $billNumbers->distinct()->pluck('bill_no');
+
+    $check_pb_query = ProductPurchase::select(
+        DB::raw('bill_no'),
+        DB::raw('COUNT(*) as total_items'), 
+        DB::raw('MAX(received_date) as received_date'),
+        DB::raw('MAX(dmr_no) as dmr_no'),
+        DB::raw('MAX(chalan_no) as chalan_no'),
+        DB::raw('MAX(supplier_id) as supplier_id'),
+        DB::raw('MAX(branchId) as branchId'),
+        DB::raw('SUM(product_qty) as total_qty'),
+        DB::raw('SUM(total_material_cost) as total_material_cost'),
+        DB::raw('SUM(truck_rent) as total_truck_rent'),
+        DB::raw('SUM(unload_bill) as total_unload_bill'),
+        DB::raw('SUM(total_material_cost + truck_rent + unload_bill) as grand_total')
+    )
+    ->with(['supplier', 'product_name', 'branch'])
+    ->whereIn('bill_no', $billNumbers); 
+
+    // Group and order
+    $check_pb = $check_pb_query
+        ->groupBy('bill_no')
+        ->orderBy('bill_no', 'ASC')
+        ->get();
+
+    $grand_total = [
+        'total_bills' => $check_pb->count(),
+        'total_items' => $check_pb->sum('total_items'),
+        'total_qty' => $check_pb->sum('total_qty'),
+        'total_material_cost' => $check_pb->sum('total_material_cost'),
+        'total_truck_rent' => $check_pb->sum('total_truck_rent'),
+        'total_unload_bill' => $check_pb->sum('total_unload_bill'),
+        'grand_total' => $check_pb->sum('grand_total')
+    ];
+
+    return view('admin.supplier.supplier_billinfo', compact('check_pb', 'grand_total'));
 }
-
-if ($request->filled('billinfo_search_text')) {
-    $term = '%' . trim($request->billinfo_search_text) . '%';
-    $check_pb_query->where(function ($q) use ($term) {
-
-        $q->where('dmr_no', 'like', $term)
-          ->orWhere('chalan_no', 'like', $term)
-          ->orWhere('bill_no', 'like', $term)
-          ->orWhereHas('product_name', function($sq) use ($term) {
-              $sq->where('name', 'like', $term);
-          })
-          ->orWhereHas('supplier', function($sq) use ($term) {
-              $sq->where('name', 'like', $term);
-          });
-    });
-}
-
-$check_pb = $check_pb_query->orderByDesc('received_date')->get();
-
-    return view('admin.supplier.supplier_billinfo', compact('check_pb'));
- }
-
 
 
 
