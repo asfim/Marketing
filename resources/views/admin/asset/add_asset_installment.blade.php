@@ -33,7 +33,7 @@
                             <label>Branch</label>
                             @if($user->hasRole(['super-admin']) || $user->can('branch-list'))
                                 <select class="form-control" name="branchId" id="branchId">
-                                    <option value="">----- Select Branch -----</option>
+                                    <option value="">----- MAIN BRANCH -----</option>
                                     @foreach($branches as $branch)
                                         <option value="{{ $branch->id }}" {{ (collect(old('branchId'))->contains($branch->id)) ? 'selected':'' }}>{{ $branch->name }}</option>
                                     @endforeach

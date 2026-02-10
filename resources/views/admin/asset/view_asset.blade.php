@@ -81,7 +81,7 @@
                                 <td>{{ number_format($remain_installment_amnt,2) }}</td>
                                 <td>{{ ($asset->installment_status == 0)? 'No':'Yes' }}</td>
                                 @if($user->branchId =='')
-                                    <td>{{ $asset->branch->name??'-' }}</td>
+                                    <td>{{ $asset->branch->name??'MAIN BRANCH' }}</td>
                                 @endif
                                 <td class="hidden-print">
                                     @if($user->hasRole('super-admin') || $user->can('edit-assets'))

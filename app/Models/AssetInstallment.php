@@ -17,4 +17,18 @@ class AssetInstallment extends Model
     protected static $logName = 'asset_installment';
 //    protected static $logOnlyDirty = true;
     protected static $submitEmptyLogs = false;
+   public function bank_info()
+{
+    return $this->belongsTo(BankInfo::class, 'bank_id');
+}
+
+     public function asset()
+    {
+        return $this->belongsTo(Asset::class, 'asset_id');
+    }
+    public function branch()
+{
+    return $this->belongsTo(Branch::class, 'branchId'); 
+}
+
 }

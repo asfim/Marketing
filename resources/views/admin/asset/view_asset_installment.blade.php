@@ -27,6 +27,7 @@
                             <th>Description</th>
                             <th>Payment Mode</th>
                             <th>Installment Amount</th>
+                            <th>Branch</th>
 
                         </tr>
                         </thead>
@@ -39,6 +40,14 @@
                                 <td>{{ $installment->description }}</td>
                                 <td>{{ $installment->payment_mode }}</td>
                                 <td>{{ number_format($installment->installment_amount,2) }}</td>
+                                <td>
+                                    @if($installment->branch)
+                                        {{ $installment->branch->name }}
+                                    @else
+                                        MAIN BRANCH
+                                    @endif
+                                </td>
+
                             </tr>
                         @endforeach
                         <tr style="background-color:#999999; color: #fff;">
@@ -48,6 +57,7 @@
                             <td><b></b></td>
                             <td><b>Total: </b></td>
                             <td><b>{{ 'BDT '.number_format($total_amount,2) }}</b></td>
+                            <td></td>
                         </tr>
 
                         </tbody>

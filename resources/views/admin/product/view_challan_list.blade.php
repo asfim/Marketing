@@ -69,12 +69,12 @@
                     </div>
                 </div>
                 <div class="block-fluid table-sorting clearfix">
-                    <table cellpadding="0" cellspacing="0" width="100%" class="table" id="datatable4">
+                    <table cellpadding="0" cellspacing="0" width="100%" class="table" id="datatable">
                         <thead>
                             <tr>
                                 <th>
-                                        <input type="checkbox" value="" name="checkall"/>
-                                        </th>
+                                    <input type="checkbox" value="" name="checkall" />
+                                </th>
                                 <th>CL. no</th>
                                 <th>PSI</th>
                                 <th>Sell Date</th>
@@ -87,7 +87,7 @@
                                 @endif
                                 <th>Total</th>
                                 <th>Bill Status</th>
-                                 @if ($user->hasRole(['super-admin']) || $user->can('challan-branch-view'))
+                                @if ($user->hasRole(['super-admin']) || $user->can('challan-branch-view'))
                                     <th>Branch</th>
                                 @endif
                                 <th class="hidden-print">Actions</th>
@@ -114,7 +114,7 @@
                                     $total2 = $qty_cft * $chalan->rate;
                                     ?>
                                     <td>
-                                        <input type="checkbox" id="checkbox" name="checkbox[]"/>
+                                        <input type="checkbox" id="checkbox" name="checkbox[]" />
                                     </td>
                                     <td>{{ $chalan->challan_no }}</td>
                                     <td>{{ $chalan->mix_design->psi }}</td>
@@ -134,7 +134,7 @@
                                     @endif
 
                                     <td>{{ $chalan->status == 1 ? 'Not Submitted' : 'Submitted' }}</td>
-                                      @if ($user->hasRole(['super-admin']) || $user->can('challan-branch-view'))
+                                    @if ($user->hasRole(['super-admin']) || $user->can('challan-branch-view'))
                                         <td>{{ $chalan->branch->name ?? '-' }}</td>
                                     @endif
                                     <td class="hidden-print">
@@ -165,11 +165,7 @@
                                 <?php $total_cum += $chalan->cuM;
                                 $total_cft += $qty_cft;
                                 
-                                if ($chalan->rate <= 0.0) {
-                                    $total_amount += $total; // use mix_design->rate
-                                } else {
-                                    $total_amount += $total2; // use challan->rate
-                                }
+                                $total_amount += $total; // use mix_design->rate
                                 
                                 ?>
                             @endforeach
@@ -342,157 +338,7 @@
 
 
 
-    <script type="text/javascript">
-        $(document).ready(function() {
 
-
-
-            //Buttons examples
-            $('#datatable4').DataTable({
-
-
-                dom: 'Bfrtip',
-                select: true,
-                fixedHeader: true,
-                lengthMenu: [
-                    [50, 100, 150, 200, 300, 500, 700, -1],
-                    [50, 100, 150, 200, 300, 500, 700, "All"]
-                ],
-                "order": [],
-                buttons: [{
-                        extend: 'pageLength',
-                        className: 'btn btn-danger',
-                        exportOptions: {
-                            columns: [':not(.hidden-print)']
-                        },
-                    },
-                    {
-                        extend: 'csv',
-                        className: 'btn btn-info',
-                        exportOptions: {
-                            columns: [':not(.hidden-print)']
-                        },
-                        footer: true,
-                    },
-                    {
-                        extend: 'pdfHtml5',
-                        className: 'btn btn-success',
-                        exportOptions: {
-                            columns: [':not(.hidden-print)']
-                        },
-                        footer: true,
-                        customize: function(doc) {
-                         
-                            if (doc.content[1].table && doc.content[1].table.body) {
-                                var table = doc.content[1].table;
-                                
-                            }
-
-                            
-                            doc.defaultStyle.fontSize = 9;
-                            doc.styles.tableHeader.fontSize = 10;
-                            doc.pageMargins = [20, 30, 20, 40]; // [left, top, right, bottom]
-
-                            
-
-                            doc.content[1].table.dontBreakRows = true;
-                        }
-                    },
-                    {
-                        extend: 'print',
-                        text: 'Print All',
-                        autoPrint: true,
-                        className: 'btn btn-warning',
-                        exportOptions: {
-                            columns: [':not(.hidden-print)']
-                        },
-                        footer: true,
-
-                        messageTop: function() {
-                            return print_header;
-                        },
-                        messageBottom: 'Print: {{ date('d-M-Y') }}',
-                        customize: function(win) {
-
-                            $(win.document.body).find('h1').css('text-align', 'center');
-                            $(win.document.body).find('table')
-                                .removeClass(
-                                    'table-striped table-responsive-sm table-responsive-lg dataTable'
-                                )
-                                .addClass('compact')
-                                .css('font-size', 'inherit', 'color', '#000');
-                            $(win.document.body).find('table tfoot tr').css('border-top',
-                                '2px solid #000');
-                            var tfoot = $(win.document.body).find('table tfoot').detach();
-                            $(win.document.body).find('table tbody').after(tfoot);
-
-                            // Add CSS to prevent footer repetition
-                            var css = 'tfoot { display: table-row-group; }',
-                                head = $(win.document.head),
-                                style = $('<style type="text/css"></style>').html(css);
-
-                            $(head).append(style);
-
-
-                        }
-                    },
-                    {
-                        extend: 'print',
-                        text: 'Print Page',
-                        autoPrint: true,
-                        className: 'btn btn-success',
-                        // exportOptions: {
-                        //     columns: [':not(.hidden-print)'],
-                        //     modifier: {
-                        //         page: 'current'
-                        //     }
-                        // },
-                        exportOptions: {
-                            columns: [':not(.hidden-print)'],
-                            stripHtml: false,
-                            format: {
-                                body: function(data, row, column, node) {
-                                    return data;
-                                }
-                            }
-                        },
-                        footer: true,
-
-                        messageTop: function() {
-                            return print_header;
-                        },
-                        messageBottom: 'Print: {{ date('d-M-Y') }}',
-                        customize: function(win) {
-
-                            $(win.document.body).find('h1').css('text-align', 'center');
-                            $(win.document.body).find('table')
-                                .removeClass(
-                                    'table-striped table-responsive-sm table-responsive-lg dataTable'
-                                )
-                                .addClass('compact')
-                                .css('font-size', 'inherit', 'color', '#000');
-                            $(win.document.body).find('table tfoot tr').css('border-top',
-                                '2px solid #000');
-                            var tfoot = $(win.document.body).find('table tfoot').detach();
-                            $(win.document.body).find('table tbody').after(tfoot);
-
-                            // Add CSS to prevent footer repetition
-                            var css = 'tfoot { display: table-row-group; }',
-                                head = $(win.document.head),
-                                style = $('<style type="text/css"></style>').html(css);
-
-                            $(head).append(style);
-
-
-
-                        }
-
-                    }
-
-                ]
-            });
-        });
-    </script>
 
 
     <script>

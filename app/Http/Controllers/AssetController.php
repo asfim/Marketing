@@ -323,7 +323,7 @@ class AssetController extends Controller
         $rules = [
             'id' => 'required|numeric',
             'payment_mode' => 'required',
-            'bank_id' => 'required_if:payment_mode,==,Bank',
+            'bank_id' => 'required_if:payment_mode,Bank',
             'name' => 'required',
             'date' => 'required',
             'installment_amount' => 'required|numeric',
@@ -338,27 +338,39 @@ class AssetController extends Controller
         $cheque_date = date('Y-m-d',strtotime($request->cheque_date));
 
         DB::beginTransaction();
-        try {
-            //asset info for description
-            $asset_row = Asset::where('id', $id)->first();
-            if ($asset_row->purchase_amount+$request->installment_amount > $asset_row->total_installment_amount) {
-                throw new \Exception( 'Payment amount is greater than purchase amount!');
-            }
-            $ex_id = AssetInstallment::max('id');
-            if ($ex_id == "") $ex_id = 1;
-            else $ex_id++;
+try {
+    //asset info for description
+    $asset_row = Asset::where('id', $id)->first();
+    if ($asset_row->purchase_amount+$request->installment_amount > $asset_row->total_installment_amount) {
+        throw new \Exception( 'Payment amount is greater than purchase amount!');
+    }
+    $ex_id = AssetInstallment::max('id');
+    if ($ex_id == "") $ex_id = 1;
+    else $ex_id++;
 
-            $asset_installment_ = new AssetInstallment();
-            $asset_installment_->transaction_id = 'ASINS-' . $ex_id;
-            $asset_installment_->asset_id = $id;
-            $asset_installment_->name = $request->name;
-            $asset_installment_->description = $request->description;
-            $asset_installment_->date = $date;
-            $asset_installment_->installment_amount = $request->installment_amount;
-            $asset_installment_->payment_mode = $request->payment_mode;
-            $asset_installment_->user_id = $user_data->id;
-            $asset_installment_->branchId = $request->branchId;
-            $status = $asset_installment_->save();
+
+    $payment_mode_value = $request->payment_mode;
+    if ($request->payment_mode == 'Bank' && $request->filled('bank_id')) {
+        $bank_info = BankInfo::find($request->bank_id);
+
+
+        if ($bank_info) {
+            $payment_mode_value = $bank_info->bank_name; 
+            
+        }
+    }
+
+    $asset_installment_ = new AssetInstallment();
+    $asset_installment_->transaction_id = 'ASINS-' . $ex_id;
+    $asset_installment_->asset_id = $id;
+    $asset_installment_->name = $request->name;
+    $asset_installment_->description = $request->description;
+    $asset_installment_->date = $date;
+    $asset_installment_->installment_amount = $request->installment_amount;
+    $asset_installment_->payment_mode = $payment_mode_value;
+    $asset_installment_->user_id = $user_data->id;
+    $asset_installment_->branchId = $request->branchId;
+    $status = $asset_installment_->save();
 
             //save in cash or bank statement
             if ($request->payment_mode == 'Bank') {

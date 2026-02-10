@@ -306,6 +306,7 @@ Route::group(['middleware' => ['role:super-admin|admin|manager']], function () {
     Route::get('/asset/type/delete/{id}', [AssetController::class, 'deleteAssetType'])->name('asset.type.delete');
 
     Route::get('/asset', [AssetController::class, 'index'])->name('asset.index');
+    
     Route::get('/asset/create', [AssetController::class, 'create'])->name('asset.create');
     Route::post('/asset/store', [AssetController::class, 'store'])->name('asset.store');
     Route::post('/asset/update', [AssetController::class, 'update'])->name('asset.update');
