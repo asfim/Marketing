@@ -598,7 +598,7 @@
                     </li>
                 @endif
 
-                @if ($user->hasRole(['super-admin']) || $user->can('monthly-report'))
+                @if ($user->hasRole(['super-admin']) || $user->can('monthly supplier-report'))
                     <li>
                         <a href="{{ route('monthly.supplier.report.index') }}">
                             <span class="glyphicon glyphicon-calendar"></span><span class="text">Monthly Supplier
