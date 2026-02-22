@@ -43,10 +43,8 @@
                             <th>Email</th>
                             <th>Phone</th>
                             <th>Extra Phone</th>
-                            <th>Address</th>
-                            @if(($user->branchId == '14') || $user->hasRole('super-admin'))
+                            <th>Address</th>                         
                             <th>Balance</th>
-                            @endif
                             <th class="hidden-print">Actions</th>
                         </tr>
                         </thead>
@@ -64,11 +62,12 @@
                                 <td style="font-size: 13px; width: 90px" >{{ $supplier->phone }}</td>
                                 <td style="font-size: 13px">{{ $supplier->extra_phone_no }}</td>
                                 <td style="font-size: 13px">{{ $supplier->address }}</td>
-                                @if(($user->branchId == '14') || $user->hasRole('super-admin'))
+                                @if($user->branchId == '' || $user->can('supplier-balance show'))
                                 <td style="width: 220px;font-size: 15px;">{!! $supplier->balanceText() !!}</td>
                                 @endif
                                 <td class="hidden-print">
-                                    @if($user->hasRole('super-admin') || $user->can('supplier-edit'))
+                                    
+                                    @if($user->hasRole('super-admin') || $user->can('supplier - edit'))
                                         <a role="button" class="edit-btn"
                                            data-id="{{$supplier->id}}"
                                            data-name="{{$supplier->name}}"
@@ -81,7 +80,7 @@
                                             <span class="fa fa-edit"></span>
                                         </a>
                                     @endif
-                                    @if($user->branchId == '14' || ($user->hasRole(['super-admin']) || $user->can('supplier-profile')))
+                                    @if( ($user->hasRole(['super-admin']) || $user->can('supplier-profile')))
                                         <a href="{{ route('supplier.profile',$supplier->id)}}" target="_blank" class="fa fa-eye"></a>
                                     @endif
                                 </td>

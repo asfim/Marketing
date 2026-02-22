@@ -92,7 +92,7 @@
                                 </li>
                             @endif
 
-                            @if ($user->branchId == '' && ($user->hasRole('super-admin') || $user->can('bill-create')))
+                            @if (($user->hasRole('super-admin') || $user->can('customer bill-create')))
                                 <li class="ui-state-default ui-corner-top {{ $selected_tab == 'tab-bill-generate' ? 'ui-tabs-active ui-state-active' : '' }}"
                                     role="tab" tabindex="-1" aria-controls="tab-bill-generate"
                                     aria-labelledby="ui-id-7" aria-selected="false">
@@ -101,7 +101,7 @@
                                         Bill</a>
                                 </li>
                             @endif
-                            @if ($user->branchId == '14' || ($user->hasRole('super-admin') || $user->can('bill-list')))
+                            @if (($user->hasRole('super-admin') || $user->can('customer view-bill list')))
                                 <li class="ui-state-default ui-corner-top {{ $selected_tab == 'tab-bills' ? 'ui-tabs-active ui-state-active' : '' }}"
                                     role="tab" tabindex="-1" aria-controls="tab-bills" aria-labelledby="ui-id-6"
                                     aria-selected="false">
@@ -558,7 +558,7 @@
                         </div>
                     @endif
 
-                    @if ($user->branchId == '14' || ($user->hasRole('super-admin') || $user->can('bill-list')))
+                    @if (($user->hasRole('super-admin') || $user->can('bill-list')))
                         <div id="tab-bills" aria-labelledby="ui-id-6"
                             class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel"
                             aria-expanded="false" aria-hidden="true" style="display: none;">

@@ -41,10 +41,8 @@
                             <th>Name</th>
                             <th>Email</th>
                             <th>Phone</th>
-                            <th>Address</th>
-                            @if($user->branchId == '14' || $user->hasRole('super-admin'))
+                            <th>Address</th>                           
                             <th>Balance</th>
-                            @endif
                             <th class="hidden-print">Actions</th>
                         </tr>
                         </thead>
@@ -61,7 +59,7 @@
                                 <td>{{ $customer->email }}</td>
                                 <td style="width: 70px;">{{ $customer->phone }} <br> {{ $customer->extra_phone_no }}</td>
                                 <td>{{ $customer->address }}</td>
-                                @if(($user->branchId == '14') || $user->hasRole('super-admin'))
+                                @if($user->hasRole('super-admin') || $user->can('customer-balance show'))
                                 {{-- <td>{{ $customer->balanceText() }}</td> --}}
                                 <td style="width: 170px;" >{!! $customer->balanceText() !!}</td>
                                 @endif
@@ -79,7 +77,7 @@
                                             <span class="fa fa-edit"></span>
                                         </a>
                                     @endif
-                                    @if($user->branchId == '14' || $user->hasRole('super-admin') || $user->can('customer-profile'))
+                                    @if($user->branchId == '' && $user->hasRole('super-admin') || $user->can('customer-profile'))
                                     <a href="{{ route('customer.profile', $customer->id) }}" title="View Profile" target="_blank"><span class="fa fa-eye"></span></a>
                                     @endif
                                 </td>

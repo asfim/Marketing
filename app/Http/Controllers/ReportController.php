@@ -1140,17 +1140,15 @@ public function allCustomerBalanceReport(Request $request)
     $isSuperAdmin = $user && $user->is_super_admin;
     $branchId = $user ? $user->branchId : null;
     
-    // 🔹 বিশেষ ইউজার যারা সব ব্রাঞ্চ দেখতে পারবে (যেমন user_id = 17)
- $canViewAllBranches = $user && ($user->id == 17 || $user->id == 20);
 
-    /** Purchase List - Grouped by Month (Last 3 Months) */
+    $canViewAllBranches = $user && $user->quick_report_special_permission;  
+
     $threeMonthsAgo = now()->subMonths(3)->format('Y-m-d H:i:s');
 
     $purchaseSummaryQuery = DB::table('product_purchases')
         ->selectRaw('COUNT(*) AS purchase_count, YEAR(purchase_date) AS Year, MONTH(purchase_date) AS Month, SUM(material_cost) AS total_mcost')
         ->where('purchase_date', '>=', $threeMonthsAgo);
 
-    // ব্রাঞ্চ ফিল্টারিং: সুপার অ্যাডমিন অথবা user_id=17 না হলে ব্রাঞ্চ ফিল্টার
     if (!$isSuperAdmin && !$canViewAllBranches && $branchId) {
         $purchaseSummaryQuery->where('branchId', $branchId);
     }
@@ -1167,7 +1165,7 @@ public function allCustomerBalanceReport(Request $request)
         $pp = 0;
 
         foreach ($total_purchase_month as $tp_month) {
-            // Sub-query: count per supplier + product
+
             $detailQuery = DB::table('product_purchases')
                 ->selectRaw('MAX(id) as mid, supplier_id, product_name_id, SUM(material_cost) as tm_cost, COUNT(*) as tp_count')
                 ->whereYear('purchase_date', $tp_month->Year)
@@ -1190,7 +1188,6 @@ public function allCustomerBalanceReport(Request $request)
                 $query_count_data_array[$key] = $item->tp_count . '___' . $item->tm_cost;
             }
 
-            // Final detailed purchase data
             $finalQuery = DB::table('product_purchases')
                 ->join('suppliers', 'product_purchases.supplier_id', '=', 'suppliers.id')
                 ->join('product_names', 'product_purchases.product_name_id', '=', 'product_names.id')
@@ -1288,7 +1285,7 @@ public function allCustomerBalanceReport(Request $request)
     }
 
     /********************** SECOND SECTION: Aggregated Purchase List **********************/
-    // 🔹 PURCHASE LIST WITH BRANCH NAME
+  
     $purchaseListQuery = DB::table('product_purchases as pp')
         ->join('product_names as p', 'p.id', '=', 'pp.product_name_id')
         ->join('branches', 'branches.id', '=', 'pp.branchId')
@@ -1312,26 +1309,22 @@ public function allCustomerBalanceReport(Request $request)
         '))
         ->orderBy('pp.received_date', 'DESC');
 
-    // ব্রাঞ্চ ফিল্টারিং: সুপার অ্যাডমিন অথবা user_id=17 না হলে ব্রাঞ্চ ফিল্টার
     if (!$isSuperAdmin && !$canViewAllBranches && $branchId) {
         $purchaseListQuery->where('pp.branchId', $branchId);
     }
     $purchase_list = $purchaseListQuery->get();
 
-    // 🔹 MONTHS LIST (no branch needed here)
     $monthsListQuery = DB::table('product_purchases as pp')
         ->selectRaw('MONTH(pp.received_date) as month, YEAR(pp.received_date) as year, COUNT(pp.received_date) as row_total')
         ->groupBy(DB::raw('MONTH(pp.received_date), YEAR(pp.received_date)'))
         ->orderBy('year', 'DESC')
         ->orderBy('month', 'DESC');
 
-    // ব্রাঞ্চ ফিল্টারিং: সুপার অ্যাডমিন অথবা user_id=17 না হলে ব্রাঞ্চ ফিল্টার
     if (!$isSuperAdmin && !$canViewAllBranches && $branchId) {
         $monthsListQuery->where('pp.branchId', $branchId);
     }
     $months_list = $monthsListQuery->get();
 
-    // 🔹 BUILD HTML WITH BRANCH NAME
     $html_purchase_list = [];
     $i = 0;
     foreach ($months_list as $pmlist) {
@@ -1365,10 +1358,9 @@ public function allCustomerBalanceReport(Request $request)
 
         $html_purchase_list[$i] .= '</tbody></table></div>';
         $i++;
-        if ($i >= 2) break; // Only show last 2 months
+        if ($i >= 2) break; 
     }
 
-    // 🔹 SALES LIST WITH BRANCH NAME
     $salesListQuery = DB::table('product_sales as ps')
         ->join('mix_designs', 'mix_designs.id', '=', 'ps.mix_design_id')
         ->join('branches', 'branches.id', '=', 'ps.branchId') 
@@ -1376,26 +1368,22 @@ public function allCustomerBalanceReport(Request $request)
         ->groupBy('ps.sell_date', 'mix_designs.psi', 'mix_designs.rate', 'branches.name') 
         ->orderBy('ps.sell_date', 'DESC');
 
-    // ব্রাঞ্চ ফিল্টারিং: সুপার অ্যাডমিন অথবা user_id=17 না হলে ব্রাঞ্চ ফিল্টার
     if (!$isSuperAdmin && !$canViewAllBranches && $branchId) {
         $salesListQuery->where('ps.branchId', $branchId);
     }
     $sales_list = $salesListQuery->get();
 
-    // 🔹 SALES MONTHS SUMMARY (no branch name needed here)
     $salesMonthsQuery = DB::table('product_sales as ps')
         ->selectRaw('MONTH(ps.sell_date) as month, YEAR(ps.sell_date) as year, COUNT(ps.sell_date) as row_total, SUM(ps.cuM) as total_cum')
         ->groupBy(DB::raw('MONTH(ps.sell_date), YEAR(ps.sell_date)'))
         ->orderBy('year', 'DESC')
         ->orderBy('month', 'DESC');
 
-    // ব্রাঞ্চ ফিল্টারিং: সুপার অ্যাডমিন অথবা user_id=17 না হলে ব্রাঞ্চ ফিল্টার
     if (!$isSuperAdmin && !$canViewAllBranches && $branchId) {
         $salesMonthsQuery->where('ps.branchId', $branchId);
     }
     $sales_months_list = $salesMonthsQuery->get();
 
-    // 🔹 BUILD HTML WITH BRANCH NAME
     $html_sales_list = [];
     $i = 0;
     foreach ($sales_months_list as $smlist) {
@@ -1434,11 +1422,11 @@ public function allCustomerBalanceReport(Request $request)
 
         $html_sales_list[$i] .= '</tbody></table></div>';
         $i++;
-        if ($i >= 2) break; // Only last 2 months
+        if ($i >= 2) break; 
     }
 
     /********************** PRODUCT STOCK (NO FILTER) **********************/
-    $product_stocks = ProductStock::all(); // No filtering as per requirement
+    $product_stocks = ProductStock::all(); 
 
     return view('admin.report.report_quick', compact(
         'product_stocks',

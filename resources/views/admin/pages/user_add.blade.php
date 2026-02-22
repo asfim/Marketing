@@ -47,6 +47,10 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="row-form clearfix">
+                                <div class="col-md-12"><label><input type="checkbox" name="branchsee" 
+                                class=""/>Can See All Branch Value In Quick Report</div>
+                            </div>
 
                             <div class="col-md-12">
                                 <div class="footer" style="text-align: center;">

@@ -71,9 +71,11 @@ class UserController extends Controller
         $inputs = $request->only('name', 'email', 'password');
         $inputs['password']         = bcrypt($request->input('password'));
         $inputs['branchId']         = $request->input('branch');
+        $inputs['quick_report_special_permission']         = $request->input('branchsee');
 
         $user_save  = $this->_userObj->create($inputs);
         $user_save->attachRole($request->input('role'));
+        $user_save->attachRole($request->input('branchsee'));
 
         if ($user_save->save()) {
             Session::flash('message', 'Data save successfully!');
@@ -196,6 +198,8 @@ class UserController extends Controller
 
         $user = User::find($id);
         $user->role_id = $request->input('role');
+        $user->quick_report_special_permission = !is_null($request->input('branchsee')) ;
+
         $user->save();
 
         if ($user_update) {

@@ -32,6 +32,7 @@
                             <th>User Name</th>
                             <th>User Email</th>
                             <th>Role</th>
+                            <th>See Branch</th>
                             <th>Branch</th>
                             <th>Actions</th>
                         </tr>
@@ -47,6 +48,17 @@
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user_role->display_name }}</td>
+                                <td>
+                                    @if($user->quick_report_special_permission == 1)
+                                    <span style="color:green;">
+                                        <i class=""></i> Yes
+                                    </span>
+                                @else
+                                    <span style="color:red;">
+                                        <i class=""></i> No
+                                    </span>
+                                @endif
+                                </td>
                                 <td>{{ ($user->branch ? $user->branch->name : '') }}</td>
                                 <td>
                                     @if($auth_user->hasRole(['super-admin']) || $user->can('user-secret-login'))
