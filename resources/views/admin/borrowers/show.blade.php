@@ -57,10 +57,10 @@
                         <a href="#tab-borrower-info" class="ui-tabs-anchor"><i class="glyphicon glyphicon-user"></i> Borrower Info</a>
                     </li>
                     <li class="ui-state-default ui-corner-top {{ $selected_tab=='tab-repayment-history' ? 'ui-tabs-active ui-state-active' : '' }}" role="tab">
-                        <a href="#tab-repayment-history" class="ui-tabs-anchor"><i class="glyphicon glyphicon-repeat"></i> Return Loan History</a>
+                        <a href="#tab-repayment-history" class="ui-tabs-anchor"><i class="glyphicon glyphicon-repeat"></i> Borrowed Loan History</a>
                     </li>
                     <li class="ui-state-default ui-corner-top {{ $selected_tab=='tab-loan-history' ? 'ui-tabs-active ui-state-active' : '' }}" role="tab">
-                        <a href="#tab-loan-history" class="ui-tabs-anchor"><i class="glyphicon glyphicon-usd"></i> Borrowed Loan History</a>
+                        <a href="#tab-loan-history" class="ui-tabs-anchor"><i class="glyphicon glyphicon-usd"></i>  Return Loan History</a>
                     </li>
                     <li class="ui-state-default ui-corner-top {{ $selected_tab=='tab-loan-statement' ? 'ui-tabs-active ui-state-active' : '' }}" role="tab">
                         <a href="#tab-loan-statement" class="ui-tabs-anchor"><i class="glyphicon glyphicon-list"></i>Statements</a>
@@ -137,7 +137,8 @@
                         <div class="head clearfix">
                             <div class="col-md-4">
                                 <h3>
-                                    Loan Repayment History
+                                    
+                                    Loan History 
                                     <span class="src-info">
                             {{-- {{ request('repayment_date_range') ? '- ' . request('repayment_date_range') : '- All Time' }} --}}
                              <span class="src-info">{{ (request('repayment_search_text') == '' && request('repayment_date_range') == '')?'- Last 30 Days':'- '. request('repayment_date_range') }}</span>
@@ -247,7 +248,7 @@
                             <div class="col-md-4">
                                 <div class="isw-documents"></div>
                                 <h3>
-                                    Loan History
+                                    Loan Repayment History
                                     <span class="src-info">
                             {{-- {{ request('loan_date_range') ? '- ' . request('loan_date_range') : '- All Time' }} --}}
                              <span class="src-info">{{ (request('loan_search_text') == '' && request('loan_date_range') == '')?'- Last 30 Days':'- '. request('loan_date_range') }}</span>

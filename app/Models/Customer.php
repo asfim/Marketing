@@ -33,6 +33,20 @@ class Customer extends Model
         return $this->customerStatements()->sum(DB::raw('credit'));
     }
 
+    public function adjustedBalance() {
+        $s_balance = $this->balance();
+        $uncheck_challans = ProductSale::where('customer_id', $this->id)
+            ->where('status', 1)
+            ->get();
+        $total_billable = 0;
+        foreach ($uncheck_challans as $challan) {
+            $qty_cft = $challan->cuM * 35.315;
+            $rate = $challan->rate > 0 ? $challan->rate : ($challan->mix_design ? $challan->mix_design->rate : 0);
+            $total_billable += $qty_cft * $rate;
+        }
+        return $s_balance + $total_billable;
+    }
+
     public function balanceText() {
         // Calculate the current balance
         $s_balance = $this->balance();
@@ -73,7 +87,27 @@ class Customer extends Model
             }
 
 
-            public function balanceTextF($from_date = null, $to_date = null) {
+    public function adjustedBalanceF($from_date = null, $to_date = null) {
+        $s_balance = $this->balance();
+        $query = ProductSale::where('customer_id', $this->id)
+            ->where('status', 1);
+        if ($from_date) {
+            $query->whereDate('created_at', '>=', $from_date);
+        }
+        if ($to_date) {
+            $query->whereDate('created_at', '<=', $to_date);
+        }
+        $uncheck_challans = $query->get();
+        $total_billable = 0;
+        foreach ($uncheck_challans as $challan) {
+            $qty_cft = $challan->cuM * 35.315;
+            $rate = $challan->rate > 0 ? $challan->rate : ($challan->mix_design ? $challan->mix_design->rate : 0);
+            $total_billable += $qty_cft * $rate;
+        }
+        return $s_balance + $total_billable;
+    }
+
+    public function balanceTextF($from_date = null, $to_date = null) {
     // Calculate the current balance
     $s_balance = $this->balance();
 

@@ -314,56 +314,7 @@ class reportController extends Controller
 
         return view('admin.report.report_investment',compact('bank_investments','cash_investments'));
     }
-// public function allCustomerBalanceReport(Request $request)
-// {
-//     $date_info = "";
-//     $search_name = $request->input('search_name');
-//     $from_date   = $request->input('from_date');
-//     $to_date     = $request->input('to_date');
 
-//     // Default date range: last 30 days
-//     $from = $from_date ?? date('Y-m-d', strtotime('-30 days'));
-//     $to   = $to_date   ?? date('Y-m-d');
-    
-  
-
-//     if ($from_date && $to_date) {
-//         $request->validate([
-//             'from_date' => 'required|date',
-//             'to_date'   => 'required|date|after_or_equal:from_date',
-//         ]);
-
-//         $date_info = "Showing results From " . date('d-m-Y', strtotime($from))
-//                    . " To " . date('d-m-Y', strtotime($to));
-//     }
-//     $customer_statements = Customer::query();
-    
-    
-
-//     if($search_name){
-//         $customer_statements->where('name','LIKE','%'.$search_name.'%');
-//     }
-
-//     if ($from_date && $to_date) {
-//     $customer_statements->whereBetween('created_at', [$from_date, $to_date]);
-//     }
-
-//     if($search_name && $from_date && $to_date){
-//         $customer_statements->where('name','LIKE','%'.$search_name.'%');
-//         $customer_statements->whereBetween('created_at', [$from_date, $to_date]);
-//     }
-
-
-//     $customer_statements = $customer_statements->get();
-  
-    
-
-//     // Totals
-//     $total_debit = $total_credit = $total_billable_all = $total_balance = $total_new_balance = 0;
-
-//    return view('admin.report.report_customer_balance', compact('customer_statements', 'date_info', 'total_debit', 'total_credit', 'total_new_balance'));
-
-// }
 
 public function allCustomerBalanceReport(Request $request)
 {

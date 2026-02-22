@@ -44,15 +44,21 @@
                             <th>Phone</th>
                             <th>Extra Phone</th>
                             <th>Address</th>                         
-                            <th>Balance</th>
+                            <th>Advance</th>
+                            <th>Due</th>
                             <th class="hidden-print">Actions</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <?php $i = 1; $total = 0;?>
+                        <?php $i = 1; $total_advance = 0; $total_due = 0;?>
                         @foreach ($suppliers as $supplier)
                         @php
-                        $total +=$supplier->balance();
+                            $adj_balance = $supplier->adjustedBalance();
+                            if ($adj_balance < 0) {
+                                $total_advance += abs($adj_balance);
+                            } else {
+                                $total_due += abs($adj_balance);
+                            }
                         @endphp
                             <tr>
                                 <td style="font-size: 13px"><input type="checkbox" class="row-checkbox"></td> {{-- NEW --}}
@@ -63,7 +69,20 @@
                                 <td style="font-size: 13px">{{ $supplier->extra_phone_no }}</td>
                                 <td style="font-size: 13px">{{ $supplier->address }}</td>
                                 @if($user->branchId == '' || $user->can('supplier-balance show'))
-                                <td style="width: 220px;font-size: 15px;">{!! $supplier->balanceText() !!}</td>
+                                <td style="width: 100px; font-size: 15px !important;">
+                                    @if($adj_balance < 0)
+                                        <span style="background:#007bff;color:#fff;padding:6px 12px;border-radius:6px;">{{ number_format(abs($adj_balance), 2) }} TK</span>
+                                    @else
+                                        <span style="background:#3a3a3a;color:#fff;padding:6px 12px;border-radius:6px;">0.00 TK</span>
+                                    @endif
+                                </td>
+                                <td style="width: 100px; font-size: 15px !important;">
+                                    @if($adj_balance > 0)
+                                        <span style="background:#dc3545;color:#fff;padding:6px 12px;border-radius:6px;">{{ number_format(abs($adj_balance), 2) }} TK</span>
+                                    @else
+                                        <span style="background:#3a3a3a;color:#fff;padding:6px 12px;border-radius:6px;">0 TK</span>
+                                    @endif
+                                </td>
                                 @endif
                                 <td class="hidden-print">
                                     
@@ -91,20 +110,11 @@
                         </tbody>
                         <tfoot>
                             <tr>
+                                <td colspan="7" class="text-right" style="font-size: 13px"> <strong>Total : </strong></td>
+                                <td class="text-left" style="font-size: 15px;font-weight: bold;">{{number_format($total_advance,2)}} TK</td>
+                                <td class="text-left" style="font-size: 15px;font-weight: bold;">{{number_format($total_due,2)}} TK</td>
                                 <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            
-
-                                <td  class="text-right"style="font-size: 13px"> <strong>Total : </strong></td>
-                                <td  class="text-left"style="font-size: 15px;font-weight: bold;">{{number_format(abs($total),2)}} TK</td>
-                                <td></td>
-                                
                             </tr>
-
                         </tfoot>
                     </table>
                 </div>

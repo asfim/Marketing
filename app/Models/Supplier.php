@@ -27,6 +27,10 @@ class Supplier extends Model
         return $this->supplierStatements()->sum(DB::raw('credit - debit'));
     }
 
+    public function adjustedBalance(){
+        return $this->balance();
+    }
+
     public function balanceText(){
     $s_balance = $this->balance();
 
