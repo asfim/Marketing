@@ -42,11 +42,11 @@ jobs:
           sed -i '/^DB_USERNAME=/c\DB_USERNAME=root' .env
           sed -i '/^DB_PASSWORD=/c\DB_PASSWORD=${{ secrets.DB_PASSWORD }}' .env
 
-      - name: Install PHP Dependencies
-        run: composer install --prefer-dist --no-ansi --no-interaction --no-progress
+      # - name: Install PHP Dependencies
+      #   run: composer install --prefer-dist --no-ansi --no-interaction --no-progress
 
-      - name: Generate Application Key
-        run: php artisan key:generate
+      # - name: Generate Application Key
+      #   run: php artisan key:generate
 
       # - name: Run Migrations
       #   run: php artisan migrate --force
