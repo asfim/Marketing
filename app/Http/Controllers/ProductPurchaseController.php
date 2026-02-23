@@ -135,8 +135,7 @@ public function productPurchaseList(Request $request)
     $isSuperAdmin = in_array($user_data->id, $admin_ids);
 
     // Branch-less users (can see all branches)
-    $branchless_ids = [13, 14];
-    $canViewAllBranches = $isSuperAdmin || in_array($user_data->branchId, $branchless_ids);
+    $canViewAllBranches = $isSuperAdmin;
 
     // 1️⃣ Handle date range
     if ($request->filled("date_range")) {

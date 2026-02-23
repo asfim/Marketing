@@ -29,12 +29,9 @@ class ProductSaleController extends Controller
         }
         $challans  = new ProductSale();
 
-        // if($branchId == 'head_office'){
-        //     $challans = $challans->where('branchId', null);
-        // } elseif ($branchId != ''){
-        //     $challans = $challans->where('branchId', $branchId);
-        // }
-        if ($branchId != 14 && $branchId != 13 && $branchId != '') {
+        if($branchId == 'head_office'){
+            $challans = $challans->where('branchId', null);
+        } elseif ($branchId != ''){
             $challans = $challans->where('branchId', $branchId);
         }
 

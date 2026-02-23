@@ -40,53 +40,44 @@
                                     <th style ="font-size: 15px">Customer Name</th>
                                     <th style ="font-size: 15px">Debit</th>
                                     <th style ="font-size: 15px">Credit</th>
-                                    <th style ="font-size: 15px">Advance</th>
-                                    <th style ="font-size: 15px">Due</th>
+                                    <th style ="font-size: 15px">Balance</th>
                                 </tr>
                             </thead>
                             @php
                                 $i = 1;
+                                $total_balance = 0;
                                 $total_debit = 0;
                                 $total_credit = 0;
-                                $total_advance = 0;
-                                $total_due = 0;
+                                $total_billable_all = 0;
+                                $total_new_balance = 0;
                             @endphp
 
                             @foreach ($customer_statements as $statement)
                                 @php
-                                    $from = request('from_date') ?? null;
-                                    $to = request('to_date') ?? null;
-                                    $adj_balance = $statement->adjustedBalanceF($from, $to);
-                                    if ($adj_balance < 0) {
-                                        $total_advance += abs($adj_balance);
-                                    } else {
-                                        $total_due += abs($adj_balance);
-                                    }
+                                    $_balance = $statement->credit - $statement->debit;
+                                    $_new_balance = $_balance - $statement->total_billable;
+                                    $from = request('from_date') ?? null; //
+                                    $to = request('to_date') ?? null; //
+
                                 @endphp
                                 <tr>
                                     <td style ="font-size: 15px">{{ $statement->name }}</td>
                                     <td style ="font-size: 15px">{{ number_format($statement->debitSum(), 2) }}</td>
                                     <td style ="font-size: 15px">{{ number_format($statement->creditSum(), 2) }}</td>
                                    
-                                    <td style ="font-size: 15px !important">
-                                        @if($adj_balance < 0)
-                                            <span style="background:#007bff;color:#fff;padding:6px 12px;border-radius:6px;">{{ number_format(abs($adj_balance), 2) }} TK</span>
-                                        @else
-                                            <span style="background:#3a3a3a;color:#fff;padding:6px 12px;border-radius:6px;">0.00 TK</span>
-                                        @endif
+                                    <td style ="font-size: 15px">
+
+                                     {!! $statement->balanceTextF($from, $to) !!} 
+
                                     </td>
-                                    <td style ="font-size: 15px !important">
-                                        @if($adj_balance > 0)
-                                            <span style="background:#dc3545;color:#fff;padding:6px 12px;border-radius:6px;">{{ number_format(abs($adj_balance), 2) }} TK</span>
-                                        @else
-                                            <span style="background:#3a3a3a;color:#fff;padding:6px 12px;border-radius:6px;">0 TK</span>
-                                        @endif
-                                    </td>
+                                    
                                 </tr>
                                 @php
                                     $i++;
+                                    $total_balance += $statement->balance();
                                     $total_debit += $statement->debitSum();
                                     $total_credit += $statement->creditSum();
+                                 
                                 @endphp
                             @endforeach
 
@@ -97,8 +88,7 @@
                                     <td style ="font-size: 15px"><b>{{ 'BDT ' . number_format($total_debit, 2) }}</b></td>
                                     <td style ="font-size: 15px"><b>{{ 'BDT ' . number_format($total_credit, 2) }}</b></td>
                                    
-                                    <td style ="font-size: 15px"><b>{{ 'BDT ' . number_format($total_advance, 2) }}</b></td>
-                                    <td style ="font-size: 15px"><b>{{ 'BDT ' . number_format($total_due, 2) }}</b></td>
+                                    <td style ="font-size: 15px"><b>{{ 'BDT ' . number_format($total_balance, 2) }}</b></td>
                                 </tr>
                             </tfoot>
                         </table>

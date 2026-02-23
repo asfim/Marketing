@@ -35,47 +35,23 @@
                             <th style="font-size: 15px">Supplier Name</th>
                             <th style="font-size: 15px">Debit</th>
                             <th style="font-size: 15px">Credit</th>
-                            <th style="font-size: 15px">Advance</th>
-                            <th style="font-size: 15px">Due</th>
+                            <th style="font-size: 15px">Balance</th>
                         </tr>
                         </thead>
                         <tbody>
-                            @php 
-                                $i = 1; 
-                                $total_advance = 0; 
-                                $total_due = 0; 
-                                $payable = 0; 
-                                $receivable = 0; 
-                            @endphp
+                            @php $i = 1; $bal = 0; $payable = 0; $receivable = 0; @endphp
 
                             @foreach ($all_statements as $statement)
                                 <tr>
                                     <td style="font-size: 15px">{{ $statement->name }}</td>
                                     <td style="font-size: 15px">{{ number_format($statement->payable, 2) }}</td>
                                     <td style="font-size: 15px">{{ number_format($statement->receivable, 2) }}</td>
-                                    <td style="font-size: 15px !important">
-                                        @if($statement->balance < 0)
-                                            <span style="background:#007bff;color:#fff;padding:6px 12px;border-radius:6px;">{{ number_format(abs($statement->balance), 2) }} TK</span>
-                                        @else
-                                            <span style="background:#929191;color:#fff;padding:6px 12px;border-radius:6px;">0.00 TK</span>
-                                        @endif
-                                    </td>
-                                    <td style="font-size: 15px !important">
-                                        @if($statement->balance > 0)
-                                            <span style="background:#dc3545;color:#fff;padding:6px 12px;border-radius:6px;">{{ number_format(abs($statement->balance), 2) }} TK</span>
-                                        @else
-                                            <span style="background:#929191;color:#fff;padding:6px 12px;border-radius:6px;">0 TK</span>
-                                        @endif
-                                    </td>
+                                    <td style="font-size: 15px">{!! $statement->balance_text !!}</td>
                                 </tr>
 
                                 @php 
                                     $i++; 
-                                    if($statement->balance < 0){
-                                        $total_advance += abs($statement->balance);
-                                    } else {
-                                        $total_due += abs($statement->balance);
-                                    }
+                                    $bal += $statement->balance;
                                     $payable += $statement->payable;
                                     $receivable += $statement->receivable;
                                 @endphp
@@ -87,8 +63,7 @@
                                 <td style="font-size: 15px"><b>Total:</b></td>
                                 <td style="font-size: 15px"><b>{{ number_format($payable,2) }}</b></td>
                                 <td style="font-size: 15px"><b>{{ number_format($receivable,2) }}</b></td>
-                                <td style="font-size: 15px"><b>{{ number_format($total_advance,2) }}</b></td>
-                                <td style="font-size: 15px"><b>{{ number_format($total_due,2) }}</b></td>
+                                <td style="font-size: 15px"><b>{{ number_format($bal,2) }}</b></td>
                             </tr>
                         </tfoot>
 
